@@ -3,12 +3,80 @@ import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary } from './shared.js'
 import { addMetroLayers, fitMetroLayers, loadMetroData } from './metro.js'
 import { addSTogLayers, loadSTogData } from './stog.js'
-import { ADMIN_BOUNDARY_STYLES } from './BoundaryStyle.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
-import { loadAdministrativeLayers } from './LayerLoader.js'
-import { buildContextPopup } from './PopupBuilder.js'
+
+const ADMIN_BOUNDARY_STYLES = {
+  kommuner: {
+    color: '#2f4f79',
+    weight: 2.2,
+    opacity: 0.92,
+    dashArray: '11 5',
+    fillColor: '#3f638f',
+    fillOpacity: 0.045,
+  },
+  postomraader: {
+    color: '#2f7d9c',
+    weight: 1.55,
+    opacity: 0.78,
+    dashArray: '4 8',
+    fillColor: '#4e9ec0',
+    fillOpacity: 0.028,
+  },
+  opstillingskredse: {
+    color: '#3f7b4f',
+    weight: 1.75,
+    opacity: 0.8,
+    dashArray: '9 6',
+    fillColor: '#5c9e6f',
+    fillOpacity: 0.03,
+  },
+  sogne: {
+    color: '#8f5b7f',
+    weight: 1.25,
+    opacity: 0.66,
+    dashArray: '2 8',
+    fillColor: '#b77ba5',
+    fillOpacity: 0.018,
+  },
+}
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
+function buildContextPopup(context) {
+  const lines = []
+  if (context.kommune) lines.push(`<p><strong>Kommune:</strong> ${escapeHtml(context.kommune)}</p>`)
+  if (context.postomraade) lines.push(`<p><strong>Postområde:</strong> ${escapeHtml(context.postomraade)}</p>`)
+  if (context.opstillingskreds) lines.push(`<p><strong>Opstillingskreds:</strong> ${escapeHtml(context.opstillingskreds)}</p>`)
+  if (context.sogn) lines.push(`<p><strong>Sogn:</strong> ${escapeHtml(context.sogn)}</p>`)
+  if (context.stationName) lines.push(`<p><strong>Station:</strong> ${escapeHtml(context.stationName)}</p>`)
+  if (context.lines) lines.push(`<p><strong>Linjer:</strong> ${escapeHtml(context.lines)}</p>`)
+
+  return [
+    '<article class="admin-popup">',
+    ...lines,
+    '</article>',
+  ].join('')
+}
+
+async function loadAdministrativeLayers(configs) {
+  const entries = await Promise.all(
+    configs.map(async (config) => {
+      const response = await fetch(config.dataFile)
+      if (!response.ok) throw new Error(`Kunne ikke hente ${config.dataFile}`)
+      return [config.id, await response.json()]
+    }),
+  )
+  return Object.fromEntries(entries)
+}
 
 const ADMIN_LAYER_CONFIGS = [
   {

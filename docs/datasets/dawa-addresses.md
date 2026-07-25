@@ -4,7 +4,7 @@
 
 DAWA provides Danish address autocomplete, lookup, and reverse-address functionality.
 
-It is a very good conceptual fit for typed address search and GPS-based address resolution, but there is a major lifecycle issue: **DAWA is documented to shut down on 1 July 2026**.
+It is a good conceptual fit for typed address search and GPS-based address resolution. Availability and lifecycle messaging around DAWA has changed over time, so operational status should be verified before relying on it as a long-term provider.
 
 ## Relevant endpoints
 
@@ -24,12 +24,12 @@ It is a very good conceptual fit for typed address search and GPS-based address 
 
 ## Risks / open questions
 
-- **Critical:** DAWA closes on **2026-07-01**
+- Service stability and long-term availability should be revalidated periodically
 - Replacement strategy is not yet locked in
 - Reverse lookup is address-entry focused and may need a second step for full address resolution
 
 ## Recommendation for this project
 
-DAWA is acceptable only as a **short-lived bridge**.
+DAWA is acceptable as the current provider, but the app should remain provider-swappable.
 
-If used, structure the app so the address provider can later be swapped out. Do not build long-term assumptions around DAWA remaining available.
+Keep the lookup integration thin so an alternative provider can be introduced without changing page logic.

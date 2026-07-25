@@ -16,7 +16,6 @@ from pyproj import Transformer
 from shapely.geometry import LineString, MultiLineString, mapping, shape
 from shapely.ops import unary_union
 
-# geometry utilities are available in `hide_and_seek.geometry` if needed.
 from hide_and_seek.rules import (
     MIN_TOTAL_EVENTS,
     has_consecutive_eligible_stops,
@@ -521,26 +520,21 @@ def main() -> None:
     ensure_dirs()
     download_if_missing(GTFS_URL, GTFS_ZIP)
     boundary_feature = load_region_boundary_feature()
-    routes, stops, metadata = build_transit_dataset(boundary_feature)
+    build_transit_dataset(boundary_feature)
     municipalities = build_municipalities_dataset(boundary_feature)
     postnumre = build_postnumre_dataset(boundary_feature)
     opstillingskredse = build_opstillingskredse_dataset(boundary_feature)
     sogne = build_sogne_dataset(boundary_feature)
-    afstemningsomraader = build_afstemningsomraader_dataset(boundary_feature)
     boundary = {
         "type": "FeatureCollection",
         "features": [boundary_feature],
     }
 
-    write_json_to_targets("routes.geojson", routes)
-    write_json_to_targets("eligible-stops.geojson", stops)
     write_json_to_targets("municipalities.geojson", municipalities)
     write_json_to_targets("postnumre.geojson", postnumre)
     write_json_to_targets("opstillingskredse.geojson", opstillingskredse)
     write_json_to_targets("sogne.geojson", sogne)
-    write_json_to_targets("afstemningsomraader.geojson", afstemningsomraader)
     write_json_to_targets("boundary.geojson", boundary)
-    write_json_to_targets("metadata.json", metadata)
 
 
 if __name__ == "__main__":

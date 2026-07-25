@@ -1,3 +1,4 @@
+import './style.css'
 import { loadJson } from './shared.js'
 
 const METRO_LINE_META = {
@@ -233,3 +234,13 @@ export class GuidePage {
     await this.renderStations()
   }
 }
+
+async function init() {
+  const page = new GuidePage()
+  await page.init()
+  document.body.dataset.guideReady = 'true'
+}
+
+init().catch((error) => {
+  console.error('Kunne ikke starte Spilguide.', error)
+})

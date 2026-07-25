@@ -9,4 +9,4 @@ test-results/
 playwright-report/
 *.pyc
 __pycache__/
-.pytest_cache/ß
+.pytest_cache/

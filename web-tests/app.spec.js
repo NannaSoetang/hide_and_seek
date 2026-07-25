@@ -41,7 +41,9 @@ test('print page loads map and generated route legend', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: 'Hide & Seek København - Print' })).toBeVisible()
   await expect(page.locator('#print-map')).toBeVisible()
-  await expect(page.locator('#route-legend-list .route-legend-item').first()).toBeVisible()
+  await expect(page.locator('.legend-footer')).toBeVisible()
+  await expect(page.getByText('Metro')).toBeVisible()
+  await expect(page.getByText('S-tog')).toBeVisible()
 })
 
 test('where-am-i page loads and tabs can switch', async ({ page }) => {

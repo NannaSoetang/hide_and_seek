@@ -1,3 +1,4 @@
+import './style.css'
 import { AdministrativeLookup } from './AdministrativeLookup.js'
 import { searchAddresses, resolveAddressToCoordinates } from './AddressLookup.js'
 import { getCurrentPosition } from './LocationLookup.js'
@@ -155,3 +156,13 @@ export class WhereAmIPage {
     }
   }
 }
+
+async function init() {
+  const page = new WhereAmIPage()
+  await page.init()
+  document.body.dataset.pageReady = 'true'
+}
+
+init().catch((error) => {
+  console.error('Kunne ikke starte Hvor er jeg?-siden.', error)
+})
