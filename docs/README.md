@@ -1,25 +1,18 @@
-# Randers Hide and Seek docs
+# Documentation Index
 
-<!-- TODO: Docs reference Randers. Update these notes or add a configuration
-  section for alternate regions such as Storkøbenhavn. -->
+This folder contains short source notes for the static Copenhagen map and preprocessing pipeline.
 
-Small research notes for the datasets and services currently in scope for the Randers Jet Lag: Hide and Seek helper tools.
+## Primary references
 
-## Dataset notes
+- datasets/rejseplanen-gtfs.md: GTFS source notes
+- datasets/dagi-sogne.md: parish dataset notes
+- datasets/dagi-postnumre.md: postal area dataset notes
+- datasets/dagi-opstillingskredse.md: constituency dataset notes
+- datasets/dawa-addresses.md: address lookup service notes
+- datasets/danish-basemap.md: basemap provider notes
 
-- [Rejseplanen GTFS](./datasets/rejseplanen-gtfs.md)
-- [DAGI historical kommune boundary](./datasets/dagi-historical-kommune.md)
-- [DAGI sogne](./datasets/dagi-sogne.md)
-- [DAGI postnumre](./datasets/dagi-postnumre.md)
-- [DAGI opstillingskredse](./datasets/dagi-opstillingskredse.md)
-- [Midttrafik fare zones](./datasets/midttrafik-fare-zones.md)
-- [DAWA address search](./datasets/dawa-addresses.md)
-- [Official Danish basemap options](./datasets/danish-basemap.md)
+The repository README is the source of truth for setup, development, preprocessing, testing, and deployment. These files document external data sources and licensing assumptions only.
 
-## Notes
+## Maintenance guideline
 
-- These files are planning/research notes, not implementation docs.
-- Current project direction is to use one-off preprocessing and ship derived static data to the web app.
-- Tooling preference locked in by user:
-  - Python via `uv`
-  - JavaScript via `npm`
+When changing a data source, update the relevant file in docs/datasets and the pipeline section in the repository README.

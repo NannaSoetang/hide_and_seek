@@ -3,24 +3,147 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Randers printkort</title>
-    <!-- TODO: Print title is Randers-specific; update when switching region -->
+    <title>Hide & Seek København - Print</title>
     <script type="module" src="/src/print.js"></script>
   </head>
   <body class="print-page">
-    <div id="print-map"></div>
-    <div class="print-overlay print-overlay-portrait">
-      <h1>Randers hide and seek</h1>
-      <!-- TODO: Update printed header when switching region -->
-      <div class="print-legend">
-        <span><span class="swatch boundary"></span>Spillegrænse</span>
-        <span><span class="swatch route"></span>Busrute</span>
-        <span><span class="swatch stop"></span>Gyldigt stoppested</span>
-      </div>
-      <div class="route-legend-block">
-        <h2>Busruter</h2>
-        <ul id="route-legend-list" class="route-legend-list"></ul>
-      </div>
-    </div>
+    <main class="print-doc">
+      <section class="a4-sheet map-sheet">
+        <header class="sheet-header">
+          <div>
+            <p class="sheet-kicker">Hide & Seek København</p>
+            <h1>Spillekort</h1>
+          </div>
+          <aside class="micro-legend" aria-label="Lille kortsignatur">
+            <span class="micro-item"><span class="map-line metro"></span>Metro</span>
+            <span class="micro-item"><span class="map-line stog"></span>S-tog</span>
+            <span class="micro-item"><span class="map-dot"></span>Station</span>
+            <span class="micro-item"><span class="map-transfer"></span>Skiftestation</span>
+          </aside>
+        </header>
+
+        <div class="sheet-map-wrap">
+          <div id="print-map" aria-label="Spillekort"></div>
+        </div>
+
+        <footer class="sheet-footer">
+          <div class="legend-footer" aria-label="Signatur">
+            <span><span class="legend-line metro"></span>Metro</span>
+            <span><span class="legend-line stog"></span>S-tog</span>
+            <span><span class="legend-dot station"></span>Station</span>
+            <span><span class="legend-dot transfer"></span>Skiftestation</span>
+            <span><span class="legend-line kommune"></span>Kommune</span>
+            <span><span class="legend-line post"></span>Postområde</span>
+            <span><span class="legend-line opstilling"></span>Opstillingskreds</span>
+          </div>
+          <div class="sheet-qr-block">
+            <img id="print-qr" alt="QR-kode til hjemmesiden" width="82" height="82" />
+            <p id="print-qr-caption">Kort • Regler • Stationer</p>
+          </div>
+        </footer>
+      </section>
+
+      <section class="a4-sheet quick-sheet">
+        <header class="sheet-header quick-header">
+          <div>
+            <p class="sheet-kicker">Hide & Seek København</p>
+            <h2>Small Game</h2>
+          </div>
+        </header>
+
+        <section class="quick-card">
+          <h3>Spilflow</h3>
+          <div class="timeline" aria-label="Spilflow">
+            <div class="timeline-step">30 min gemmetid</div>
+            <div class="timeline-arrow">↓</div>
+            <div class="timeline-step">Vælg station</div>
+            <div class="timeline-arrow">↓</div>
+            <div class="timeline-step">Hold jer indenfor 500 meter</div>
+            <div class="timeline-arrow">↓</div>
+            <div class="timeline-step">Søgerne starter</div>
+            <div class="timeline-arrow">↓</div>
+            <div class="timeline-step">Søgerne kommer ind i zonen</div>
+            <div class="timeline-arrow">↓</div>
+            <div class="timeline-step">Bliv på jeres endelige gemmested</div>
+          </div>
+        </section>
+
+        <section class="quick-grid-two">
+          <article class="quick-card compact-card">
+            <h3>Transport</h3>
+            <ul class="checklist">
+              <li>✅ Metro</li>
+              <li>✅ S-tog</li>
+              <li>❌ Bus</li>
+              <li>❌ Regionaltog</li>
+              <li>❌ Letbane</li>
+              <li>❌ Havnebus</li>
+            </ul>
+          </article>
+
+          <article class="quick-card compact-card">
+            <h3>Forbudt</h3>
+            <ul class="checklist">
+              <li>❌ AI</li>
+              <li>❌ Google Street View</li>
+            </ul>
+            <h3 class="subhead">Svarfrister</h3>
+            <p class="deadline">Normale spørgsmål: <strong>5 min</strong></p>
+            <p class="deadline">Billeder: <strong>10 min</strong></p>
+          </article>
+        </section>
+
+        <section class="quick-grid-two">
+          <article class="quick-card">
+            <h3>Gemmere</h3>
+            <ul class="rule-list">
+              <li>30 minutters gemmetid</li>
+              <li>Vælg én station</li>
+              <li>Hold jer indenfor 500 meter</li>
+              <li>Når slutspillet starter må I ikke flytte jer</li>
+              <li>Maks. 6 kort på hånden</li>
+            </ul>
+          </article>
+
+          <article class="quick-card">
+            <h3>Eksempelspørgsmål</h3>
+            <ul class="question-list">
+              <li><strong>Radar:</strong> Er du inden for 2 km af mig?</li>
+              <li><strong>Termometer:</strong> Er jeg blevet varmere eller koldere?</li>
+              <li><strong>Måling:</strong> Er du tættere på Nørreport end jeg er?</li>
+              <li><strong>Nærmeste station:</strong> Er din nærmeste station den samme som min?</li>
+              <li><strong>Billede:</strong> Tag et billede fra din station.</li>
+            </ul>
+          </article>
+        </section>
+
+        <section>
+          <article class="quick-card lines-card">
+            <h3>Metro & S-tog</h3>
+            <div class="line-columns">
+              <div>
+                <p class="line-heading">Metro</p>
+                <p><strong>M1</strong> Vanløse ↔ Vestamager</p>
+                <p><strong>M2</strong> Vanløse ↔ Lufthavnen</p>
+                <p><strong>M3</strong> Cityringen</p>
+                <p><strong>M4</strong> Orientkaj ↔ København Syd</p>
+              </div>
+              <div>
+                <p class="line-heading">S-tog</p>
+                <p><strong>A</strong> Hillerød ↔ Vallensbæk</p>
+                <p><strong>B</strong> Farum ↔ Høje Taastrup</p>
+                <p><strong>C</strong> Klampenborg ↔ Frederikssund</p>
+                <p><strong>F</strong> Hellerup ↔ Ny Ellebjerg</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <footer class="quick-footer">
+          <p>Kort • Regler • Stationer</p>
+          <p>QR-kode til hjemmesiden</p>
+        </footer>
+      </section>
+    </main>
   </body>
 </html>

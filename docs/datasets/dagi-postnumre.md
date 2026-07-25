@@ -30,8 +30,7 @@ Official DAGI geodata is available under **CC BY 4.0** with attribution to **Kli
 
 - Datafordeler access patterns may require authenticated download/preprocessing
 - Postal boundaries are operational areas, not guaranteed to align with municipality/parish borders
-- <!-- TODO: Postnummer notes mention Randers; consider generalizing examples or parametrizing the region -->
-- `erGadepostnummer` creates edge cases, especially outside the Randers use case but still worth preserving in the data model
+- `erGadepostnummer` creates edge cases and should still be preserved in the data model
 
 ## Recommendation for this project
 

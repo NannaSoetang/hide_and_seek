@@ -69,9 +69,10 @@ async function main() {
     const outputPath = join(distDir, 'print-map.pdf')
     await page.pdf({
       path: outputPath,
-      format: 'A3',
+      format: 'A4',
       landscape: false,
       printBackground: true,
+      preferCSSPageSize: true,
     })
     await copyFile(outputPath, publicPdfPath)
   } finally {

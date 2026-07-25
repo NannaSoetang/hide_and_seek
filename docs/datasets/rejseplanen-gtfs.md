@@ -9,8 +9,7 @@ The feed appears to be a normal static GTFS Schedule archive and includes standa
 ## What we can use it for
 
 - Determine which stops are eligible on a Saturday
-- <!-- TODO: Update GTFS notes to cover Storkøbenhavn or make kommune filter configurable -->
-- Determine which routes serve Randers-area stops
+- Determine which routes serve stops inside the configured playable boundary
 - Derive route geometry from `shape_id` + `shapes.txt`
 - Build a one-off processed dataset so the web app does not need live transit calls
 
@@ -38,7 +37,7 @@ Use this as the **primary source** for stop eligibility and route geometry.
 
 For the user’s rules, process the feed one-off and derive:
 
-- stops inside the old Randers boundary
+- stops inside the playable boundary
 - stops with at least **2 bus stop events/hour on average** in the Saturday 09:00–18:00 window
 - routes that have at least **2 usable consecutive in-zone eligible stops**
 

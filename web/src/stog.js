@@ -160,10 +160,3 @@ export function addSTogLayers(map, data, options = {}) {
   return { group, lineCasingLayer, lineLayer, stationLayer }
 }
 
-export function fitSTogLayers(map, sTogLayers) {
-  const bounds = L.featureGroup([
-    sTogLayers.lineLayer,
-    sTogLayers.stationLayer,
-  ]).getBounds()
-  if (bounds.isValid()) map.fitBounds(bounds.pad(0.08))
-}

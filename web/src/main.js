@@ -8,6 +8,8 @@ import { AdministrativeLayer } from './AdministrativeLayer.js'
 import { loadAdministrativeLayers } from './LayerLoader.js'
 import { buildContextPopup } from './PopupBuilder.js'
 
+const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
+
 const ADMIN_LAYER_CONFIGS = [
   {
     id: 'kommuner',
@@ -106,20 +108,20 @@ async function init() {
 
   const metroLayers = addMetroLayers(map, metroData, {
     onStationClick: (stationInfo) => {
-      map.__skipNextContextClick = true
+      map[SKIP_CONTEXT_CLICK_FLAG] = true
       showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
     },
   })
   const sTogLayers = addSTogLayers(map, sTogData, {
     onStationClick: (stationInfo) => {
-      map.__skipNextContextClick = true
+      map[SKIP_CONTEXT_CLICK_FLAG] = true
       showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
     },
   })
 
   map.on('click', (event) => {
-    if (map.__skipNextContextClick) {
-      map.__skipNextContextClick = false
+    if (map[SKIP_CONTEXT_CLICK_FLAG]) {
+      map[SKIP_CONTEXT_CLICK_FLAG] = false
       return
     }
     showContextPopup(map, adminLayers, event.latlng)
@@ -129,8 +131,8 @@ async function init() {
     null,
     Object.fromEntries(adminLayers.map((layer) => [layer.config.displayName, layer.overlay])),
     {
-    collapsed: true,
-    position: 'topright',
+      collapsed: true,
+      position: 'topright',
     },
   ).addTo(map)
   const bounds = boundaryLayer.getBounds()

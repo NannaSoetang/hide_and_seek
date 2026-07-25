@@ -7,24 +7,6 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;')
 }
 
-export function buildAdminPopup(properties, config) {
-  const title = properties?.[config.popupTitleField] || config.fallbackTitle || 'Ukendt område'
-  const lines = config.popupFields
-    .map((field) => {
-      const value = properties?.[field.key]
-      if (value === null || value === undefined || value === '') return null
-      return `<p><strong>${escapeHtml(field.label)}:</strong> ${escapeHtml(value)}</p>`
-    })
-    .filter(Boolean)
-
-  return [
-    '<article class="admin-popup">',
-    `  <h2>${escapeHtml(title)}</h2>`,
-    ...lines,
-    '</article>',
-  ].join('')
-}
-
 export function buildContextPopup(context) {
   const lines = []
   if (context.kommune) lines.push(`<p><strong>Kommune:</strong> ${escapeHtml(context.kommune)}</p>`)
