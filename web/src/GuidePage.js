@@ -1,5 +1,5 @@
 import './style.css'
-import { loadJson } from './shared.js'
+import { filterTransportData, loadTransportData } from './transport.js'
 
 const METRO_LINE_META = {
   M1: { title: 'M1', route: 'Vanløse – Vestamager', color: '#00a650', network: 'Metro' },
@@ -185,14 +185,11 @@ export class GuidePage {
   }
 
   async renderStations() {
-    const [metroLines, metroStations, stogLines, stogStations] = await Promise.all([
-      loadJson('/data/metro-lines.geojson'),
-      loadJson('/data/metro-stations.geojson'),
-      loadJson('/data/s-tog-lines.geojson'),
-      loadJson('/data/s-tog-stations.geojson'),
-    ])
+    const transport = await loadTransportData()
+    const metro = filterTransportData(transport, 'metro')
+    const stog = filterTransportData(transport, 's-tog')
 
-    const transfers = transferNames(metroStations, stogStations)
+    const transfers = transferNames(metro.stations, stog.stations)
     const container = this.elements.stationGroups
     container.replaceChildren()
 
@@ -206,8 +203,8 @@ export class GuidePage {
         parent: container,
         lineKey,
         meta: METRO_LINE_META[lineKey],
-        stations: lineStations(metroStations, lineKey),
-        lineCoords: bestLineCoordinates(metroLines.features || [], lineKey),
+        stations: lineStations(metro.stations, lineKey),
+        lineCoords: bestLineCoordinates(metro.lines.features || [], lineKey),
         transfers,
       })
     }
@@ -222,8 +219,8 @@ export class GuidePage {
         parent: container,
         lineKey,
         meta: STOG_LINE_META[lineKey],
-        stations: lineStations(stogStations, lineKey),
-        lineCoords: bestLineCoordinates(stogLines.features || [], lineKey),
+        stations: lineStations(stog.stations, lineKey),
+        lineCoords: bestLineCoordinates(stog.lines.features || [], lineKey),
         transfers,
       })
     }

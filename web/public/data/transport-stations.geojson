@@ -1,0 +1,2042 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Aksel M\u00f8llers Have St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603342",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.533187,
+          55.686378
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Amager Strand St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603324",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.631584,
+          55.656519
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Amagerbro St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603321",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.602929,
+          55.663326
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Aved\u00f8re St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600765",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.454256,
+          55.625183
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bella Center St.",
+        "lines": [
+          "M1"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603313",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.582928,
+          55.638051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bernstorffsvej St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600672",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.557488,
+          55.743052
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bispebjerg St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600739",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.541632,
+          55.706348
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Br\u00f8ndby Strand St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600766",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.42266,
+          55.620936
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Br\u00f8ndby\u00f8ster St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600679",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.440211,
+          55.665068
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Buddinge St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600690",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.494038,
+          55.747383
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Carlsberg St.",
+        "lines": [
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600631",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.537353,
+          55.663257
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Charlottenlund St.",
+        "lines": [
+          "C",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600657",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.572144,
+          55.751851
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Christianshavn St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603309",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.591385,
+          55.672054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "DR Byen St.",
+        "lines": [
+          "M1"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603311",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.58899,
+          55.655813
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dansh\u00f8j St.",
+        "lines": [
+          "B",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600742",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.493732,
+          55.664274
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dybb\u00f8lsbro St.",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600634",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.559511,
+          55.664828
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dysseg\u00e5rd St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600780",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.535743,
+          55.732629
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Emdrup St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600688",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.540687,
+          55.720887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Enghave Brygge St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603348",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.556169,
+          55.653766
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Enghave Plads St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603344",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.545814,
+          55.667284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fasanvej St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603304",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.523102,
+          55.681669
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fem\u00f8ren St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603326",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.638324,
+          55.645348
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Flintholm St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603302",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.499527,
+          55.685868
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Flintholm St.",
+        "lines": [
+          "C",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600736",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.49866,
+          55.685435
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Forum St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603306",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.552431,
+          55.681821
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Frederiksberg All\u00e9 St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603343",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.540351,
+          55.673727
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Frederiksberg St.",
+        "lines": [
+          "M1",
+          "M2",
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603305",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.531719,
+          55.681223
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Friheden St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600764",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.482553,
+          55.628887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fuglebakken St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600640",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.527382,
+          55.695429
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gammel Strand St.",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603332",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.579575,
+          55.677749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gentofte St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600673",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.54162,
+          55.753509
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Glostrup St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600622",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.397827,
+          55.663148
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gr\u00f8ndal St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600641",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.516007,
+          55.690738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Havneholmen St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603347",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.559426,
+          55.66091
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hellerup St.",
+        "lines": [
+          "A",
+          "C",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600655",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.567658,
+          55.731022
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Herlev St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600706",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.443674,
+          55.718919
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husum St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600705",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.464033,
+          55.709409
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hvidovre St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600600",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.474346,
+          55.66451
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Islands Brygge St.",
+        "lines": [
+          "M1"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603310",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585217,
+          55.663422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Islev St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600704",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.469383,
+          55.699529
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jyllingevej St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600734",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.477206,
+          55.69081
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "J\u00e6gersborg St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600674",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.521561,
+          55.761621
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "KB Hallen St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600740",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.492328,
+          55.677963
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kastrup St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603327",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.646732,
+          55.635747
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kildebakke St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600781",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.508535,
+          55.744614
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Klampenborg St.",
+        "lines": [
+          "C",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600659",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.58773,
+          55.777446
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kongens Nytorv St.",
+        "lines": [
+          "M1",
+          "M2",
+          "M3",
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603308",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585228,
+          55.679185
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "K\u00f8benhavn H",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603330",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.56412,
+          55.671941
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "K\u00f8benhavn H",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600626",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.565558,
+          55.673059
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "K\u00f8benhavn Syd St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603351",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.516427,
+          55.65253
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "K\u00f8benhavn Syd St.",
+        "lines": [
+          "A",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600783",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.516849,
+          55.652626
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "K\u00f8benhavns Lufthavn St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603328",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.64939,
+          55.630137
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Langgade St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600701",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.504224,
+          55.66705
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lergravsparken St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603322",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.616417,
+          55.662101
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lindevang St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603303",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.512873,
+          55.683482
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lyngby St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600675",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.503101,
+          55.768084
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Marmorkirken St.",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603333",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.588632,
+          55.685245
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mozarts Plads St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603350",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.533956,
+          55.649049
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nordhavn St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603346",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.591834,
+          55.707298
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nordhavn St.",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600653",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.590613,
+          55.705616
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nuuks Plads St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603341",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.542892,
+          55.688796
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebro St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603339",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.538082,
+          55.700552
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebro St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600642",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.537806,
+          55.700847
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebros Runddel St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603340",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.548899,
+          55.693945
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rreport St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603307",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.571044,
+          55.683843
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rreport St.",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600646",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.571804,
+          55.683452
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ordrup St.",
+        "lines": [
+          "C",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600658",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.583649,
+          55.76307
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Orientkaj St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603345",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.595272,
+          55.711612
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Peter Bangs Vej St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600702",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.503443,
+          55.67859
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Poul Henningsens Plads St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603336",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.576709,
+          55.70925
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ryparken St.",
+        "lines": [
+          "B",
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600644",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.559492,
+          55.715362
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "R\u00e5dhuspladsen St.",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603331",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.568803,
+          55.676373
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "R\u00f8dovre St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600680",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.458641,
+          55.66482
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sj\u00e6l\u00f8r St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600761",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.527265,
+          55.651742
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Skjolds Plads St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603338",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.548233,
+          55.70328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sluseholmen St.",
+        "lines": [
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603349",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.543747,
+          55.645836
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sundby St.",
+        "lines": [
+          "M1"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603312",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585728,
+          55.645199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Svanem\u00f8llen St.",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600654",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.578049,
+          55.71555
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sydhavn St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600760",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.537174,
+          55.654756
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Trianglen St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603335",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.57607,
+          55.699135
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Valby St.",
+        "lines": [
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600624",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.51445,
+          55.663997
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vallensb\u00e6k St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600767",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.388444,
+          55.623253
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vangede St.",
+        "lines": [
+          "B"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600689",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.523342,
+          55.739658
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vanl\u00f8se St.",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603301",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.491664,
+          55.687297
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vanl\u00f8se St.",
+        "lines": [
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600703",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.490603,
+          55.687355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vestamager St.",
+        "lines": [
+          "M1"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603317",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.575297,
+          55.619391
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vesterport St.",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600645",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.562087,
+          55.676011
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vibenshus Runddel St.",
+        "lines": [
+          "M3"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603337",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.564,
+          55.706284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vigerslev Alle St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600804",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.498686,
+          55.659898
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00c5lholm St.",
+        "lines": [
+          "F"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600741",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.493114,
+          55.67233
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00c5marken St.",
+        "lines": [
+          "A"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600763",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.499699,
+          55.640079
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8restad St.",
+        "lines": [
+          "M1"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603315",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.579389,
+          55.629055
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8resund St.",
+        "lines": [
+          "M2"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603323",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.628453,
+          55.661701
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8sterport St.",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "networks": [
+          "metro"
+        ],
+        "stop_id": "000008603334",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585352,
+          55.693217
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8sterport St.",
+        "lines": [
+          "A",
+          "B",
+          "C"
+        ],
+        "networks": [
+          "s-tog"
+        ],
+        "stop_id": "000008600650",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.587785,
+          55.692499
+        ]
+      }
+    }
+  ]
+}

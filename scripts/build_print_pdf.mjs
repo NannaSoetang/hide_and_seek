@@ -1,11 +1,10 @@
 import { chromium } from '@playwright/test'
 import http from 'node:http'
-import { copyFile, mkdir, readFile, stat } from 'node:fs/promises'
+import { readFile, stat } from 'node:fs/promises'
 import { createReadStream } from 'node:fs'
 import { extname, join, resolve } from 'node:path'
 
 const distDir = resolve(process.cwd(), 'dist')
-const publicPdfPath = resolve(process.cwd(), 'web/public/print-map.pdf')
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
@@ -58,7 +57,6 @@ async function createStaticServer() {
 async function main() {
   const printHtml = join(distDir, 'print.html')
   await readFile(printHtml)
-  await mkdir(resolve(process.cwd(), 'web/public'), { recursive: true })
 
   const { server, port } = await createStaticServer()
   const browser = await chromium.launch()
@@ -74,7 +72,6 @@ async function main() {
       printBackground: true,
       preferCSSPageSize: true,
     })
-    await copyFile(outputPath, publicPdfPath)
   } finally {
     await browser.close()
     await new Promise((resolvePromise, rejectPromise) => {

@@ -4,7 +4,6 @@ node_modules/
 dist/
 build/
 data/raw/
-data/derived/
 test-results/
 playwright-report/
 *.pyc

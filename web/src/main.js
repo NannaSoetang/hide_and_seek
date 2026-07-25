@@ -1,9 +1,8 @@
 import './style.css'
 import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary } from './shared.js'
-import { addMetroLayers, fitMetroLayers, loadMetroData } from './metro.js'
-import { addSTogLayers, loadSTogData } from './stog.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
+import { addTransportLayers, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
 
 const ADMIN_BOUNDARY_STYLES = {
   kommuner: {
@@ -163,24 +162,25 @@ function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
 
 async function init() {
   const map = createBaseMap('map')
-  const [boundary, metroData, sTogData, adminLayerData] = await Promise.all([
+  const [boundary, transportData, adminLayerData] = await Promise.all([
     loadBoundary(),
-    loadMetroData(),
-    loadSTogData(),
+    loadTransportData(),
     loadAdministrativeLayers(ADMIN_LAYER_CONFIGS),
   ])
   const boundaryLayer = addBoundary(map, boundary)
   const adminLayers = ADMIN_LAYER_CONFIGS.map((config) => {
     return new AdministrativeLayer(map, config, adminLayerData[config.id])
   })
+  const metroData = filterTransportData(transportData, 'metro')
+  const sTogData = filterTransportData(transportData, 's-tog')
 
-  const metroLayers = addMetroLayers(map, metroData, {
+  const metroLayers = addTransportLayers(map, metroData, 'metro', {
     onStationClick: (stationInfo) => {
       map[SKIP_CONTEXT_CLICK_FLAG] = true
       showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
     },
   })
-  const sTogLayers = addSTogLayers(map, sTogData, {
+  const sTogLayers = addTransportLayers(map, sTogData, 's-tog', {
     onStationClick: (stationInfo) => {
       map[SKIP_CONTEXT_CLICK_FLAG] = true
       showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
@@ -208,7 +208,7 @@ async function init() {
   if (bounds.isValid()) {
     map.fitBounds(bounds.pad(0.08))
   } else {
-    fitMetroLayers(map, metroLayers)
+    fitTransportLayers(map, metroLayers)
   }
   window.__appDebug = { map, metroLayers, sTogLayers, adminLayers }
   document.body.dataset.appReady = 'true'

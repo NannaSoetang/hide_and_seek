@@ -5,28 +5,19 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import zipfile
-from collections import Counter, defaultdict
-from dataclasses import dataclass
+from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any
 
 import requests
-from pyproj import Transformer
-from shapely.geometry import LineString, MultiLineString, mapping, shape
+from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
-
-from hide_and_seek.rules import (
-    MIN_TOTAL_EVENTS,
-    has_consecutive_eligible_stops,
-    is_stop_eligible,
-    is_time_in_window,
-)
 
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
-DERIVED_DIR = ROOT / "data" / "derived"
 PUBLIC_DIR = ROOT / "web" / "public" / "data"
 GTFS_URL = "https://www.rejseplanen.info/labs/GTFS.zip"
 GTFS_ZIP = RAW_DIR / "gtfs.zip"
@@ -34,38 +25,34 @@ KOMMUNER_GEOJSON = RAW_DIR / "kommuner.geojson"
 POSTNUMRE_GEOJSON = RAW_DIR / "postnumre.geojson"
 OPSTILLINGSKREDSE_GEOJSON = RAW_DIR / "opstillingskredse.geojson"
 SOGNE_GEOJSON = RAW_DIR / "sogne.geojson"
-AFSTEMNINGSOMRAADER_GEOJSON = RAW_DIR / "afstemningsomraader.geojson"
 KOMMUNER_URL = "https://api.dataforsyningen.dk/kommuner?format=geojson"
 POSTNUMRE_URL = "https://api.dataforsyningen.dk/postnumre?format=geojson"
 OPSTILLINGSKREDSE_URL = "https://api.dataforsyningen.dk/opstillingskredse?format=geojson"
 SOGNE_URL = "https://api.dataforsyningen.dk/sogne?format=geojson"
-AFSTEMNINGSOMRAADER_URL = (
-    "https://api.dataforsyningen.dk/afstemningsomraader"
-)
-NEARBY_RADIUS_METERS = 750
-REQUIRED_HOURS = tuple(range(9, 18))
 ADMIN_SIMPLIFY_TOLERANCE = {
     "municipalities": 0.00008,
     "postnumre": 0.00012,
     "opstillingskredse": 0.00010,
     "sogne": 0.00008,
 }
-
-
-@dataclass
-class Stop:
-    stop_id: str
-    name: str
-    lat: float
-    lon: float
-
-
-WGS84_TO_ETRS89_UTM32 = Transformer.from_crs("EPSG:4326", "EPSG:25832", always_xy=True)
+METRO_LINE_COLORS = {"M1": "#00a650", "M2": "#f5c400", "M3": "#e03b3b", "M4": "#0072bc"}
+STOG_LINES = {"A", "B", "C", "F"}
+STOG_LINE_COLORS = {
+    "A": "#1f4e9e",
+    "B": "#2f9e44",
+    "C": "#f28e2b",
+    "F": "#f2a900",
+}
+STOG_LINE_ENDPOINTS = {
+    "A": ("lyngby", "vallensbaek"),
+    "B": ("buddinge", "glostrup"),
+    "C": ("klampenborg", "herlev"),
+    "F": ("klampenborg", "kobenhavn syd"),
+}
 
 
 def ensure_dirs() -> None:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    DERIVED_DIR.mkdir(parents=True, exist_ok=True)
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -76,6 +63,16 @@ def download_if_missing(url: str, destination: Path) -> None:
     response = requests.get(url, timeout=120)
     response.raise_for_status()
     destination.write_bytes(response.content)
+
+
+def load_region_boundary_feature() -> dict[str, Any]:
+    """Read the committed Copenhagen playable-area boundary."""
+    boundary_path = PUBLIC_DIR / "boundary.geojson"
+    collection = json.loads(boundary_path.read_text())
+    feature = (collection.get("features") or [None])[0]
+    if not feature:
+        raise RuntimeError(f"Boundary GeoJSON contains no feature: {boundary_path}")
+    return feature
 
 
 def load_csv_from_zip(archive: zipfile.ZipFile, name: str) -> list[dict[str, str]]:
@@ -90,236 +87,39 @@ def iter_csv_from_zip(archive: zipfile.ZipFile, name: str):
         yield from csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8-sig"))
 
 
-def load_region_boundary_feature() -> dict[str, Any]:
-    """Read the committed Copenhagen playable-area boundary."""
-    boundary_path = PUBLIC_DIR / "boundary.geojson"
-    collection = json.loads(boundary_path.read_text())
-    feature = (collection.get("features") or [None])[0]
-    if not feature:
-        raise RuntimeError(f"Boundary GeoJSON contains no feature: {boundary_path}")
-    return feature
+def load_selected_routes_and_trips(
+    archive: zipfile.ZipFile,
+    route_selector,
+) -> tuple[dict[str, dict[str, str]], list[dict[str, str]]]:
+    route_rows = load_csv_from_zip(archive, "routes.txt")
+    routes = {row["route_id"]: row for row in route_rows if route_selector(row)}
+    trip_rows = [row for row in load_csv_from_zip(archive, "trips.txt") if row.get("route_id") in routes]
+    return routes, trip_rows
 
 
-def build_transit_dataset(
-    boundary_feature: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Create route, stop, and summary datasets from GTFS."""
-    boundary_shape = shape(boundary_feature["geometry"])
-    route_view_shape = boundary_shape
-    # Compute a sensible map center from the provided region boundary.
-    region_centroid = boundary_shape.centroid.coords[0]
-
-    with zipfile.ZipFile(GTFS_ZIP) as archive:
-        stops_rows = load_csv_from_zip(archive, "stops.txt")
-        routes_rows = load_csv_from_zip(archive, "routes.txt")
-        trips_rows = load_csv_from_zip(archive, "trips.txt")
-        calendar_rows = load_csv_from_zip(archive, "calendar.txt")
-        bus_route_ids = {
-            row["route_id"]
-            for row in routes_rows
-            if row.get("route_type") in {"3", "700"}
-        }
-        saturday_service_ids = {
-            row["service_id"] for row in calendar_rows if row.get("saturday") == "1"
-        }
-    relevant_trips = {
-        row["trip_id"]: row
-        for row in trips_rows
-        if row.get("route_id") in bus_route_ids
-        and row.get("service_id") in saturday_service_ids
-    }
-    all_route_shape_ids: dict[str, set[str]] = defaultdict(set)
-    for trip in relevant_trips.values():
-        if trip.get("shape_id"):
-            all_route_shape_ids[trip["route_id"]].add(trip["shape_id"])
-
-    stops = {
-        row["stop_id"]: Stop(
-            stop_id=row["stop_id"],
-            name=row.get("stop_name", row["stop_id"]),
-            lat=float(row["stop_lat"]),
-            lon=float(row["stop_lon"]),
-        )
-        for row in stops_rows
-        if row.get("location_type", "0") in {"", "0"}
-    }
-    area_stop_ids = {
-        stop_id
-        for stop_id, stop in stops.items()
-        if boundary_shape.contains(
-            shape({"type": "Point", "coordinates": [stop.lon, stop.lat]})
-        )
+def load_selected_stop_rows(
+    archive: zipfile.ZipFile,
+    stop_ids_by_route: dict[str, set[str]],
+) -> dict[str, dict[str, str]]:
+    selected_stop_ids = {stop_id for ids in stop_ids_by_route.values() for stop_id in ids}
+    return {
+        row["stop_id"]: row
+        for row in load_csv_from_zip(archive, "stops.txt")
+        if row.get("stop_id") in selected_stop_ids
     }
 
-    stop_event_counts: Counter[str] = Counter()
-    stop_hour_counts: dict[str, Counter[int]] = defaultdict(Counter)
-    trip_area_sequences: dict[str, list[tuple[int, str]]] = defaultdict(list)
 
-    with zipfile.ZipFile(GTFS_ZIP) as archive:
-        for row in iter_csv_from_zip(archive, "stop_times.txt"):
-            trip_id = row.get("trip_id")
-            if trip_id not in relevant_trips:
-                continue
-            stop_id = row.get("stop_id")
-            if stop_id not in area_stop_ids:
-                continue
-            if is_time_in_window(
-                row.get("departure_time") or row.get("arrival_time") or ""
-            ):
-                service_hour = int(
-                    (
-                        row.get("departure_time")
-                        or row.get("arrival_time")
-                        or "0:00:00"
-                    ).split(":", 1)[0]
-                )
-                stop_event_counts[stop_id] += 1
-                stop_hour_counts[stop_id][service_hour] += 1
-            trip_area_sequences[trip_id].append(
-                (int(row.get("stop_sequence") or 0), stop_id)
-            )
+def clean_station_name(name: str) -> str:
+    return re.sub(r"\s*\(Metro\)\s*", "", str(name or "")).strip()
 
-    area_stop_list = sorted(stop_event_counts)
-    projected_stops = {
-        stop_id: WGS84_TO_ETRS89_UTM32.transform(stops[stop_id].lon, stops[stop_id].lat)
-        for stop_id in area_stop_list
-    }
-    nearby_event_counts: dict[str, int] = {}
-    for stop_id in area_stop_list:
-        x1, y1 = projected_stops[stop_id]
-        nearby_total = 0
-        for other_stop_id in area_stop_list:
-            x2, y2 = projected_stops[other_stop_id]
-            if (x1 - x2) ** 2 + (y1 - y2) ** 2 <= NEARBY_RADIUS_METERS**2:
-                nearby_total += stop_event_counts[other_stop_id]
-        nearby_event_counts[stop_id] = nearby_total
 
-    eligible_stop_ids = {
-        stop_id
-        for stop_id, count in nearby_event_counts.items()
-        if is_stop_eligible(count)
-        and all(stop_hour_counts[stop_id][hour] >= 1 for hour in REQUIRED_HOURS)
-    }
-    route_has_eligible_sequence: dict[str, bool] = defaultdict(bool)
-
-    for trip_id, sequence_rows in trip_area_sequences.items():
-        trip = relevant_trips[trip_id]
-        ordered_stop_ids = [stop_id for _, stop_id in sorted(sequence_rows)]
-        route_id = trip["route_id"]
-        if has_consecutive_eligible_stops(ordered_stop_ids, eligible_stop_ids):
-            route_has_eligible_sequence[route_id] = True
-
-    included_route_ids = {
-        route_id for route_id, ok in route_has_eligible_sequence.items() if ok
-    }
-    route_by_id = {row["route_id"]: row for row in routes_rows}
-    selected_shape_ids = {
-        shape_id
-        for route_id in included_route_ids
-        for shape_id in all_route_shape_ids[route_id]
-    }
-
-    shape_points: dict[str, list[tuple[int, float, float]]] = defaultdict(list)
-    with zipfile.ZipFile(GTFS_ZIP) as archive:
-        for row in iter_csv_from_zip(archive, "shapes.txt"):
-            shape_id = row.get("shape_id")
-            if not shape_id or shape_id not in selected_shape_ids:
-                continue
-            shape_points[shape_id].append(
-                (
-                    int(row.get("shape_pt_sequence") or 0),
-                    float(row["shape_pt_lon"]),
-                    float(row["shape_pt_lat"]),
-                )
-            )
-
-    route_features = []
-    for route_id in sorted(included_route_ids):
-        route = route_by_id[route_id]
-        route_geometries = []
-        for shape_id in sorted(all_route_shape_ids[route_id]):
-            if shape_id not in shape_points:
-                continue
-            coords = [(lon, lat) for _, lon, lat in sorted(shape_points[shape_id])]
-            clipped_geometry = LineString(coords).intersection(route_view_shape)
-            if clipped_geometry.is_empty:
-                continue
-            route_geometries.append(clipped_geometry)
-
-        if not route_geometries:
-            continue
-
-        line_parts = []
-        for route_geometry in route_geometries:
-            if route_geometry.geom_type == "LineString":
-                line_parts.append(list(route_geometry.coords))
-            elif route_geometry.geom_type == "MultiLineString":
-                line_parts.extend(list(part.coords) for part in route_geometry.geoms)
-
-        if not line_parts:
-            continue
-
-        geometry = mapping(
-            route_geometries[0] if len(line_parts) == 1 else MultiLineString(line_parts)
-        )
-        route_features.append(
-            {
-                "type": "Feature",
-                "properties": {
-                    "route_id": route_id,
-                    "label": route.get("route_short_name")
-                    or route.get("route_long_name")
-                    or route_id,
-                    "name": route.get("route_long_name")
-                    or route.get("route_short_name")
-                    or route_id,
-                    "agency_id": route.get("agency_id"),
-                },
-                "geometry": geometry,
-            }
-        )
-
-    major_stop_ids = {
-        stop_id
-        for stop_id, _ in sorted(
-            nearby_event_counts.items(), key=lambda item: item[1], reverse=True
-        )[:15]
-        if stop_id in eligible_stop_ids
-    }
-
-    stop_features = []
-    for stop_id in sorted(eligible_stop_ids):
-        stop = stops[stop_id]
-        stop_features.append(
-            {
-                "type": "Feature",
-                "properties": {
-                    "stop_id": stop_id,
-                    "name": stop.name,
-                    "events": stop_event_counts[stop_id],
-                    "nearby_events": nearby_event_counts[stop_id],
-                    "major": stop_id in major_stop_ids,
-                },
-                "geometry": {"type": "Point", "coordinates": [stop.lon, stop.lat]},
-            }
-        )
-
-    metadata = {
-        "center": {"lon": region_centroid[0], "lat": region_centroid[1]},
-        "boundary_status": "committed-copenhagen-area",
-        "boundary_note": "Spilområdet følger den committed Copenhagen boundary.",
-        "eligible_stop_count": len(stop_features),
-        "included_route_count": len(route_features),
-        "play_window": "09:00-18:00 normal lordag",
-        "eligibility_rule": f"Stop er gyldigt hvis stop inden for {NEARBY_RADIUS_METERS} meter tilsammen har mindst {MIN_TOTAL_EVENTS} bushaendelser i spilvinduet, og stoppet selv har mindst en direkte bushaendelse i hver time fra 09 til 17.",
-        "nearby_radius_meters": NEARBY_RADIUS_METERS,
-    }
-
-    return (
-        {"type": "FeatureCollection", "features": route_features},
-        {"type": "FeatureCollection", "features": stop_features},
-        metadata,
-    )
+def normalize_station_name(name: str) -> str:
+    normalized = str(name or "").casefold().replace("ø", "o").replace("å", "a").replace("æ", "ae")
+    normalized = re.sub(r"\(.*?\)", "", normalized)
+    normalized = re.sub(r"\bst\.?\b", "", normalized)
+    normalized = normalized.replace("station", "")
+    normalized = re.sub(r"[\W_]+", " ", normalized, flags=re.UNICODE)
+    return " ".join(normalized.split())
 
 
 def build_sogne_dataset(boundary_feature: dict[str, Any]) -> dict[str, Any]:
@@ -489,19 +289,220 @@ def build_opstillingskredse_dataset(boundary_feature: dict[str, Any]) -> dict[st
     )
 
 
-def build_afstemningsomraader_dataset(
-    boundary_feature: dict[str, Any],
-) -> dict[str, Any]:
-    """Download voting areas and keep only features in the playable boundary."""
-    download_if_missing(AFSTEMNINGSOMRAADER_URL + "?format=geojson", AFSTEMNINGSOMRAADER_GEOJSON)
-    all_areas = json.loads(AFSTEMNINGSOMRAADER_GEOJSON.read_text())
-    boundary_shape = shape(boundary_feature["geometry"])
-    filtered = [
-        feature
-        for feature in all_areas.get("features", [])
-        if feature.get("geometry") and shape(feature["geometry"]).intersects(boundary_shape)
-    ]
-    return {"type": "FeatureCollection", "features": filtered}
+def _add_station_feature(
+    station_index: dict[tuple[str, float, float], dict[str, Any]],
+    stop: dict[str, str],
+    line: str,
+    network: str,
+) -> None:
+    name = clean_station_name(stop.get("stop_name", stop["stop_id"]))
+    if not name:
+        return
+    lat = float(stop["stop_lat"])
+    lon = float(stop["stop_lon"])
+    key = (normalize_station_name(name), round(lat, 6), round(lon, 6))
+    station = station_index.setdefault(
+        key,
+        {
+            "type": "Feature",
+            "properties": {
+                "name": name,
+                "lines": [],
+                "networks": [],
+                "stop_id": stop["stop_id"],
+                "source": "Rejseplanen GTFS",
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [lon, lat],
+            },
+        },
+    )
+    if line not in station["properties"]["lines"]:
+        station["properties"]["lines"].append(line)
+    if network not in station["properties"]["networks"]:
+        station["properties"]["networks"].append(network)
+
+
+def build_metro_transport_features(
+    archive: zipfile.ZipFile,
+    station_index: dict[tuple[str, float, float], dict[str, Any]],
+) -> list[dict[str, Any]]:
+    routes, trip_rows = load_selected_routes_and_trips(
+        archive,
+        lambda row: row.get("route_short_name") in METRO_LINE_COLORS,
+    )
+    shape_ids_by_route: dict[str, set[str]] = defaultdict(set)
+    for trip in trip_rows:
+        if trip.get("shape_id"):
+            shape_ids_by_route[trip["route_id"]].add(trip["shape_id"])
+
+    selected_shape_ids = {shape_id for ids in shape_ids_by_route.values() for shape_id in ids}
+    shape_points: dict[str, list[tuple[int, float, float]]] = defaultdict(list)
+    for row in iter_csv_from_zip(archive, "shapes.txt"):
+        shape_id = row.get("shape_id")
+        if shape_id not in selected_shape_ids:
+            continue
+        shape_points[shape_id].append(
+            (
+                int(row.get("shape_pt_sequence") or 0),
+                float(row["shape_pt_lon"]),
+                float(row["shape_pt_lat"]),
+            )
+        )
+
+    stop_ids_by_route: dict[str, set[str]] = defaultdict(set)
+    trip_route = {trip["trip_id"]: trip["route_id"] for trip in trip_rows}
+    for row in iter_csv_from_zip(archive, "stop_times.txt"):
+        route_id = trip_route.get(row.get("trip_id"))
+        if route_id:
+            stop_ids_by_route[route_id].add(row["stop_id"])
+
+    stop_rows = load_selected_stop_rows(archive, stop_ids_by_route)
+
+    line_features: list[dict[str, Any]] = []
+    for route_id, route in sorted(routes.items(), key=lambda item: item[1]["route_short_name"]):
+        line = route["route_short_name"]
+        for shape_id in sorted(shape_ids_by_route[route_id]):
+            points = sorted(shape_points.get(shape_id, []))
+            if len(points) < 2:
+                continue
+            line_features.append(
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "network": "metro",
+                        "line": line,
+                        "route_id": route_id,
+                        "shape_id": shape_id,
+                        "color": METRO_LINE_COLORS[line],
+                        "source": "Rejseplanen GTFS",
+                    },
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[lon, lat] for _, lon, lat in points],
+                    },
+                }
+            )
+
+    for route_id, stop_ids in stop_ids_by_route.items():
+        line = routes[route_id]["route_short_name"]
+        for stop_id in stop_ids:
+            stop = stop_rows.get(stop_id)
+            if not stop or not stop.get("stop_lat") or not stop.get("stop_lon"):
+                continue
+            _add_station_feature(station_index, stop, line, "metro")
+
+    return line_features
+
+
+def build_stog_transport_features(
+    archive: zipfile.ZipFile,
+    station_index: dict[tuple[str, float, float], dict[str, Any]],
+) -> list[dict[str, Any]]:
+    routes, trip_rows = load_selected_routes_and_trips(
+        archive,
+        lambda row: row.get("route_short_name") in STOG_LINES and row.get("route_type") == "109",
+    )
+    trip_routes = {trip["trip_id"]: trip["route_id"] for trip in trip_rows}
+    stop_times: dict[str, list[tuple[int, str]]] = defaultdict(list)
+    for row in iter_csv_from_zip(archive, "stop_times.txt"):
+        trip_id = row.get("trip_id")
+        if trip_id in trip_routes:
+            stop_times[trip_id].append((int(row.get("stop_sequence") or 0), row["stop_id"]))
+    stop_rows = load_selected_stop_rows(
+        archive,
+        {trip_id: {stop_id for _, stop_id in entries} for trip_id, entries in stop_times.items()},
+    )
+
+    paths_by_line: dict[str, list[list[str]]] = defaultdict(list)
+    for trip in trip_rows:
+        line = routes[trip["route_id"]]["route_short_name"]
+        collapsed: list[str] = []
+        for _, stop_id in sorted(stop_times[trip["trip_id"]]):
+            current_stop = stop_rows[stop_id]
+            if not collapsed:
+                collapsed.append(stop_id)
+                continue
+            previous_stop = stop_rows[collapsed[-1]]
+            if normalize_station_name(current_stop.get("stop_name", "")) != normalize_station_name(previous_stop.get("stop_name", "")):
+                collapsed.append(stop_id)
+        if len(collapsed) >= 2:
+            paths_by_line[line].append(collapsed)
+
+    selected_paths: dict[str, list[str]] = {}
+    for line, (start_name, target_name) in STOG_LINE_ENDPOINTS.items():
+        names_to_stop: dict[str, str] = {}
+        adjacency: dict[str, set[str]] = defaultdict(set)
+        for path in paths_by_line[line]:
+            for stop_id in path:
+                names_to_stop.setdefault(normalize_station_name(stop_rows[stop_id].get("stop_name", "")), stop_id)
+            for left, right in zip(path, path[1:]):
+                adjacency[left].add(right)
+                adjacency[right].add(left)
+
+        start = names_to_stop.get(start_name)
+        target = names_to_stop.get(target_name)
+        if not start or not target:
+            raise ValueError(f"Could not find endpoints for {line}: {start_name} -> {target_name}")
+        queue = deque([start])
+        previous = {start: None}
+        while queue and target not in previous:
+            current = queue.popleft()
+            for neighbor in adjacency[current]:
+                if neighbor not in previous:
+                    previous[neighbor] = current
+                    queue.append(neighbor)
+        if target not in previous:
+            raise ValueError(f"No connected route for {line}: {start_name} -> {target_name}")
+        path = []
+        current = target
+        while current is not None:
+            path.append(current)
+            current = previous[current]
+        selected_paths[line] = list(reversed(path))
+
+    line_features: list[dict[str, Any]] = []
+    for line in sorted(STOG_LINES):
+        path = selected_paths[line]
+        coordinates = []
+        for stop_id in path:
+            stop = stop_rows[stop_id]
+            coordinates.append([float(stop["stop_lon"]), float(stop["stop_lat"])])
+            _add_station_feature(station_index, stop, line, "s-tog")
+        line_features.append(
+            {
+                "type": "Feature",
+                "properties": {
+                    "network": "s-tog",
+                    "line": line,
+                    "color": STOG_LINE_COLORS[line],
+                    "source": "Rejseplanen GTFS",
+                },
+                "geometry": {"type": "LineString", "coordinates": coordinates},
+            }
+        )
+
+    return line_features
+
+
+def build_transport_datasets() -> tuple[dict[str, Any], dict[str, Any]]:
+    download_if_missing(GTFS_URL, GTFS_ZIP)
+    station_index: dict[tuple[str, float, float], dict[str, Any]] = {}
+    with zipfile.ZipFile(GTFS_ZIP) as archive:
+        line_features = build_metro_transport_features(archive, station_index)
+        line_features.extend(build_stog_transport_features(archive, station_index))
+
+    station_features = list(station_index.values())
+    for station in station_features:
+        station["properties"]["lines"].sort()
+        station["properties"]["networks"].sort()
+    line_features.sort(key=lambda feat: (feat["properties"]["network"], feat["properties"]["line"], feat["properties"].get("shape_id", "")))
+    station_features.sort(key=lambda feat: feat["properties"]["name"])
+    return (
+        {"type": "FeatureCollection", "features": line_features},
+        {"type": "FeatureCollection", "features": station_features},
+    )
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -509,18 +510,11 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=True, indent=2) + "\n")
 
 
-def write_json_to_targets(filename: str, payload: dict[str, Any]) -> None:
-    """Write the same payload to both derived and public output folders."""
-    for folder in (DERIVED_DIR, PUBLIC_DIR):
-        write_json(folder / filename, payload)
-
-
 def main() -> None:
     """Build all derived data files for the Copenhagen playable area."""
     ensure_dirs()
-    download_if_missing(GTFS_URL, GTFS_ZIP)
     boundary_feature = load_region_boundary_feature()
-    build_transit_dataset(boundary_feature)
+    transport_lines, transport_stations = build_transport_datasets()
     municipalities = build_municipalities_dataset(boundary_feature)
     postnumre = build_postnumre_dataset(boundary_feature)
     opstillingskredse = build_opstillingskredse_dataset(boundary_feature)
@@ -530,11 +524,13 @@ def main() -> None:
         "features": [boundary_feature],
     }
 
-    write_json_to_targets("municipalities.geojson", municipalities)
-    write_json_to_targets("postnumre.geojson", postnumre)
-    write_json_to_targets("opstillingskredse.geojson", opstillingskredse)
-    write_json_to_targets("sogne.geojson", sogne)
-    write_json_to_targets("boundary.geojson", boundary)
+    write_json(PUBLIC_DIR / "municipalities.geojson", municipalities)
+    write_json(PUBLIC_DIR / "postnumre.geojson", postnumre)
+    write_json(PUBLIC_DIR / "opstillingskredse.geojson", opstillingskredse)
+    write_json(PUBLIC_DIR / "sogne.geojson", sogne)
+    write_json(PUBLIC_DIR / "boundary.geojson", boundary)
+    write_json(PUBLIC_DIR / "transport-lines.geojson", transport_lines)
+    write_json(PUBLIC_DIR / "transport-stations.geojson", transport_stations)
 
 
 if __name__ == "__main__":

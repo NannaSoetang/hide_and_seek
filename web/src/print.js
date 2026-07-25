@@ -2,6 +2,7 @@ import './style.css'
 import L from 'leaflet'
 import QRCode from 'qrcode'
 import { createBaseMap, fitBoundsWithPadding, loadJson } from './shared.js'
+import { cleanedStationName, filterTransportData, loadTransportData } from './transport.js'
 
 const WEBSITE_URL_FALLBACK = 'https://nannasoetang.github.io/hide_and_seek/'
 
@@ -62,10 +63,6 @@ const ADMIN_STYLES = {
     dashArray: '2 8',
     fillOpacity: 0,
   },
-}
-
-function cleanedStationName(name) {
-  return String(name || '').replace(/\s*\(Metro\)\s*/gi, '').trim()
 }
 
 function normalizeStationName(name) {
@@ -271,26 +268,22 @@ async function init() {
     maxZoom: 19,
   })
 
+  const transport = await loadTransportData()
+  const metro = filterTransportData(transport, 'metro')
+  const stog = filterTransportData(transport, 's-tog')
+
   const [
     boundary,
     municipalities,
     postAreas,
     constituencies,
     parishes,
-    metroLines,
-    metroStations,
-    sTogLines,
-    sTogStations,
   ] = await Promise.all([
     loadJson('/data/boundary.geojson'),
     loadJson('/data/municipalities.geojson'),
     loadJson('/data/postnumre.geojson'),
     loadJson('/data/opstillingskredse.geojson'),
     loadJson('/data/sogne.geojson'),
-    loadJson('/data/metro-lines.geojson'),
-    loadJson('/data/metro-stations.geojson'),
-    loadJson('/data/s-tog-lines.geojson'),
-    loadJson('/data/s-tog-stations.geojson'),
   ])
 
   const boundaryLayer = L.geoJSON(boundary, {
@@ -308,8 +301,8 @@ async function init() {
   addNamedBoundaryLayer(map, constituencies, ADMIN_STYLES.opstillingskredse)
   addNamedBoundaryLayer(map, parishes, ADMIN_STYLES.sogne)
 
-  addTransitLines(map, metroLines, sTogLines)
-  addAllowedStations(map, metroStations, sTogStations)
+  addTransitLines(map, metro.lines, stog.lines)
+  addAllowedStations(map, metro.stations, stog.stations)
 
   addAreaLabels(map, municipalities, 'name', 'admin-label--kommuner', {
     minZoom: 9.2,
