@@ -1,6 +1,6 @@
 import './style.css'
 import L from 'leaflet'
-import { addBoundary, createBaseMap, loadBoundary } from './shared.js'
+import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
 import { addTransportLayers, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
 
@@ -69,9 +69,8 @@ function buildContextPopup(context) {
 async function loadAdministrativeLayers(configs) {
   const entries = await Promise.all(
     configs.map(async (config) => {
-      const response = await fetch(config.dataFile)
-      if (!response.ok) throw new Error(`Kunne ikke hente ${config.dataFile}`)
-      return [config.id, await response.json()]
+      const data = await loadJson(config.dataFile)
+      return [config.id, data]
     }),
   )
   return Object.fromEntries(entries)
