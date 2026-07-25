@@ -1,45 +1,188 @@
 # hide_and_seek
 
-Static map toolkit for a hide-and-seek ruleset in Greater Copenhagen.
+Static Copenhagen hide-and-seek map toolkit. The repository combines Python preprocessing, a Vite-based multi-page frontend, and an A3 printable map export.
 
-The project contains:
-- a Leaflet-based interactive map
-- a printable A3 map export
-- Python preprocessing scripts that generate optimized static GeoJSON data for the web app
+## Project overview
+
+The project provides a Copenhagen-only map and lookup app for a hide-and-seek ruleset. It is intentionally static at runtime: the Python pipeline downloads and filters source datasets, writes compact GeoJSON into the web app, and the frontend reads those files directly.
+
+High-level architecture:
+
+1. Python preprocessing downloads and clips source data to the Copenhagen play area.
+2. Vite builds the interactive pages and copies generated data into the production bundle.
+3. A Node script renders the printable map to PDF from the built print page.
+4. GitHub Actions deploys the built site to GitHub Pages.
+
+Technology stack:
+
+- Python 3.12 with `uv`, `requests`, `shapely`, and `pyproj` for preprocessing
+- Node.js 20 with `Vite`, `Leaflet`, `Playwright`, and `qrcode`
+- GitHub Actions and GitHub Pages for hosting
 
 ## Quick Start
 
-### 1. Prerequisites
+### 1. Clone the repository
 
-- Python 3.12+
-- Node.js 20+
-- npm
-- uv: https://docs.astral.sh/uv/
+```bash
+git clone https://github.com/<owner>/hide_and_seek.git
+cd hide_and_seek
+```
 
-### 2. Install dependencies
+### 2. Install prerequisites
+
+Install Python 3.12+, Node.js 20+, npm, and `uv`.
+
+### 3. Install dependencies
 
 ```bash
 uv sync
-npm install
+npm ci
 ```
 
-### 3. Run the app locally
+### 4. Rebuild datasets
+
+```bash
+npm run build:data
+```
+
+This downloads source data when needed and rewrites the generated GeoJSON in `web/public/data/`.
+
+### 5. Start the development server
 
 ```bash
 npm run dev
 ```
 
-Open the URL shown by Vite (typically http://127.0.0.1:5173).
+Open the local URL printed by Vite.
 
-### 4. Build production assets
+### 6. Build for production
 
 ```bash
 npm run build
 ```
 
-This builds the static site to dist and generates print-map.pdf.
+This builds the frontend into `dist/` and writes `dist/print-map.pdf`.
 
-### 5. Run tests
+### 7. Preview the production build
+
+```bash
+npm run preview
+```
+
+Open the local URL printed by Vite preview.
+
+## Repository structure
+
+- `scripts/`: preprocessing, build, PDF, and capture scripts
+- `data/`: downloaded raw source data cached by preprocessing
+- `docs/`: short source notes and documentation index
+- `src/hide_and_seek/`: currently empty reserved Python package directory
+- `tests/`: Python tests for preprocessing and supporting logic
+- `web/`: the frontend source, HTML entry points, and Vite configuration
+- `web/src/`: reusable browser modules for maps, lookups, overlays, and page setup
+- `web/public/`: static assets copied by Vite into the production build
+- `web/public/data/`: generated runtime GeoJSON consumed by the frontend
+- `web-tests/`: Playwright end-to-end tests
+- `dist/`: production build output created by Vite and the PDF script
+
+## Data pipeline
+
+The preprocessing pipeline lives in `scripts/build_data.py`.
+
+Downloaded data:
+
+- Rejseplanen GTFS ZIP from `https://www.rejseplanen.info/labs/GTFS.zip`
+- Dataforsyningen GeoJSON for kommuner, postnumre, opstillingskredse, and sogne
+
+Processing flow:
+
+1. Read the committed Copenhagen boundary from `web/public/data/boundary.geojson`.
+2. Download raw source files into `data/raw/` when they are missing.
+3. Clip every administrative layer to the Copenhagen boundary.
+4. Simplify geometries so the browser only receives the playable area.
+5. Group postal areas by name and merge their clipped geometries.
+6. Extract Metro and S-tog routes and stations from GTFS.
+7. Normalize station names and retain only the Copenhagen transport network used by the game.
+
+Why only Copenhagen data is retained:
+
+The app is designed around the Copenhagen play area. Clipping everything to the committed boundary keeps the runtime payload small and avoids shipping nationwide data to the browser.
+
+Generated GeoJSON output:
+
+- `web/public/data/municipalities.geojson`
+- `web/public/data/postnumre.geojson`
+- `web/public/data/opstillingskredse.geojson`
+- `web/public/data/sogne.geojson`
+- `web/public/data/boundary.geojson`
+- `web/public/data/transport-lines.geojson`
+- `web/public/data/transport-stations.geojson`
+
+Frontend inputs:
+
+- Administrative overlays read the four administrative GeoJSON files plus the boundary file.
+- The main map, guide page, and transport layers read `transport-lines.geojson` and `transport-stations.geojson`.
+- Vite serves these files from `/data/*.geojson` in development and copies them into `dist/` for production.
+
+```mermaid
+flowchart TD
+  A[Downloaded data] --> B[Preprocessing]
+  B --> C[Generated GeoJSON]
+  C --> D[Frontend]
+  D --> E[Printable maps]
+  E --> F[Production build]
+```
+
+## Frontend architecture
+
+The frontend is a multi-page Leaflet app built from `web/index.html`, `web/print.html`, `web/where-am-i.html`, and `web/guide.html`.
+
+Map architecture:
+
+- `web/src/main.js` initializes the main interactive map.
+- `web/src/shared.js` provides shared map and data loading helpers.
+- `web/src/AdministrativeLayer.js` and `web/src/LabelManager.js` handle overlays and zoom-sensitive labels.
+- `web/src/transport.js` renders Metro and S-tog lines and stations.
+
+Data loading:
+
+- Administrative layers are fetched as generated GeoJSON from `/data/`.
+- Transport layers are fetched from the generated line and station files and filtered by network in the browser.
+- The boundary file is used to fit the initial map view to the playable area.
+
+Reusable modules:
+
+- `web/src/AdministrativeLookup.js`, `web/src/PolygonLookup.js`, and `web/src/LocationLookup.js` power the "Where am I?" page.
+- `web/src/AddressLookup.js` adds address search and coordinate resolution.
+- `web/src/GuidePage.js` builds the station guide and transfer summaries.
+- `web/src/print.js` and `web/src/WhereAmIPage.js` provide page-specific startup logic.
+
+Overlays and station data:
+
+- Administrative overlays cover kommuner, postnumre, opstillingskredse, and sogne.
+- Transport stations are normalized in preprocessing and reused by the map and guide pages.
+- Metro and S-tog lines are kept as separate networks so the UI can render them with network-specific styling.
+
+Print pages:
+
+- `web/print.html` renders the printable map layout.
+- `scripts/build_print_pdf.mjs` opens the built print page and writes `dist/print-map.pdf`.
+
+## Development
+
+Rebuild datasets:
+
+```bash
+npm run build:data
+```
+
+Regenerate printable maps:
+
+```bash
+npm run build:site && npm run build:pdf
+```
+
+Run tests:
 
 ```bash
 uv run pytest
@@ -52,212 +195,117 @@ If Playwright browsers are missing:
 npx playwright install --with-deps chromium
 ```
 
-## Developer Workflow
+Linting:
 
-### Rebuild datasets
+- No dedicated lint command is currently defined in `package.json`.
 
-Run preprocessing when data rules or sources change:
-
-```bash
-npm run build:data
-```
-
-This executes scripts/build_data.py and writes output to:
-- web/public/data/
-
-### Preview production bundle
+Verify a production build locally:
 
 ```bash
+npm run build
 npm run preview
 ```
-
-### Capture screenshots and print output
-
-In one terminal:
-
-```bash
-npm run preview -- --host 127.0.0.1 --port 4173
-```
-
-In another terminal:
-
-```bash
-npm run capture
-```
-
-Output files:
-- test-results/captures/interactive-map.png
-- test-results/captures/print-map.png
-- test-results/captures/print-map.pdf
-
-## Project Structure
-
-- scripts: preprocessing and output capture scripts
-- src/hide_and_seek: Python gameplay rules used by preprocessing
-- tests: Python unit tests
-- web: HTML, JS, and CSS application source
-- web/public/data: committed static runtime datasets
-- web-tests: Playwright end-to-end tests
-- docs: dataset notes and implementation documentation
-
-## Data Pipeline
-
-### Data sources downloaded by preprocessing
-
-Main pipeline in scripts/build_data.py downloads and uses:
-- Dataforsyningen kommuner
-- Dataforsyningen postnumre
-- Dataforsyningen opstillingskredse
-- Dataforsyningen sogne
-
-### Processing steps
-
-1. Read the committed Copenhagen playable-area boundary.
-2. Download and read administrative source layers from Dataforsyningen.
-3. Clip and simplify each administrative layer to the playable boundary.
-4. Write deterministic GeoJSON output to web/public/data.
-
-Transit layers are generated by scripts/build_data.py.
-
-### Where processed files are stored
-
-- web/public/data: runtime data consumed by the frontend and included in site builds
-
-## Frontend Architecture
-
-### Entry pages
-
-- web/index.html: main interactive map
-- web/print.html: print-focused map layout and legend
-- web/where-am-i.html: administrative lookup page
-- web/guide.html: game guide and allowed stations page
-
-### Main modules
-
-- web/src/main.js: interactive map initialization and overlay coordination
-- web/src/shared.js: common map/data helpers
-- web/src/transport.js: unified transport loading, filtering, and layer rendering
-- web/src/AdministrativeLayer.js and web/src/LabelManager.js: overlay boundaries and label rendering
-- web/src/AdministrativeLookup.js and web/src/PolygonLookup.js: point-in-polygon lookup path
-- web/src/WhereAmIPage.js and web/src/GuidePage.js: page-specific application logic
-
-### Administrative overlay system
-
-The map overlays are configured in web/src/main.js as ADMIN_LAYER_CONFIGS.
-Each config defines:
-- dataset file
-- boundary style
-- label source field
-- popup summary field
-- label visibility thresholds
-
-AdministrativeLayer couples boundary rendering with zoom-sensitive labels.
-
-## Performance and Data Optimization
-
-The pipeline clips and simplifies every dataset to the playable boundary before writing runtime files. The browser receives no nationwide administrative or transit dataset.
-
-Remaining performance work:
-
-1. Build spatial indexes for polygon lookup in preprocessing
-- Why: reduces runtime point-in-polygon checks to a smaller candidate set.
-- Impact: High
-- Effort: Medium
-
-2. Persist bbox arrays per feature in output GeoJSON properties
-- Why: avoids runtime bounds recomputation in lookup modules.
-- Impact: Medium
-- Effort: Small
-
-3. Clip transit geometries to boundary with an additional small pad
-- Why: further reduces geometry complexity outside playable area.
-- Impact: Medium
-- Effort: Small
-
-4. Optional topology-preserving simplification by zoom tier
-- Why: lighter payload and faster rendering on mobile.
-- Impact: Medium
-- Effort: Medium
-
-5. Split guide-only datasets from map-critical datasets
-- Why: lets first paint load only essentials.
-- Impact: Low to Medium
-- Effort: Medium
-
-6. Precompute per-layer name indexes for administrative lookups
-- Why: removes repeated string/property access in hot paths.
-- Impact: Low
-- Effort: Small
-
-## Dependency Notes
-
-Current runtime dependency footprint is intentionally small:
-- leaflet
-
-Dev/test/build dependencies:
-- vite
-- @playwright/test
-
-Python dependencies are limited to preprocessing and tests.
-
-## Configuration and Build Files
-
-These files control build, preprocessing, deployment, and hosting behavior:
-
-- package.json: npm scripts for dev/build/test/data pipeline orchestration
-- pyproject.toml: Python project metadata and dependencies
-- uv.lock: pinned Python dependency lockfile
-- playwright.config.js: E2E test targets and preview web server
-- web/vite.config.js: multi-page static build configuration and output directory
-- scripts/build_data.py: primary data preprocessing pipeline
-- scripts/build_print_pdf.mjs: PDF generation from built print page
-- .github/workflows/deploy-pages.yml: GitHub Pages CI build and deploy workflow
 
 ## Deploying to GitHub Pages
 
 ### Prerequisites
 
-- GitHub repository with Actions enabled
-- GitHub Pages configured to use GitHub Actions as the source
-- Required files committed, including web/public/data and the workflow file
+- GitHub repository
+- GitHub Actions enabled
+- GitHub Pages enabled
 
-### Required repository settings
+### Repository settings
 
-In GitHub repository settings:
-1. Go to Pages.
-2. Set Source to GitHub Actions.
+Set the repository to publish from GitHub Actions:
+
+1. Open the repository on GitHub.
+2. Go to Settings.
+3. Open Pages.
+4. Under Build and deployment, set Source to GitHub Actions.
+
+No branch or folder source should be selected when GitHub Actions is used.
 
 ### Deployment workflow
 
-Deployment is controlled by .github/workflows/deploy-pages.yml.
+The deployment workflow is `.github/workflows/deploy-pages.yml`.
 
-Current trigger:
-- push to branch main or master
-- manual run via workflow_dispatch
+Trigger:
 
-The workflow:
-1. Checks out code.
-2. Installs Python/uv and Node dependencies.
-3. Installs Playwright Chromium.
-4. Runs npm run build.
-5. Uploads dist as Pages artifact.
-6. Deploys via actions/deploy-pages.
+- push to `main` or `master`
+- manual run through `workflow_dispatch`
 
-### Build command used for deployment
+Deployment flow:
+
+```mermaid
+flowchart TD
+  A[Push to main] --> B[GitHub Actions]
+  B --> C[Install dependencies]
+  C --> D[Run preprocessing]
+  D --> E[Build frontend]
+  E --> F[Upload Pages artifact]
+  F --> G[Deploy GitHub Pages]
+  G --> H[Website available]
+```
+
+What the workflow does:
+
+1. Checks out the repository.
+2. Installs Python 3.12 and `uv`.
+3. Installs Node.js 20.
+4. Runs `uv sync` to install Python dependencies.
+5. Runs `npm ci` to install Node dependencies.
+6. Installs Playwright Chromium.
+7. Runs `npm run build`.
+8. Uploads `dist/` as the Pages artifact.
+9. Deploys the artifact with `actions/deploy-pages`.
+
+### Build commands
+
+Local build script used by deployment:
 
 ```bash
 npm run build
 ```
 
-### How to publish a new version
+That command expands to:
 
-1. Ensure local pipeline/tests pass.
-2. Commit and push to the deployment branch used by the workflow trigger.
-3. Wait for Deploy GitHub Pages workflow to complete.
+```bash
+npm run build:site && npm run build:pdf
+```
 
-### How to verify deployment
+The workflow itself also runs:
 
-1. Open the Actions tab and confirm build and deploy jobs succeeded.
+```bash
+uv sync
+npm ci
+npx playwright install --with-deps chromium
+```
+
+### Publishing a new version
+
+1. Commit the changes.
+2. Push to `main`.
+3. Wait for the GitHub Actions workflow to finish.
+4. Verify that the Pages deploy job succeeded.
+5. Open the GitHub Pages URL.
+
+No manual upload step is required.
+
+### Deployment files
+
+- `.github/workflows/deploy-pages.yml`: defines the GitHub Pages build and deploy pipeline.
+- `package.json`: defines the Node scripts used locally and in CI.
+- `package-lock.json`: pins the Node dependency tree used by `npm ci`.
+- `pyproject.toml`: defines the Python project metadata and runtime dependencies.
+- `uv.lock`: pins the Python environment used by `uv sync`.
+- `scripts/build_data.py`: downloads, filters, and writes generated GeoJSON.
+- `scripts/build_print_pdf.mjs`: generates `dist/print-map.pdf` from the built print page.
+- `web/vite.config.js`: configures the multi-page Vite build and output directory.
+- `playwright.config.js`: configures browser-based verification against the production preview server.
+
+## Documentation notes
+
+Dataset-specific source notes live in `docs/datasets/`. Update the relevant note whenever a source changes, and keep this README aligned with the scripts and build pipeline.
 2. Open the published Pages URL shown in the deploy job environment output.
 3. Verify index, print, guide, and where-am-i pages load.
 
