@@ -15,9 +15,9 @@ const METRO_LINE_COLORS = {
 
 const METRO_LINE_PATTERNS = {
   M1: null,
-  M2: '12 8',
-  M3: '5 7',
-  M4: '20 8 4 8',
+  M2: null,
+  M3: null,
+  M4: null,
 }
 
 const S_TOG_LINE_COLORS = {
@@ -29,9 +29,9 @@ const S_TOG_LINE_COLORS = {
 
 const S_TOG_LINE_PATTERNS = {
   A: null,
-  B: '12 8',
-  C: '4 8',
-  F: '18 6 4 6',
+  B: null,
+  C: null,
+  F: null,
 }
 
 const ADMIN_STYLES = {

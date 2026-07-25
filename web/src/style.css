@@ -69,7 +69,8 @@ main {
 .quick-links {
   position: absolute;
   z-index: 1000;
-  top: calc(var(--safe-top) + 3.35rem);
+  top: auto;
+  bottom: calc(var(--safe-bottom) + 0.9rem);
   left: calc(var(--safe-left) + 4rem);
   display: flex;
   gap: 0.5rem;
@@ -197,7 +198,8 @@ main {
   }
 
   .quick-links {
-    top: calc(var(--safe-top) + 3.05rem);
+    top: auto;
+    bottom: calc(var(--safe-bottom) + 0.75rem);
     left: calc(var(--safe-left) + 3.6rem);
     right: calc(var(--safe-right) + 0.75rem);
     display: grid;

@@ -9,3 +9,4 @@ playwright-report/
 *.pyc
 __pycache__/
 .pytest_cache/
+.playwright-browsers/

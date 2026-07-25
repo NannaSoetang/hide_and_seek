@@ -54,15 +54,15 @@ const NETWORK_COLORS = {
 const NETWORK_PATTERNS = {
   metro: {
     M1: null,
-    M2: '12 8',
-    M3: '5 7',
-    M4: '20 8 4 8',
+    M2: null,
+    M3: null,
+    M4: null,
   },
   's-tog': {
     A: null,
-    B: '12 8',
-    C: '4 8',
-    F: '18 6 4 6',
+    B: null,
+    C: null,
+    F: null,
   },
 }
 
