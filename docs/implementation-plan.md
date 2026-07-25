@@ -2,6 +2,9 @@
 
 ## Goal
 
+<!-- TODO: This plan is Randers-specific. Consider generalizing steps or
+   making the boundary/kommunekode configurable for other regions. -->
+
 Build two assets for a Randers Jet Lag: Hide and Seek game:
 
 1. a **printable map** of the playable area and bus network

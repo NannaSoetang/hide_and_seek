@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hvor er jeg?</title>
+    <script type="module" src="/src/where-am-i.js"></script>
+  </head>
+  <body>
+    <main class="where-page">
+      <header class="where-header">
+        <a class="subpage-back-link" href="./index.html" aria-label="Tilbage til kort">Tilbage til kort</a>
+        <h1>Hvor er jeg?</h1>
+      </header>
+
+      <nav class="where-tabs" aria-label="Valg af opslagstype">
+        <button id="tab-location" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-location">
+          Min placering
+        </button>
+        <button id="tab-address" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-address">
+          Adresse
+        </button>
+      </nav>
+
+      <section id="panel-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
+        <button id="find-location-button" class="primary-button" type="button">Find min placering</button>
+        <p id="location-status" class="status-text" aria-live="polite"></p>
+      </section>
+
+      <section id="panel-address" class="tab-panel is-hidden" role="tabpanel" aria-labelledby="tab-address">
+        <label class="field-label" for="address-query">Adresse</label>
+        <input id="address-query" class="text-input" type="text" autocomplete="off" placeholder="Søg vejnavn, husnummer eller postområde" />
+        <div id="address-results" class="address-results" role="listbox" aria-label="Adresseforslag"></div>
+        <p id="address-status" class="status-text" aria-live="polite"></p>
+      </section>
+
+      <section class="result-card" aria-live="polite">
+        <h2>Resultat</h2>
+        <dl class="result-list">
+          <div class="result-item">
+            <dt>Kommune</dt>
+            <dd id="result-municipality">-</dd>
+          </div>
+          <div class="result-item">
+            <dt>Postområde</dt>
+            <dd id="result-postal-area">-</dd>
+          </div>
+          <div class="result-item">
+            <dt>Sogn</dt>
+            <dd id="result-parish">-</dd>
+          </div>
+          <div class="result-item">
+            <dt>Opstillingskreds</dt>
+            <dd id="result-constituency">-</dd>
+          </div>
+          <div class="result-item">
+            <dt>Adresse</dt>
+            <dd id="result-address">-</dd>
+          </div>
+          <div class="result-item">
+            <dt>Koordinater</dt>
+            <dd id="result-coordinates">-</dd>
+          </div>
+        </dl>
+      </section>
+    </main>
+  </body>
+</html>

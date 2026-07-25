@@ -13,6 +13,7 @@ async function openMobilePanelIfNeeded(page, testInfo) {
 test('interactive map loads core UI', async ({ page }) => {
   await page.goto('/')
   await waitForAppReady(page)
+  // TODO: Update this test when changing the target region (currently Randers).
   await expect(page.getByRole('heading', { name: 'Randers hide and seek' })).toBeVisible()
   await expect(page.locator('#map')).toBeVisible()
   await expect(page.getByText('Spillegrænse')).toBeVisible()
@@ -28,6 +29,7 @@ test('address lookup resolves area information', async ({ page }) => {
   await page.goto('/')
   await waitForAppReady(page)
   const input = page.locator('#address-input')
+  // TODO: Replace hard-coded Randers example addresses used in tests.
   await input.fill('Rådhustorvet 1, 8900 Randers C')
   await page.waitForTimeout(1000)
   await input.press('Enter')

@@ -2,6 +2,7 @@
 
 ## Overview
 
+<!-- TODO: Midttrafik notes reference Randers; update when adapting to a different region -->
 I did **not** find a clearly documented, openly reusable machine-readable Midttrafik fare-zone dataset for Randers.
 
 What is clearly available is official **reference material** such as zone maps, interactive viewers, route pages, and journey-planning tools.

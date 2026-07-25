@@ -1,0 +1,814 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Aksel Møllers Have St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603342",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.533187,
+          55.686378
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Amager Strand St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603324",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.631584,
+          55.656519
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Amagerbro St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603321",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.602929,
+          55.663326
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bella Center St. (Metro)",
+        "lines": [
+          "M1"
+        ],
+        "stop_id": "000008603313",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.582928,
+          55.638051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Christianshavn St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603309",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.591385,
+          55.672054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "DR Byen St. (Metro)",
+        "lines": [
+          "M1"
+        ],
+        "stop_id": "000008603311",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.58899,
+          55.655813
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Enghave Brygge St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603348",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.556169,
+          55.653766
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Enghave Plads St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603344",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.545814,
+          55.667284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fasanvej St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603304",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.523102,
+          55.681669
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Femøren St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603326",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.638324,
+          55.645348
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Flintholm St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603302",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.499527,
+          55.685868
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Forum St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603306",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.552431,
+          55.681821
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Frederiksberg Allé St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603343",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.540351,
+          55.673727
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Frederiksberg St. (Metro)",
+        "lines": [
+          "M1",
+          "M2",
+          "M3"
+        ],
+        "stop_id": "000008603305",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.531719,
+          55.681223
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gammel Strand St. (Metro)",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "stop_id": "000008603332",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.579575,
+          55.677749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Havneholmen St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603347",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.559426,
+          55.66091
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Islands Brygge St. (Metro)",
+        "lines": [
+          "M1"
+        ],
+        "stop_id": "000008603310",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585217,
+          55.663422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kastrup St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603327",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.646732,
+          55.635747
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kongens Nytorv St. (Metro)",
+        "lines": [
+          "M1",
+          "M2",
+          "M3",
+          "M4"
+        ],
+        "stop_id": "000008603308",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585228,
+          55.679185
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "København H (Metro)",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "stop_id": "000008603330",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.56412,
+          55.671941
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "København Syd St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603351",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.516427,
+          55.65253
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Københavns Lufthavn St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603328",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.64939,
+          55.630137
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lergravsparken St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603322",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.616417,
+          55.662101
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lindevang St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603303",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.512873,
+          55.683482
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Marmorkirken St. (Metro)",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "stop_id": "000008603333",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.588632,
+          55.685245
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mozarts Plads St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603350",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.533956,
+          55.649049
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nordhavn St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603346",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.591834,
+          55.707298
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nuuks Plads St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603341",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.542892,
+          55.688796
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nørrebro St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603339",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.538082,
+          55.700552
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nørrebros Runddel St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603340",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.548899,
+          55.693945
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Nørreport St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603307",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.571044,
+          55.683843
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Orientkaj St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603345",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.595272,
+          55.711612
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Poul Henningsens Plads St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603336",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.576709,
+          55.70925
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rådhuspladsen St. (Metro)",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "stop_id": "000008603331",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.568803,
+          55.676373
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Skjolds Plads St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603338",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.548233,
+          55.70328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sluseholmen St. (Metro)",
+        "lines": [
+          "M4"
+        ],
+        "stop_id": "000008603349",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.543747,
+          55.645836
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sundby St. (Metro)",
+        "lines": [
+          "M1"
+        ],
+        "stop_id": "000008603312",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585728,
+          55.645199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Trianglen St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603335",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.57607,
+          55.699135
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vanløse St. (Metro)",
+        "lines": [
+          "M1",
+          "M2"
+        ],
+        "stop_id": "000008603301",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.491664,
+          55.687297
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vestamager St. (Metro)",
+        "lines": [
+          "M1"
+        ],
+        "stop_id": "000008603317",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.575297,
+          55.619391
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vibenshus Runddel St. (Metro)",
+        "lines": [
+          "M3"
+        ],
+        "stop_id": "000008603337",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.564,
+          55.706284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ørestad St. (Metro)",
+        "lines": [
+          "M1"
+        ],
+        "stop_id": "000008603315",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.579389,
+          55.629055
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Øresund St. (Metro)",
+        "lines": [
+          "M2"
+        ],
+        "stop_id": "000008603323",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.628453,
+          55.661701
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Østerport St. (Metro)",
+        "lines": [
+          "M3",
+          "M4"
+        ],
+        "stop_id": "000008603334",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.585352,
+          55.693217
+        ]
+      }
+    }
+  ]
+}

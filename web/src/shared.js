@@ -23,6 +23,11 @@ export async function loadJson(path) {
   return response.json()
 }
 
+// TODO: Add future datasets through separate, opt-in loaders.
+export function loadBoundary() {
+  return loadJson('/data/boundary.geojson')
+}
+
 export async function loadBaseData() {
   const [boundary, routes, stops, sogne, afstemningsomraader, metadata] = await Promise.all([
     loadJson('/data/boundary.geojson'),
@@ -52,6 +57,7 @@ export function createBaseMap(elementId, options = {}) {
 
 export function addBoundary(map, geojson) {
   return L.geoJSON(geojson, {
+    interactive: false,
     style: {
       color: '#c0392b',
       weight: 3,

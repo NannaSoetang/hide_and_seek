@@ -1,12 +1,12 @@
 {
   "center": {
-    "lon": 10.03639,
-    "lat": 56.4607
+    "lon": 12.415000000000003,
+    "lat": 55.71500000000001
   },
   "boundary_status": "official-pre-reform",
-  "boundary_note": "Kortet bruger den brugerleverede pre-reform Randers kommunegraense.",
-  "eligible_stop_count": 307,
-  "included_route_count": 15,
+  "boundary_note": "Regionens gr\u00e6nse er konstrueret fra pre-reform kommunefiler.",
+  "eligible_stop_count": 3996,
+  "included_route_count": 112,
   "play_window": "09:00-18:00 normal lordag",
   "eligibility_rule": "Stop er gyldigt hvis stop inden for 750 meter tilsammen har mindst 50 bushaendelser i spilvinduet, og stoppet selv har mindst en direkte bushaendelse i hver time fra 09 til 17.",
   "nearby_radius_meters": 750

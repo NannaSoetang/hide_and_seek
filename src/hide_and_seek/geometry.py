@@ -8,6 +8,9 @@ from typing import Any
 from shapely.geometry import Point, mapping, shape
 
 
+# TODO: `RANDERS_CENTER` is a Randers-specific fallback. Make this configurable
+# or compute a region centroid dynamically when the project targets a different
+# area (e.g. Storkøbenhavn).
 RANDERS_CENTER = (10.03639, 56.4607)
 PROVISIONAL_RADIUS_KM = 20.0
 

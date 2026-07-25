@@ -2,12 +2,14 @@
   "name": "hide_and_seek",
   "version": "1.0.0",
   "description": "Randers hide and seek helper tools",
+  "todo": "Replace Randers references with configurable region (e.g. Storkoebenhavn)",
   "type": "module",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
     "dev": "vite --config web/vite.config.js",
+    "build:data:municipalities": "/Users/nannasotang/Desktop/hide_and_seek/.venv/bin/python scripts/build_municipalities_data.py",
     "build:site": "vite build --config web/vite.config.js",
     "build:pdf": "node scripts/build_print_pdf.mjs",
     "build": "npm run build:site && npm run build:pdf",

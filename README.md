@@ -1,5 +1,8 @@
 # hide_and_seek-randers
 
+<!-- TODO: This repo is currently Randers-focused. Replace or parameterize
+	Randers references when switching to Storkøbenhavn or another region. -->
+
 Randers hide-and-seek helper tools:
 
 - interactive web map

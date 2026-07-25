@@ -2,6 +2,9 @@
 
 This intentionally ships a provisional work area while the official 2006 Randers
 municipality boundary remains unresolved in this environment.
+
+TODO: Replace Randers-specific references and workflows with a configurable
+region (e.g. Storkøbenhavn). See `KOMMUNEKODER` in this module for guidance.
 """
 
 from __future__ import annotations
@@ -18,10 +21,9 @@ from typing import Any
 import requests
 from pyproj import Transformer
 from shapely.geometry import LineString, MultiLineString, mapping, shape
+from shapely.ops import unary_union
 
-from hide_and_seek.geometry import (
-    RANDERS_CENTER,
-)
+# geometry utilities are available in `hide_and_seek.geometry` if needed.
 from hide_and_seek.rules import (
     MIN_TOTAL_EVENTS,
     has_consecutive_eligible_stops,
@@ -36,15 +38,58 @@ DERIVED_DIR = ROOT / "data" / "derived"
 PUBLIC_DIR = ROOT / "web" / "public" / "data"
 GTFS_URL = "https://www.rejseplanen.info/labs/GTFS.zip"
 GTFS_ZIP = RAW_DIR / "gtfs.zip"
+KOMMUNER_GEOJSON = RAW_DIR / "kommuner.geojson"
+POSTNUMRE_GEOJSON = RAW_DIR / "postnumre.geojson"
+OPSTILLINGSKREDSE_GEOJSON = RAW_DIR / "opstillingskredse.geojson"
 SOGNE_GEOJSON = RAW_DIR / "sogne.geojson"
 AFSTEMNINGSOMRAADER_GEOJSON = RAW_DIR / "afstemningsomraader.geojson"
 KOMMUNER_PREREFORM = RAW_DIR / "kommuner-pre-strukturreform-geojson-wgs84.geojson"
+KOMMUNER_URL = "https://api.dataforsyningen.dk/kommuner?format=geojson"
+POSTNUMRE_URL = "https://api.dataforsyningen.dk/postnumre?format=geojson"
+OPSTILLINGSKREDSE_URL = "https://api.dataforsyningen.dk/opstillingskredse?format=geojson"
 SOGNE_URL = "https://api.dataforsyningen.dk/sogne?format=geojson"
+KOMMUNEKODER = [
+    "0101",  # København
+    "0147",  # Frederiksberg
+    "0151",  # Ballerup
+    "0153",  # Brøndby
+    "0155",  # Dragør
+    "0157",  # Gentofte
+    "0159",  # Gladsaxe
+    "0161",  # Glostrup
+    "0163",  # Herlev
+    "0165",  # Albertslund
+    "0167",  # Hvidovre
+    "0169",  # Høje-Taastrup
+    "0173",  # Lyngby-Taarbæk
+    "0175",  # Rødovre
+    "0183",  # Ishøj
+    "0185",  # Tårnby
+    "0187",  # Vallensbæk
+    "0190",  # Furesø
+    "0201",  # Allerød
+    "0219",  # Hillerød
+    "0223",  # Hørsholm
+    "0230",  # Rudersdal
+    "0240",  # Egedal
+    "0250",  # Frederikssund
+    "0253",  # Greve
+    "0259",  # Køge
+    "0265",  # Roskilde
+    "0269",  # Solrød
+]
+
 AFSTEMNINGSOMRAADER_URL = (
-    "https://api.dataforsyningen.dk/afstemningsomraader?kommunekode=0730&format=geojson"
+    "https://api.dataforsyningen.dk/afstemningsomraader"
 )
 NEARBY_RADIUS_METERS = 750
 REQUIRED_HOURS = tuple(range(9, 18))
+ADMIN_SIMPLIFY_TOLERANCE = {
+    "municipalities": 0.00008,
+    "postnumre": 0.00012,
+    "opstillingskredse": 0.00010,
+    "sogne": 0.00008,
+}
 
 
 @dataclass
@@ -85,20 +130,51 @@ def iter_csv_from_zip(archive: zipfile.ZipFile, name: str):
         yield from csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8-sig"))
 
 
-def load_randers_boundary_feature() -> dict[str, Any]:
-    """Load the pre-reform Randers boundary from a local GeoJSON file."""
+def load_region_boundary_feature() -> dict[str, Any]:
+    """Build a single region boundary by unioning kommune geometries for
+    the codes listed in `KOMMUNEKODER` from the pre-reform kommuner GeoJSON.
+    """
+    fallback_boundary = PUBLIC_DIR / "boundary.geojson"
+    if not KOMMUNER_PREREFORM.exists() and fallback_boundary.exists():
+        fallback = json.loads(fallback_boundary.read_text())
+        feature = (fallback.get("features") or [None])[0]
+        if feature:
+            return feature
+
     collection = json.loads(KOMMUNER_PREREFORM.read_text())
+    matched = []
     for feature in collection.get("features", []):
-        if feature.get("properties", {}).get("navn") == "Randers Kommune":
-            return {
-                "type": "Feature",
-                "properties": {
-                    "name": "Randers Kommune",
-                    "note": "Prae-reform kommunegraense fra brugerleveret GeoJSON.",
-                },
-                "geometry": feature["geometry"],
-            }
-    raise RuntimeError("Randers Kommune was not found in the pre-reform GeoJSON")
+        props = feature.get("properties", {}) or {}
+        # Try a few common property names where a kommune-kode might appear.
+        kode_candidates = [
+            props.get("kode"),
+            props.get("kommunekode"),
+            props.get("kommunenr"),
+            props.get("KOMMUNEKODE"),
+        ]
+        # Also try to find the code among any string-ish property values.
+        for v in props.values():
+            if isinstance(v, str) and v.isdigit() and len(v) == 4:
+                kode_candidates.append(v)
+
+        if any(k in KOMMUNEKODER for k in (c for c in kode_candidates if c)):
+            matched.append(feature)
+
+    if not matched:
+        raise RuntimeError("No kommuner matched KOMMUNEKODER in the pre-reform file")
+
+    # Union all matched kommune geometries into a single geometry for the region.
+    shapes = [shape(f["geometry"]) for f in matched]
+    unioned = unary_union(shapes)
+    return {
+        "type": "Feature",
+        "properties": {
+            "name": "Storkøbenhavn",
+            "note": "Union of kommuner for Storkøbenhavn built from pre-reform GeoJSON.",
+            "kommunekoder": KOMMUNEKODER,
+        },
+        "geometry": mapping(unioned),
+    }
 
 
 def build_transit_dataset(
@@ -107,6 +183,8 @@ def build_transit_dataset(
     """Create route, stop, and summary datasets from GTFS."""
     boundary_shape = shape(boundary_feature["geometry"])
     route_view_shape = boundary_shape
+    # Compute a sensible map center from the provided region boundary.
+    region_centroid = boundary_shape.centroid.coords[0]
 
     with zipfile.ZipFile(GTFS_ZIP) as archive:
         stops_rows = load_csv_from_zip(archive, "stops.txt")
@@ -307,9 +385,9 @@ def build_transit_dataset(
         )
 
     metadata = {
-        "center": {"lon": RANDERS_CENTER[0], "lat": RANDERS_CENTER[1]},
+        "center": {"lon": region_centroid[0], "lat": region_centroid[1]},
         "boundary_status": "official-pre-reform",
-        "boundary_note": "Kortet bruger den brugerleverede pre-reform Randers kommunegraense.",
+        "boundary_note": "Regionens grænse er konstrueret fra pre-reform kommunefiler.",
         "eligible_stop_count": len(stop_features),
         "included_route_count": len(route_features),
         "play_window": "09:00-18:00 normal lordag",
@@ -325,27 +403,203 @@ def build_transit_dataset(
 
 
 def build_sogne_dataset(boundary_feature: dict[str, Any]) -> dict[str, Any]:
-    """Filter public sogne GeoJSON down to the nearby area."""
+    """Build normalized sogne dataset clipped to the game boundary."""
     download_if_missing(SOGNE_URL, SOGNE_GEOJSON)
-    all_sogne = json.loads(SOGNE_GEOJSON.read_text())
+    source = json.loads(SOGNE_GEOJSON.read_text())
     boundary_shape = shape(boundary_feature["geometry"])
-    filtered = []
-    for feature in all_sogne.get("features", []):
-        if shape(feature["geometry"]).intersects(boundary_shape):
-            filtered.append(feature)
-    return {"type": "FeatureCollection", "features": filtered}
+    return _build_admin_dataset(
+        source,
+        boundary_shape,
+        ADMIN_SIMPLIFY_TOLERANCE["sogne"],
+        lambda props: {
+            "name": _first_non_empty(
+                props,
+                "navn",
+                "name",
+                "sognenavn",
+                "SOGNENAVN",
+            )
+            or "Ukendt sogn",
+            "code": _first_non_empty(
+                props,
+                "sognekode",
+                "kode",
+                "sognenr",
+                "SOGNEKODE",
+            )
+            or "-",
+            "source": "Dataforsyningen sogne",
+        },
+        sort_key=lambda feat: feat["properties"]["name"],
+    )
+
+
+def _first_non_empty(props: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = props.get(key)
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            return text
+    return ""
+
+
+def _build_admin_dataset(
+    source: dict[str, Any],
+    boundary_shape: Any,
+    simplify_tolerance: float,
+    properties_builder,
+    sort_key,
+) -> dict[str, Any]:
+    features: list[dict[str, Any]] = []
+    for feature in source.get("features", []):
+        geometry = feature.get("geometry")
+        if not geometry:
+            continue
+
+        raw_shape = shape(geometry)
+        if not raw_shape.intersects(boundary_shape):
+            continue
+
+        clipped = raw_shape.intersection(boundary_shape)
+        if clipped.is_empty:
+            continue
+
+        simplified = clipped.simplify(simplify_tolerance, preserve_topology=True)
+        if simplified.is_empty:
+            continue
+
+        props = feature.get("properties", {}) or {}
+        features.append(
+            {
+                "type": "Feature",
+                "properties": properties_builder(props),
+                "geometry": mapping(simplified),
+            }
+        )
+
+    features.sort(key=sort_key)
+    return {"type": "FeatureCollection", "features": features}
+
+
+def build_municipalities_dataset(boundary_feature: dict[str, Any]) -> dict[str, Any]:
+    """Build normalized kommune boundaries from the official dataset."""
+    download_if_missing(KOMMUNER_URL, KOMMUNER_GEOJSON)
+    source = json.loads(KOMMUNER_GEOJSON.read_text())
+    boundary_shape = shape(boundary_feature["geometry"])
+    return _build_admin_dataset(
+        source,
+        boundary_shape,
+        ADMIN_SIMPLIFY_TOLERANCE["municipalities"],
+        lambda props: {
+            "name": _first_non_empty(props, "navn", "name", "kommunenavn", "KOMMUNENAVN")
+            or "Ukendt kommune",
+            "code": _first_non_empty(props, "kode", "kommunekode", "kommunenr", "KOMMUNEKODE")
+            or "-",
+            "source": "Dataforsyningen kommuner",
+        },
+        sort_key=lambda feat: feat["properties"]["name"],
+    )
+
+
+def build_postnumre_dataset(boundary_feature: dict[str, Any]) -> dict[str, Any]:
+    """Build normalized postområde boundaries grouped by postnummernavn."""
+    download_if_missing(POSTNUMRE_URL, POSTNUMRE_GEOJSON)
+    source = json.loads(POSTNUMRE_GEOJSON.read_text())
+    boundary_shape = shape(boundary_feature["geometry"])
+    grouped_geometries: dict[str, list[Any]] = defaultdict(list)
+    for feature in source.get("features", []):
+        geometry = feature.get("geometry")
+        if not geometry:
+            continue
+
+        raw_shape = shape(geometry)
+        if not raw_shape.intersects(boundary_shape):
+            continue
+
+        clipped = raw_shape.intersection(boundary_shape)
+        if clipped.is_empty:
+            continue
+
+        props = feature.get("properties", {}) or {}
+        label = _first_non_empty(props, "navn", "postnrnavn", "postnummernavn")
+        if not label:
+            label = "Ukendt postområde"
+        grouped_geometries[label].append(clipped)
+
+    features: list[dict[str, Any]] = []
+    for label, geometries in grouped_geometries.items():
+        merged = unary_union(geometries)
+        simplified = merged.simplify(ADMIN_SIMPLIFY_TOLERANCE["postnumre"], preserve_topology=True)
+        if simplified.is_empty:
+            continue
+        features.append(
+            {
+                "type": "Feature",
+                "properties": {
+                    "postnummernavn": label,
+                    "source": "Dataforsyningen postnumre",
+                },
+                "geometry": mapping(simplified),
+            }
+        )
+
+    features.sort(key=lambda feat: feat["properties"]["postnummernavn"])
+    return {"type": "FeatureCollection", "features": features}
+
+
+def build_opstillingskredse_dataset(boundary_feature: dict[str, Any]) -> dict[str, Any]:
+    """Build normalized opstillingskredse boundaries."""
+    download_if_missing(OPSTILLINGSKREDSE_URL, OPSTILLINGSKREDSE_GEOJSON)
+    source = json.loads(OPSTILLINGSKREDSE_GEOJSON.read_text())
+    boundary_shape = shape(boundary_feature["geometry"])
+    return _build_admin_dataset(
+        source,
+        boundary_shape,
+        ADMIN_SIMPLIFY_TOLERANCE["opstillingskredse"],
+        lambda props: {
+            "name": _first_non_empty(props, "navn", "name", "opstillingskredsnavn")
+            or "Ukendt opstillingskreds",
+            "number": _first_non_empty(props, "nummer", "nr", "opstillingskredsnummer")
+            or "-",
+            "source": "Dataforsyningen opstillingskredse",
+        },
+        sort_key=lambda feat: (feat["properties"]["name"], feat["properties"]["number"]),
+    )
+
+
+def _feature_has_kommunekode(feature: dict[str, Any], codes: list[str]) -> bool:
+    props = feature.get("properties", {}) or {}
+    # Direct properties commonly used by Dataforsyningen
+    if any(props.get(k) in codes for k in ("kommunekode", "kode", "KOMMUNEKODE")):
+        return True
+    # Sometimes kommune info is nested or encoded in other props.
+    for v in props.values():
+        if isinstance(v, str) and v in codes:
+            return True
+        if isinstance(v, (list, tuple)):
+            for item in v:
+                if isinstance(item, dict) and any(
+                    str(item.get(k)) in codes for k in ("kode", "kommunekode", "KOMMUNEKODE")
+                ):
+                    return True
+    return False
 
 
 def build_afstemningsomraader_dataset(
     boundary_feature: dict[str, Any],
 ) -> dict[str, Any]:
-    """Filter afstemningsområder to only Randers-relevant polygons."""
-    download_if_missing(AFSTEMNINGSOMRAADER_URL, AFSTEMNINGSOMRAADER_GEOJSON)
+    """Download all afstemningsområder once, then filter to the desired
+    Storkøbenhavn kommuner and the region boundary.
+    """
+    download_if_missing(AFSTEMNINGSOMRAADER_URL + "?format=geojson", AFSTEMNINGSOMRAADER_GEOJSON)
     all_areas = json.loads(AFSTEMNINGSOMRAADER_GEOJSON.read_text())
     boundary_shape = shape(boundary_feature["geometry"])
     filtered = []
     for feature in all_areas.get("features", []):
-        if shape(feature["geometry"]).intersects(boundary_shape):
+        # Prefer filtering by kommune code first (fast), then by geometry.
+        if _feature_has_kommunekode(feature, KOMMUNEKODER) or shape(feature["geometry"]).intersects(boundary_shape):
             filtered.append(feature)
     return {"type": "FeatureCollection", "features": filtered}
 
@@ -359,8 +613,11 @@ def main() -> None:
     """Build all first-pass derived data files."""
     ensure_dirs()
     download_if_missing(GTFS_URL, GTFS_ZIP)
-    boundary_feature = load_randers_boundary_feature()
+    boundary_feature = load_region_boundary_feature()
     routes, stops, metadata = build_transit_dataset(boundary_feature)
+    municipalities = build_municipalities_dataset(boundary_feature)
+    postnumre = build_postnumre_dataset(boundary_feature)
+    opstillingskredse = build_opstillingskredse_dataset(boundary_feature)
     sogne = build_sogne_dataset(boundary_feature)
     afstemningsomraader = build_afstemningsomraader_dataset(boundary_feature)
     boundary = {
@@ -370,6 +627,9 @@ def main() -> None:
 
     write_json(DERIVED_DIR / "routes.geojson", routes)
     write_json(DERIVED_DIR / "eligible-stops.geojson", stops)
+    write_json(DERIVED_DIR / "municipalities.geojson", municipalities)
+    write_json(DERIVED_DIR / "postnumre.geojson", postnumre)
+    write_json(DERIVED_DIR / "opstillingskredse.geojson", opstillingskredse)
     write_json(DERIVED_DIR / "sogne.geojson", sogne)
     write_json(DERIVED_DIR / "afstemningsomraader.geojson", afstemningsomraader)
     write_json(DERIVED_DIR / "boundary.geojson", boundary)
@@ -377,6 +637,9 @@ def main() -> None:
 
     write_json(PUBLIC_DIR / "routes.geojson", routes)
     write_json(PUBLIC_DIR / "eligible-stops.geojson", stops)
+    write_json(PUBLIC_DIR / "municipalities.geojson", municipalities)
+    write_json(PUBLIC_DIR / "postnumre.geojson", postnumre)
+    write_json(PUBLIC_DIR / "opstillingskredse.geojson", opstillingskredse)
     write_json(PUBLIC_DIR / "sogne.geojson", sogne)
     write_json(PUBLIC_DIR / "afstemningsomraader.geojson", afstemningsomraader)
     write_json(PUBLIC_DIR / "boundary.geojson", boundary)

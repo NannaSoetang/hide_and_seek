@@ -1,5 +1,8 @@
 # Randers Hide and Seek docs
 
+<!-- TODO: Docs reference Randers. Update these notes or add a configuration
+  section for alternate regions such as Storkøbenhavn. -->
+
 Small research notes for the datasets and services currently in scope for the Randers Jet Lag: Hide and Seek helper tools.
 
 ## Dataset notes

@@ -2,6 +2,9 @@
 
 ## Overview
 
+<!-- TODO: This dataset note references Randers specifically; update extraction
+	guidance when changing the target region. -->
+
 The old Randers municipality boundary should come from the **historical DAGI municipality dataset**, not the current DAWA municipality endpoint.
 
 The goal is to extract the pre-reform Randers municipality polygon valid in **2006**.
@@ -17,7 +20,7 @@ Expected useful concepts in the historical DAGI model:
 
 The current Randers municipality code to verify against is `0730`, but the exact historical schema should be checked in the historical service metadata.
 
-## How to extract old Randers 2006 boundary
+## How to extract old Randers 2006 boundary ß
 
 Recommended approach:
 

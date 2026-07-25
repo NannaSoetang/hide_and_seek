@@ -9,6 +9,7 @@ The feed appears to be a normal static GTFS Schedule archive and includes standa
 ## What we can use it for
 
 - Determine which stops are eligible on a Saturday
+- <!-- TODO: Update GTFS notes to cover Storkøbenhavn or make kommune filter configurable -->
 - Determine which routes serve Randers-area stops
 - Derive route geometry from `shape_id` + `shapes.txt`
 - Build a one-off processed dataset so the web app does not need live transit calls
