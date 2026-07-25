@@ -76,7 +76,6 @@ Open the local URL printed by Vite preview.
 - `scripts/`: preprocessing, build, PDF, and capture scripts
 - `data/`: downloaded raw source data cached by preprocessing
 - `docs/`: short source notes and documentation index
-- `src/hide_and_seek/`: currently empty reserved Python package directory
 - `tests/`: Python tests for preprocessing and supporting logic
 - `web/`: the frontend source, HTML entry points, and Vite configuration
 - `web/src/`: reusable browser modules for maps, lookups, overlays, and page setup
