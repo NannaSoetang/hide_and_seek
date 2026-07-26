@@ -2,40 +2,64 @@ import './style.css'
 import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
-import { addTransportLayers, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
+import { addTransportLayers, clearSelectedStation, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
 
 const ADMIN_BOUNDARY_STYLES = {
   kommuner: {
-    color: '#7b1fa2',
-    weight: 4.0,
-    opacity: 0.92,
-    fillColor: '#8e24aa',
-    fillOpacity: 0.18,
+    color: '#1565c0',
+    weight: 3.0,
+    opacity: 0.8,
+    fillColor: '#42a5f5',
+    fillOpacity: 0.14,
   },
   postomraader: {
-    color: '#00838f',
-    weight: 3.5,
-    opacity: 0.88,
-    fillColor: '#0097a7',
-    fillOpacity: 0.18,
+    color: '#00796b',
+    weight: 2.8,
+    opacity: 0.78,
+    fillColor: '#26a69a',
+    fillOpacity: 0.12,
   },
   opstillingskredse: {
-    color: '#c2185b',
-    weight: 3.2,
-    opacity: 0.88,
-    fillColor: '#d81b60',
-    fillOpacity: 0.18,
+    color: '#ad1457',
+    weight: 2.8,
+    opacity: 0.76,
+    fillColor: '#ec407a',
+    fillOpacity: 0.12,
   },
   sogne: {
     color: '#6d4c41',
-    weight: 2.8,
-    opacity: 0.82,
-    fillColor: '#795548',
-    fillOpacity: 0.18,
+    weight: 2.5,
+    opacity: 0.74,
+    fillColor: '#8d6e63',
+    fillOpacity: 0.1,
   },
 }
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
+
+function hasActiveMapState(map, adminLayers) {
+  const hasLineFilter = Boolean(map.__selectedTransitLine)
+  const hasOverlayFilter = adminLayers.some((layer) => map.hasLayer(layer.overlay))
+  const hasStationSelection = Boolean(map.__selectedStationLayer)
+  return hasLineFilter || hasOverlayFilter || hasStationSelection
+}
+
+function resetMapToOriginalState(map, adminLayers) {
+  if (!hasActiveMapState(map, adminLayers)) return false
+
+  map.__selectedTransitLine = null
+  map.fire('transit-line-selected')
+  clearSelectedStation(map)
+
+  for (const layer of adminLayers) {
+    if (map.hasLayer(layer.overlay)) {
+      map.removeLayer(layer.overlay)
+    }
+  }
+
+  map.closePopup()
+  return true
+}
 
 function addClearFilterControl(map, adminLayers) {
   const control = L.control({ position: 'topright' })
@@ -48,9 +72,7 @@ function addClearFilterControl(map, adminLayers) {
     button.setAttribute('aria-label', 'Ryd linje- og lagfiltrering')
 
     const updateState = () => {
-      const hasLineFilter = Boolean(map.__selectedTransitLine)
-      const hasOverlayFilter = adminLayers.some((layer) => map.hasLayer(layer.overlay))
-      const hasAnyFilter = hasLineFilter || hasOverlayFilter
+      const hasAnyFilter = hasActiveMapState(map, adminLayers)
       button.disabled = !hasAnyFilter
       button.classList.toggle('is-disabled', !hasAnyFilter)
     }
@@ -59,23 +81,12 @@ function addClearFilterControl(map, adminLayers) {
     L.DomEvent.disableScrollPropagation(container)
     L.DomEvent.on(button, 'click', (event) => {
       L.DomEvent.stopPropagation(event)
-      const hasLineFilter = Boolean(map.__selectedTransitLine)
-      const hasOverlayFilter = adminLayers.some((layer) => map.hasLayer(layer.overlay))
-      if (!hasLineFilter && !hasOverlayFilter) return
-
-      map.__selectedTransitLine = null
-      map.fire('transit-line-selected')
-
-      for (const layer of adminLayers) {
-        if (map.hasLayer(layer.overlay)) {
-          map.removeLayer(layer.overlay)
-        }
-      }
-
-      map.closePopup()
+      resetMapToOriginalState(map, adminLayers)
+      updateState()
     })
 
     map.on('transit-line-selected', updateState)
+    map.on('transit-station-selected', updateState)
     map.on('overlayadd overlayremove', updateState)
     updateState()
     return container
@@ -96,8 +107,8 @@ function escapeHtml(value) {
 function buildContextPopup(context) {
   const lines = []
   if (context.kommune) lines.push(`<p><strong>Kommune:</strong> ${escapeHtml(context.kommune)}</p>`)
-  if (context.postomraade) lines.push(`<p><strong>Postområde:</strong> ${escapeHtml(context.postomraade)}</p>`)
   if (context.opstillingskreds) lines.push(`<p><strong>Opstillingskreds:</strong> ${escapeHtml(context.opstillingskreds)}</p>`)
+  if (context.postomraade) lines.push(`<p><strong>Postområde:</strong> ${escapeHtml(context.postomraade)}</p>`)
   if (context.sogn) lines.push(`<p><strong>Sogn:</strong> ${escapeHtml(context.sogn)}</p>`)
   if (context.stationName) lines.push(`<p><strong>Station:</strong> ${escapeHtml(context.stationName)}</p>`)
   if (context.lines) lines.push(`<p><strong>Linjer:</strong> ${escapeHtml(context.lines)}</p>`)
@@ -217,12 +228,18 @@ async function init() {
   const sTogData = filterTransportData(transportData, 's-tog')
 
   const metroLayers = addTransportLayers(map, metroData, 'metro', {
+    onLineClick: () => {
+      map[SKIP_CONTEXT_CLICK_FLAG] = true
+    },
     onStationClick: (stationInfo) => {
       map[SKIP_CONTEXT_CLICK_FLAG] = true
       showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
     },
   })
   const sTogLayers = addTransportLayers(map, sTogData, 's-tog', {
+    onLineClick: () => {
+      map[SKIP_CONTEXT_CLICK_FLAG] = true
+    },
     onStationClick: (stationInfo) => {
       map[SKIP_CONTEXT_CLICK_FLAG] = true
       showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
@@ -234,6 +251,11 @@ async function init() {
       map[SKIP_CONTEXT_CLICK_FLAG] = false
       return
     }
+
+    if (resetMapToOriginalState(map, adminLayers)) {
+      return
+    }
+
     showContextPopup(map, adminLayers, event.latlng)
   })
 
@@ -249,7 +271,8 @@ async function init() {
   const bounds = boundaryLayer.getBounds()
 
   if (bounds.isValid()) {
-    map.fitBounds(bounds.pad(0.08))
+    map.__initialBounds = bounds.pad(0.08)
+    map.fitBounds(map.__initialBounds)
   } else {
     fitTransportLayers(map, metroLayers)
   }

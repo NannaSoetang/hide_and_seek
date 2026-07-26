@@ -5,14 +5,16 @@ const BASE_TRANSIT_CONFIG = {
   lineTooltipSuffix: '-linjen',
   lineWeight: 7,
   selectedLineWeight: 10,
-  normalOpacity: 0.9,
-  selectedOpacity: 0.2,
+  normalOpacity: 0.95,
+  selectedOpacity: 0.12,
   stationRadius: 5,
   selectedStationRadius: 8.5,
   stationWeight: 1.5,
   selectedStationWeight: 3,
   includeCasing: true,
   lineCasingWeight: 11,
+  selectedLineCasingOpacity: 0.64,
+  fadedLineCasingOpacity: 0.05,
 }
 
 const NETWORK_CONFIG = {
@@ -78,6 +80,20 @@ function applyStationStyle(layer, style) {
   layer.__visibleMarker?.setStyle(style)
 }
 
+export function clearSelectedStation(map) {
+  const selectedLayer = map.__selectedStationLayer
+  if (!selectedLayer) return
+  applyStationStyle(selectedLayer, selectedLayer.__defaultStyle || {
+    radius: 5,
+    color: '#172033',
+    weight: 1.5,
+    fillColor: '#fff',
+    fillOpacity: 1,
+  })
+  map.__selectedStationLayer = null
+  map.fire('transit-station-selected', { stationName: null })
+}
+
 export async function loadTransportData() {
   const [lines, stations] = await Promise.all([
     loadJson('/data/transport-lines.geojson'),
@@ -121,11 +137,25 @@ export function addTransportLayers(map, data, network, options = {}) {
     fillColor: '#fff',
     fillOpacity: 1,
   }
+  const transferStationStyle = {
+    radius: config.stationRadius + 0.8,
+    color: '#172033',
+    weight: config.stationWeight + 0.8,
+    fillColor: '#fff3c6',
+    fillOpacity: 1,
+  }
   const markedStationStyle = {
     radius: config.selectedStationRadius,
     color: '#172033',
     weight: config.selectedStationWeight,
     fillColor: '#ffd54a',
+    fillOpacity: 1,
+  }
+  const transferMarkedStationStyle = {
+    radius: config.selectedStationRadius + 0.8,
+    color: '#0f213a',
+    weight: config.selectedStationWeight + 0.5,
+    fillColor: '#ffbf3c',
     fillOpacity: 1,
   }
 
@@ -157,6 +187,10 @@ export function addTransportLayers(map, data, network, options = {}) {
       const line = feature.properties?.line
       layer.bindTooltip(`${line || ''}${config.lineTooltipSuffix}`, { sticky: true })
       layer.on('click', () => {
+          options.onLineClick?.({ network, line })
+        if (map.__selectedStationLayer) {
+          clearSelectedStation(map)
+        }
         const isSameSelection = map.__selectedTransitLine?.network === network
           && map.__selectedTransitLine.line === line
         map.__selectedTransitLine = isSameSelection ? null : { network, line }
@@ -197,18 +231,21 @@ export function addTransportLayers(map, data, network, options = {}) {
       const candidateLine = candidate.feature?.properties?.line
       const { isSelected, lineOpacity } = styleForLine(candidateLine)
       candidate.setStyle({
-        opacity: isSelected ? 0.95 : lineOpacity,
+          opacity: isSelected ? config.selectedLineCasingOpacity : Math.min(lineOpacity, config.fadedLineCasingOpacity),
       })
     })
 
     if (selectedLine) {
-      lineLayer.eachLayer((candidate) => {
-        if (candidate.feature?.properties?.line === selectedLine) candidate.bringToFront()
-      })
       lineCasingLayer?.eachLayer((candidate) => {
         if (candidate.feature?.properties?.line === selectedLine) candidate.bringToFront()
       })
+      lineLayer.eachLayer((candidate) => {
+        if (candidate.feature?.properties?.line === selectedLine) candidate.bringToFront()
+      })
     }
+
+    // Keep station dots above highlighted lines so they never disappear during selection.
+    stationLayer.bringToFront()
   }
   map.on('transit-line-selected', updateLineStyles)
 
@@ -218,18 +255,31 @@ export function addTransportLayers(map, data, network, options = {}) {
       const name = cleanedStationName(feature.properties?.name || config.stationFallback)
       const lines = (feature.properties?.lines || []).map((line) => String(line))
       const isTransfer = counterpartStationNames.has(normalizeStationName(name))
+      const defaultStyle = isTransfer ? transferStationStyle : stationStyle
+      const selectedStyle = isTransfer ? transferMarkedStationStyle : markedStationStyle
+      layer.__defaultStyle = defaultStyle
+      applyStationStyle(layer, defaultStyle)
       layer.on('click', () => {
+        if (map.__selectedTransitLine) {
+          map.__selectedTransitLine = null
+          map.fire('transit-line-selected')
+        }
         const previous = map.__selectedStationLayer
         if (previous && previous !== layer) {
-          applyStationStyle(previous, stationStyle)
+          applyStationStyle(previous, previous.__defaultStyle || stationStyle)
         }
         if (previous === layer) {
-          applyStationStyle(layer, stationStyle)
-          map.__selectedStationLayer = null
+          clearSelectedStation(map)
           return
         }
-        applyStationStyle(layer, markedStationStyle)
+        applyStationStyle(layer, selectedStyle)
         map.__selectedStationLayer = layer
+        map.fire('transit-station-selected', {
+          stationName: name,
+          lines: lines.join(', '),
+          network,
+          isTransfer,
+        })
         const stationLatLng = layer.getLayers?.()[0]?.getLatLng?.() || null
         options.onStationClick?.({
           latlng: stationLatLng,

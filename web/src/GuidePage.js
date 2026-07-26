@@ -88,49 +88,21 @@ function transferNames(metroStations, stogStations) {
   return transfers
 }
 
-function renderStationListItem(station, network, transfers) {
-  const item = document.createElement('li')
-  item.className = 'guide-station-item'
-
-  const name = normalizeStationName(station.properties?.name || '').replace(/^./, (c) => c.toUpperCase())
-  const displayName = (station.properties?.name || '').replace(/\s*\(Metro\)\s*/gi, '').trim()
-  const isTransfer = transfers.has(name)
-
-  const nameSpan = document.createElement('span')
-  nameSpan.className = 'guide-station-name'
-  nameSpan.textContent = displayName
-
-  const badges = document.createElement('span')
-  badges.className = 'guide-station-badges'
-
-  const networkBadge = document.createElement('span')
-  networkBadge.className = 'guide-badge guide-badge-network'
-  networkBadge.textContent = network
-  badges.append(networkBadge)
-
-  if (isTransfer) {
-    const transferBadge = document.createElement('span')
-    transferBadge.className = 'guide-badge guide-badge-transfer'
-    transferBadge.textContent = 'Skift'
-    badges.append(transferBadge)
-  }
-
-  item.append(nameSpan, badges)
-  return item
+function createSvgElement(tagName) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tagName)
 }
 
-function renderLineAccordion({ parent, lineKey, meta, stations, lineCoords, transfers }) {
-  const details = document.createElement('details')
-  details.className = 'guide-line-accordion'
+function splitStationLabel(name) {
+  const words = String(name || '').split(/\s+/).filter(Boolean)
+  if (words.length <= 2 || words.join(' ').length <= 14) return [words.join(' ')]
 
-  const summary = document.createElement('summary')
-  summary.className = 'guide-line-summary'
-  summary.style.setProperty('--line-color', meta.color)
-  summary.innerHTML = `<strong>${meta.title}</strong> <span>${meta.route}</span>`
+  const halfway = Math.max(1, Math.ceil(words.length / 2))
+  const first = words.slice(0, halfway).join(' ')
+  const second = words.slice(halfway).join(' ')
+  return second ? [first, second] : [first]
+}
 
-  const list = document.createElement('ol')
-  list.className = 'guide-station-list'
-
+function renderLineDiagram({ parent, meta, stations, lineCoords, transfers }) {
   const ordered = [...stations]
     .map((station) => ({
       station,
@@ -139,10 +111,97 @@ function renderLineAccordion({ parent, lineKey, meta, stations, lineCoords, tran
     .sort((a, b) => a.measure - b.measure)
     .map((entry) => entry.station)
 
-  list.replaceChildren(...ordered.map((station) => renderStationListItem(station, meta.network, transfers)))
+  const diagram = document.createElement('article')
+  diagram.className = 'guide-line-diagram'
 
-  details.append(summary, list)
-  parent.append(details)
+  const header = document.createElement('div')
+  header.className = 'guide-line-diagram-header'
+
+  const title = document.createElement('h3')
+  title.style.setProperty('--line-color', meta.color)
+  title.textContent = meta.title
+
+  const route = document.createElement('p')
+  route.textContent = meta.route
+
+  header.append(title, route)
+
+  const scroller = document.createElement('div')
+  scroller.className = 'guide-line-diagram-scroll'
+
+  const svgWidth = Math.max(760, ordered.length * 118)
+  const svgHeight = 148
+  const svg = createSvgElement('svg')
+  svg.classList.add('guide-line-diagram-svg')
+  svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`)
+  svg.setAttribute('width', String(svgWidth))
+  svg.setAttribute('height', String(svgHeight))
+  svg.setAttribute('role', 'img')
+  svg.setAttribute('aria-label', `${meta.title} ${meta.route}`)
+
+  const lineY = 72
+  const left = 46
+  const right = svgWidth - 46
+  const step = ordered.length > 1 ? (right - left) / (ordered.length - 1) : 0
+
+  const baseLine = createSvgElement('line')
+  baseLine.setAttribute('x1', String(left))
+  baseLine.setAttribute('y1', String(lineY))
+  baseLine.setAttribute('x2', String(right))
+  baseLine.setAttribute('y2', String(lineY))
+  baseLine.setAttribute('stroke', meta.color)
+  baseLine.setAttribute('stroke-width', '7')
+  baseLine.setAttribute('stroke-linecap', 'round')
+  svg.append(baseLine)
+
+  ordered.forEach((station, index) => {
+    const stationName = (station.properties?.name || '').replace(/\s*\(Metro\)\s*/gi, '').trim()
+    const normalizedName = normalizeStationName(stationName)
+    const isTransfer = transfers.has(normalizedName)
+    const x = ordered.length > 1 ? left + step * index : svgWidth / 2
+    const labelLines = splitStationLabel(stationName)
+    const labelTop = index % 2 === 0 ? 24 : 118
+
+    const marker = createSvgElement('circle')
+    marker.setAttribute('cx', String(x))
+    marker.setAttribute('cy', String(lineY))
+    marker.setAttribute('r', '8')
+    marker.setAttribute('fill', '#ffffff')
+    marker.setAttribute('stroke', isTransfer ? '#835900' : meta.color)
+    marker.setAttribute('stroke-width', '3')
+    svg.append(marker)
+
+    if (labelLines.length > 1) {
+      const tie = createSvgElement('line')
+      tie.setAttribute('x1', String(x))
+      tie.setAttribute('y1', String(lineY + (index % 2 === 0 ? -12 : 12)))
+      tie.setAttribute('x2', String(x))
+      tie.setAttribute('y2', String(index % 2 === 0 ? labelTop + 18 : labelTop - 14))
+      tie.setAttribute('stroke', '#cad5e4')
+      tie.setAttribute('stroke-width', '1.2')
+      svg.append(tie)
+    }
+
+    const text = createSvgElement('text')
+    text.setAttribute('x', String(x))
+    text.setAttribute('y', String(labelTop))
+    text.setAttribute('text-anchor', 'middle')
+    text.setAttribute('class', isTransfer ? 'guide-line-label is-transfer' : 'guide-line-label')
+
+    labelLines.forEach((line, labelIndex) => {
+      const tspan = createSvgElement('tspan')
+      tspan.setAttribute('x', String(x))
+      tspan.setAttribute('dy', labelIndex === 0 ? '0' : '13')
+      tspan.textContent = line
+      text.append(tspan)
+    })
+
+    svg.append(text)
+  })
+
+  scroller.append(svg)
+  diagram.append(header, scroller)
+  parent.append(diagram)
 }
 
 export class GuidePage {
@@ -199,9 +258,8 @@ export class GuidePage {
     container.append(metroHeader)
 
     for (const lineKey of ['M1', 'M2', 'M3', 'M4']) {
-      renderLineAccordion({
+      renderLineDiagram({
         parent: container,
-        lineKey,
         meta: METRO_LINE_META[lineKey],
         stations: lineStations(metro.stations, lineKey),
         lineCoords: bestLineCoordinates(metro.lines.features || [], lineKey),
@@ -215,9 +273,8 @@ export class GuidePage {
     container.append(stogHeader)
 
     for (const lineKey of ['A', 'B', 'C', 'F']) {
-      renderLineAccordion({
+      renderLineDiagram({
         parent: container,
-        lineKey,
         meta: STOG_LINE_META[lineKey],
         stations: lineStations(stog.stations, lineKey),
         lineCoords: bestLineCoordinates(stog.lines.features || [], lineKey),

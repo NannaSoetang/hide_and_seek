@@ -59,9 +59,9 @@ main {
   margin: 0;
   padding: 0.55rem 0.85rem;
   border-radius: 0.5rem;
-  background: rgb(255 255 255 / 93%);
-  box-shadow: 0 1px 5px rgb(0 0 0 / 25%);
-  font-size: 0.98rem;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+  font-size: 0.92rem;
   line-height: 1.25;
   font-weight: 600;
 }
@@ -70,7 +70,7 @@ main {
   position: absolute;
   z-index: 1000;
   top: auto;
-  bottom: calc(var(--safe-bottom) + 0.9rem);
+  bottom: calc(var(--safe-bottom) + 0.8rem);
   left: calc(var(--safe-left) + 4rem);
   display: flex;
   gap: 0.5rem;
@@ -82,7 +82,7 @@ main {
   padding: 0.58rem 0.85rem;
   border-radius: 0.65rem;
   border: 1px solid #2b578f;
-  background: rgb(255 255 255 / 95%);
+  background: rgb(255 255 255 / 91%);
   color: #1f4f8f;
   text-decoration: none;
   font-size: 0.95rem;
@@ -161,19 +161,19 @@ main {
 }
 
 .admin-label--kommuner span {
-  border-color: rgb(123 31 162 / 32%);
+  border-color: rgb(21 101 192 / 42%);
 }
 
 .admin-label--postomraader span {
-  border-color: rgb(0 131 143 / 28%);
+  border-color: rgb(0 121 107 / 40%);
 }
 
 .admin-label--opstillingskredse span {
-  border-color: rgb(194 24 91 / 28%);
+  border-color: rgb(173 20 87 / 40%);
 }
 
 .admin-label--sogne span {
-  border-color: rgb(109 76 65 / 28%);
+  border-color: rgb(109 76 65 / 40%);
 }
 
 .leaflet-control-layers label {
@@ -185,7 +185,7 @@ main {
 }
 
 .map-clear-filter-button {
-  min-height: 36px;
+  min-height: 44px;
   min-width: 90px;
   border: 0;
   padding: 0.32rem 0.62rem;
@@ -211,8 +211,8 @@ main {
 @media (max-width: 600px) {
   .map-title {
     left: calc(var(--safe-left) + 3.6rem);
-    max-width: min(54vw, 18rem);
-    font-size: 0.95rem;
+    max-width: min(52vw, 16rem);
+    font-size: 0.86rem;
   }
 
   .where-am-i-link {
@@ -232,6 +232,10 @@ main {
     right: calc(var(--safe-right) + 0.75rem);
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .guide-text-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -331,6 +335,97 @@ main {
   margin: 1rem 0 0.45rem;
   font-size: 1rem;
   color: #213a5f;
+}
+
+.guide-line-diagram {
+  margin-top: 0.6rem;
+  border: 1px solid #d5deea;
+  border-radius: 0.75rem;
+  background: #fff;
+  overflow: hidden;
+}
+
+.guide-line-diagram-header {
+  padding: 0.72rem 0.78rem 0.46rem;
+  border-bottom: 1px solid #e5ebf4;
+}
+
+.guide-line-diagram-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.15;
+  color: var(--line-color, #213a5f);
+}
+
+.guide-line-diagram-header p {
+  margin: 0.2rem 0 0;
+  color: #4a617f;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.guide-line-diagram-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0.15rem 0.55rem;
+}
+
+.guide-line-diagram-svg {
+  display: block;
+  min-width: 100%;
+}
+
+.guide-line-label {
+  fill: #213a5f;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.guide-line-label.is-transfer {
+  fill: #835900;
+  font-weight: 700;
+}
+
+.guide-rule-list,
+.guide-phase-list,
+.guide-type-list,
+.guide-example-list {
+  margin: 0.55rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.guide-rule-list li,
+.guide-phase-list li,
+.guide-type-list li,
+.guide-example-list li {
+  margin-top: 0.38rem;
+  line-height: 1.45;
+}
+
+.guide-text-grid {
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.guide-mini-card {
+  border: 1px solid #dfe6ef;
+  border-radius: 0.7rem;
+  background: #fbfcfe;
+  padding: 0.72rem;
+}
+
+.guide-mini-card h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #213a5f;
+}
+
+.guide-mini-card p {
+  margin: 0.35rem 0 0;
+  color: #3a4d69;
+  line-height: 1.45;
 }
 
 .guide-line-accordion {

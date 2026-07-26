@@ -16,10 +16,12 @@ import requests
 from pyproj import Transformer
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.pagesizes import A4, landscape, portrait
+from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
+from reportlab.platypus import Frame, Paragraph, Spacer, Table, TableStyle
 
 
 TRANSPORT_LINE_ORDER = {
@@ -47,6 +49,53 @@ NETWORK_LINE_LABELS = {
     "s-tog": {"A": "A", "B": "B", "C": "C", "F": "F"},
 }
 
+ADMIN_LAYER_SPECS = [
+    {
+        "id": "municipalities",
+        "label": "Kommune",
+        "path": Path("web/public/data/municipalities.geojson"),
+        "color": "#1565c0",
+        "width": 2.6,
+        "dash": None,
+        "priority": 1,
+        "visible_by_default": True,
+        "description": "Medium-priority civic boundary. Good default overlay.",
+    },
+    {
+        "id": "opstillingskredse",
+        "label": "Valgkreds / Opstillingskreds",
+        "path": Path("web/public/data/opstillingskredse.geojson"),
+        "color": "#ad1457",
+        "width": 2.2,
+        "dash": None,
+        "priority": 2,
+        "visible_by_default": True,
+        "description": "Useful political boundary layer. Keep subtle.",
+    },
+    {
+        "id": "postnumre",
+        "label": "Postområde",
+        "path": Path("web/public/data/postnumre.geojson"),
+        "color": "#00796b",
+        "width": 1.8,
+        "dash": None,
+        "priority": 3,
+        "visible_by_default": True,
+        "description": "Dense layer. Use only if the map remains readable.",
+    },
+    {
+        "id": "sogne",
+        "label": "Sogn",
+        "path": Path("web/public/data/sogne.geojson"),
+        "color": "#6d4c41",
+        "width": 1.6,
+        "dash": None,
+        "priority": 4,
+        "visible_by_default": True,
+        "description": "Most detailed layer. Best as a faint overlay or legend note.",
+    },
+]
+
 DEFAULT_INPUT_LINES = Path("web/public/data/transport-lines.geojson")
 DEFAULT_INPUT_STATIONS = Path("web/public/data/transport-stations.geojson")
 DEFAULT_INPUT_BOUNDARY = Path("web/public/data/boundary.geojson")
@@ -66,10 +115,10 @@ class PdfMapConfig:
     page_size_name: str = "A4"
     orientation: str = "auto"
     margin: float = 16.0
-    line_width: float = 2.0
-    line_casing_width: float = 4.6
-    station_radius: float = 2.2
-    station_stroke_width: float = 0.9
+    line_width: float = 2.45
+    line_casing_width: float = 5.2
+    station_radius: float = 3.3
+    station_stroke_width: float = 1.1
     network_padding: float = 0.04
     background_zoom: int = 15
     tile_url: str = "https://basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png"
@@ -77,6 +126,11 @@ class PdfMapConfig:
     boundary_color: str = "#ff4d00"
     boundary_width: float = 2.0
     boundary_casing_width: float = 4.4
+    label_clearance: float = 4.5
+    label_font_size: float = 7.8
+    label_padding_x: float = 2.5
+    label_padding_y: float = 1.8
+    label_gap: float = 2.0
 
 
 @dataclass(frozen=True)
@@ -512,6 +566,120 @@ def draw_boundary(canvas: Canvas, transform: PageTransform, boundary_rings: list
         canvas.setDash()
 
 
+def draw_geojson_layer(
+    canvas: Canvas,
+    transform: PageTransform,
+    transformer: Transformer,
+    geojson: dict,
+    color: str,
+    width: float,
+    dash: tuple[float, ...] | None = None,
+) -> None:
+    canvas.setStrokeColor(HexColor(color))
+    canvas.setLineWidth(width)
+    canvas.setLineJoin(1)
+    canvas.setLineCap(1)
+    if dash:
+        canvas.setDash(*dash)
+    else:
+        canvas.setDash()
+
+    for feature in geojson.get("features", []):
+        geometry = feature.get("geometry") or {}
+        geometry_type = geometry.get("type")
+        coordinates = geometry.get("coordinates") or []
+        if geometry_type == "Polygon":
+            rings = coordinates
+        elif geometry_type == "MultiPolygon":
+            rings = [ring for polygon in coordinates for ring in polygon]
+        else:
+            continue
+
+        for ring in rings:
+            if len(ring) < 2:
+                continue
+            path = canvas.beginPath()
+            first = transform.map_point(ProjectedPoint(*transformer.transform(ring[0][0], ring[0][1])))
+            path.moveTo(*first)
+            for lon, lat in ring[1:]:
+                x, y = transform.map_point(ProjectedPoint(*transformer.transform(lon, lat)))
+                path.lineTo(x, y)
+            canvas.drawPath(path, stroke=1, fill=0)
+
+
+def draw_admin_layers(canvas: Canvas, transform: PageTransform, transformer: Transformer, admin_layers: dict[str, dict]) -> None:
+    for spec in sorted(ADMIN_LAYER_SPECS, key=lambda item: item["width"], reverse=True):
+        geojson = admin_layers.get(spec["id"])
+        if not geojson:
+            continue
+        draw_geojson_layer(canvas, transform, transformer, geojson, "#ffffff", spec["width"] + 0.8, spec["dash"])
+        draw_geojson_layer(canvas, transform, transformer, geojson, spec["color"], spec["width"], spec["dash"])
+
+
+def line_display_name(network: str, line_id: str) -> str:
+    if network == "s-tog":
+        return f"Line – S-tog {line_id}"
+    return f"Line – {line_id}"
+
+
+def line_label_candidates(record: LineRecord) -> list[tuple[ProjectedPoint, tuple[float, float]]]:
+    fractions = [0.18, 0.32, 0.5, 0.68, 0.82]
+    candidates: list[tuple[ProjectedPoint, tuple[float, float]]] = []
+    for fraction in fractions:
+        point, tangent = point_along_polyline(record.coordinates, fraction)
+        angle = math.degrees(math.atan2(tangent[1], tangent[0]))
+        candidates.append((point, tangent))
+    return candidates
+
+
+def draw_line_labels(canvas: Canvas, transform: PageTransform, line_records: list[LineRecord], station_records: list[StationRecord], config: PdfMapConfig, font_name: str) -> None:
+    placer = LabelPlacer(transform, config)
+    for station in station_records:
+        x, y = transform.map_point(station.point)
+        placer.reserve((x - 9, y - 9, x + 9, y + 9))
+
+    grouped = line_groups(line_records)
+    ordered_keys = [(network, line_id) for network in ("metro", "s-tog") for line_id in TRANSPORT_LINE_ORDER[network]]
+    for network, line_id in ordered_keys:
+        records = grouped.get((network, line_id))
+        if not records:
+            continue
+        record = longest_record(records)
+        text = line_display_name(network, line_id)
+        font_size = config.label_font_size
+        width = pdfmetrics.stringWidth(text, font_name, font_size) + config.label_padding_x * 2
+        height = font_size * 1.25 + config.label_padding_y * 2
+        found = False
+        for point, tangent in line_label_candidates(record):
+            angle = math.degrees(math.atan2(tangent[1], tangent[0]))
+            centers = line_candidate_positions(point.x, point.y, angle, width, height, config.label_gap)
+            for center_x, center_y in centers:
+                box = (center_x - width / 2.0, center_y - height / 2.0, center_x + width / 2.0, center_y + height / 2.0)
+                if not placer.is_free(box):
+                    continue
+                placer.reserve(box)
+                draw_halo_text(canvas, center_x, center_y, text, font_name, font_size, record.color)
+                found = True
+                break
+            if found:
+                break
+        if not found:
+            point, tangent = point_along_polyline(record.coordinates, 0.5)
+            angle = math.degrees(math.atan2(tangent[1], tangent[0]))
+            center_x, center_y = line_candidate_positions(point.x, point.y, angle, width, height, config.label_gap)[0]
+            draw_halo_text(canvas, center_x, center_y, text, font_name, font_size, record.color)
+            placer.reserve((center_x - width / 2.0, center_y - height / 2.0, center_x + width / 2.0, center_y + height / 2.0))
+
+
+def draw_halo_text(canvas: Canvas, center_x: float, center_y: float, text: str, font_name: str, font_size: float, text_color: str) -> None:
+    canvas.setFont(font_name, font_size)
+    canvas.setFillColor(white)
+    for offset_x, offset_y in [(-0.35, 0), (0.35, 0), (0, -0.35), (0, 0.35)]:
+        canvas.drawCentredString(center_x + offset_x, center_y + offset_y - font_size * 0.33, text)
+    canvas.setFillColor(HexColor(text_color))
+    canvas.drawCentredString(center_x, center_y - font_size * 0.33, text)
+
+
 def draw_polyline(canvas: Canvas, transform: PageTransform, coordinates: list[ProjectedPoint], color: str, width: float) -> None:
     path = canvas.beginPath()
     first_x, first_y = transform.map_point(coordinates[0])
@@ -588,10 +756,10 @@ class LabelPlacer:
 
     def is_free(self, box: tuple[float, float, float, float]) -> bool:
         padded = (
-            box[0] - self.config.min_label_clearance,
-            box[1] - self.config.min_label_clearance,
-            box[2] + self.config.min_label_clearance,
-            box[3] + self.config.min_label_clearance,
+            box[0] - self.config.label_clearance,
+            box[1] - self.config.label_clearance,
+            box[2] + self.config.label_clearance,
+            box[3] + self.config.label_clearance,
         )
         if not self.within_bounds(padded):
             return False
@@ -683,6 +851,7 @@ def draw_transit_map(
     boundary_geojson: dict,
     line_records: list[LineRecord],
     station_records: list[StationRecord],
+    admin_layers: dict[str, dict],
     config: PdfMapConfig,
 ) -> None:
     combined_bounds = merge_bounds(None, [point for record in line_records for point in record.coordinates])
@@ -714,6 +883,8 @@ def draw_transit_map(
 
     draw_tile_background(canvas, transform, config)
 
+    draw_admin_layers(canvas, transform, transformer, admin_layers)
+
     for network in ("metro", "s-tog"):
         for line_id in TRANSPORT_LINE_ORDER[network]:
             matching = [record for record in line_records if record.network == network and record.line_id == line_id]
@@ -727,6 +898,7 @@ def draw_transit_map(
 
     draw_boundary(canvas, transform, boundary_rings, config)
 
+    draw_line_labels(canvas, transform, line_records, station_records, config, choose_font())
     canvas.showPage()
     canvas.save()
 
@@ -746,6 +918,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tile-url", type=str, default=DEFAULT_TILE_URL, help="Tile URL template with {z}, {x}, and {y}")
     parser.add_argument("--tile-cache-dir", type=Path, default=Path(".cache/transit-map/tiles"), help="Tile cache directory")
     parser.add_argument("--boundary", type=Path, default=DEFAULT_INPUT_BOUNDARY, help="Input boundary GeoJSON")
+    parser.add_argument("--hide-admin-divisions", action="store_true", help="Omit administrative division layers from the map")
     return parser.parse_args()
 
 
@@ -766,8 +939,12 @@ def config_from_args(args: argparse.Namespace) -> PdfMapConfig:
 def main() -> None:
     args = parse_args()
     config = config_from_args(args)
-    map_data = build_map_data(load_geojson(args.lines), load_geojson(args.stations), load_geojson(args.boundary))
-    draw_transit_map(args.output, load_geojson(args.boundary), map_data.line_records, map_data.station_records, config)
+    lines_geojson = load_geojson(args.lines)
+    stations_geojson = load_geojson(args.stations)
+    boundary_geojson = load_geojson(args.boundary)
+    admin_layers = {} if args.hide_admin_divisions else {spec["id"]: load_geojson(spec["path"]) for spec in ADMIN_LAYER_SPECS}
+    map_data = build_map_data(lines_geojson, stations_geojson, boundary_geojson)
+    draw_transit_map(args.output, boundary_geojson, map_data.line_records, map_data.station_records, admin_layers, config)
     print(f"Wrote {args.output}")
 
 
