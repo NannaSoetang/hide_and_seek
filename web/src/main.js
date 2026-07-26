@@ -14,6 +14,21 @@ function hasActiveMapState(map, adminLayers) {
   return hasLineFilter || hasOverlayFilter || hasStationSelection
 }
 
+function hasClearableSelection(map) {
+  return Boolean(map.__selectedTransitLine) || Boolean(map.__selectedStationLayer)
+}
+
+function clearTransientSelections(map) {
+  if (!hasClearableSelection(map)) return false
+
+  map.__selectedTransitLine = null
+  map.fire('transit-line-selected')
+  clearSelectedStation(map)
+
+  map.closePopup()
+  return true
+}
+
 function resetMapToOriginalState(map, adminLayers) {
   if (!hasActiveMapState(map, adminLayers)) return false
 
@@ -177,7 +192,7 @@ async function init() {
       return
     }
 
-    if (resetMapToOriginalState(map, adminLayers)) {
+    if (clearTransientSelections(map)) {
       return
     }
 

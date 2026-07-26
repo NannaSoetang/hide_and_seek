@@ -53,8 +53,8 @@ test('guide page loads station groups and tabs', async ({ page }) => {
   await waitForGuideReady(page)
 
   await expect(page.getByRole('heading', { name: 'Spilguide' })).toBeVisible()
-  await expect(page.locator('#station-groups .guide-line-accordion').first()).toBeVisible()
+  await expect(page.locator('#station-groups .guide-line-diagram').first()).toBeVisible()
 
-  await page.getByRole('tab', { name: 'Spilleregler' }).click()
+  await page.getByRole('tab', { name: 'Regler' }).click()
   await expect(page.locator('#guide-panel-rules')).toBeVisible()
 })
