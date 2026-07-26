@@ -20,7 +20,7 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import KeepInFrame, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import Paragraph, Spacer
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
@@ -256,10 +256,6 @@ def paragraph(text: str, style: ParagraphStyle) -> Paragraph:
     return Paragraph(text, style)
 
 
-def build_column(flowables: list, width: float, height: float) -> KeepInFrame:
-    return KeepInFrame(width, height, flowables, mode="shrink", hAlign="LEFT")
-
-
 def section_block(title: str, body_lines: list[str], title_style: ParagraphStyle, body_style: ParagraphStyle) -> list:
     flowables = [paragraph(escape(title), title_style)]
     for line in body_lines:
@@ -379,33 +375,13 @@ def build_output(path: Path) -> None:
             right_flowables.append(paragraph(line, body_style))
 
     page_width, page_height = landscape(A4)
-    margin = 12 * mm
-    usable_width = page_width - 2 * margin
-    usable_height = page_height - 2 * margin
-    gutter = 8 * mm
-    left_width = usable_width * 0.55 - gutter / 2
-    right_width = usable_width * 0.45 - gutter / 2
-
-    table = Table(
-        [
-            [
-                build_column(left_flowables, left_width, usable_height - 24),
-                build_column(right_flowables, right_width, usable_height - 24),
-            ]
-        ],
-        colWidths=[left_width, right_width],
-    )
-    table.setStyle(
-        TableStyle(
-            [
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 0),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-                ("TOPPADDING", (0, 0), (-1, -1), 0),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-            ]
-        )
-    )
+    margin = 10 * mm
+    title_height = 19 * mm
+    gutter = 7 * mm
+    usable_width = page_width - 2 * margin - gutter
+    left_width = usable_width * 0.53
+    right_width = usable_width - left_width
+    body_height = page_height - 2 * margin - title_height
 
     canvas = Canvas(str(path), pagesize=(page_width, page_height), pageCompression=1)
     canvas.setTitle("Hide and Seek guide")
@@ -421,11 +397,13 @@ def build_output(path: Path) -> None:
         paragraph("Spilguide", title_style),
         paragraph("Tilladte stationer, spilleregler og spørgsmålstyper samlet på én side.", subtitle_style),
     ]
-    title_frame = Frame(margin, page_height - margin - 24 * mm, usable_width, 24 * mm, leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0, showBoundary=0)
-    body_frame = Frame(margin, margin, usable_width, page_height - 2 * margin - 24 * mm, leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0, showBoundary=0)
+    title_frame = Frame(margin, page_height - margin - title_height, page_width - 2 * margin, title_height, leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0, showBoundary=0)
+    left_frame = Frame(margin, margin, left_width, body_height, leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0, showBoundary=0)
+    right_frame = Frame(margin + left_width + gutter, margin, right_width, body_height, leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0, showBoundary=0)
 
     title_frame.addFromList(title_block, canvas)
-    body_frame.addFromList([table], canvas)
+    left_frame.addFromList(left_flowables, canvas)
+    right_frame.addFromList(right_flowables, canvas)
     canvas.showPage()
     canvas.save()
 

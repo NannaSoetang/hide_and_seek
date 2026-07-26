@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --config web/vite.config.js",
     "build:data": "uv run python scripts/build_data.py",
-    "build:guide": "uv run python scripts/generate_guide_pdf.py",
+    "build:guide": ".venv/bin/python scripts/generate_guide_pdf.py",
     "build:site": "vite build --config web/vite.config.js",
     "build": "npm run build:site",
     "preview": "vite preview --config web/vite.config.js",
