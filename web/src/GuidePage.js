@@ -1,19 +1,6 @@
 import './style.css'
 import { filterTransportData, loadTransportData } from './transport.js'
-
-const METRO_LINE_META = {
-  M1: { title: 'M1', route: 'Vanløse – Vestamager', color: '#00a650', network: 'Metro' },
-  M2: { title: 'M2', route: 'Vanløse – Lufthavnen', color: '#f5c400', network: 'Metro' },
-  M3: { title: 'M3', route: 'Cityringen', color: '#e03b3b', network: 'Metro' },
-  M4: { title: 'M4', route: 'Orientkaj – København Syd', color: '#0072bc', network: 'Metro' },
-}
-
-const STOG_LINE_META = {
-  A: { title: 'A-linje', route: 'Hillerød – Køge (Tilladt Lyngby - Vallensbæk)', color: '#1f4e9e', network: 'S-tog' },
-  B: { title: 'B-linje', route: 'Farum – Høje Taastrup (Tilladt Budding - Glostrup)', color: '#2f9e44', network: 'S-tog' },
-  C: { title: 'C-linje', route: 'Klampenborg – Frederikssund (Tilladt Klampenborg - Herlev)', color: '#f28e2b', network: 'S-tog' },
-  F: { title: 'F-linje', route: 'Hellerup – København Syd', color: '#f2a900', network: 'S-tog' },
-}
+import { linesForNetwork } from './theme.js'
 
 function distance(a, b) {
   const dx = a[0] - b[0]
@@ -252,34 +239,26 @@ export class GuidePage {
     const container = this.elements.stationGroups
     container.replaceChildren()
 
-    const metroHeader = document.createElement('h3')
-    metroHeader.className = 'guide-network-title'
-    metroHeader.textContent = 'Metro'
-    container.append(metroHeader)
+    const networks = [
+      { label: 'Metro', data: metro },
+      { label: 'S-tog', data: stog },
+    ]
 
-    for (const lineKey of ['M1', 'M2', 'M3', 'M4']) {
-      renderLineDiagram({
-        parent: container,
-        meta: METRO_LINE_META[lineKey],
-        stations: lineStations(metro.stations, lineKey),
-        lineCoords: bestLineCoordinates(metro.lines.features || [], lineKey),
-        transfers,
-      })
-    }
+    for (const { label, data } of networks) {
+      const header = document.createElement('h3')
+      header.className = 'guide-network-title'
+      header.textContent = label
+      container.append(header)
 
-    const stogHeader = document.createElement('h3')
-    stogHeader.className = 'guide-network-title'
-    stogHeader.textContent = 'S-tog'
-    container.append(stogHeader)
-
-    for (const lineKey of ['A', 'B', 'C', 'F']) {
-      renderLineDiagram({
-        parent: container,
-        meta: STOG_LINE_META[lineKey],
-        stations: lineStations(stog.stations, lineKey),
-        lineCoords: bestLineCoordinates(stog.lines.features || [], lineKey),
-        transfers,
-      })
+      for (const meta of linesForNetwork(label === 'Metro' ? 'metro' : 's-tog')) {
+        renderLineDiagram({
+          parent: container,
+          meta,
+          stations: lineStations(data.stations, meta.line),
+          lineCoords: bestLineCoordinates(data.lines.features || [], meta.line),
+          transfers,
+        })
+      }
     }
   }
 

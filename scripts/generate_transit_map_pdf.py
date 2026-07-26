@@ -21,79 +21,23 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.platypus import Frame, Paragraph, Spacer, Table, TableStyle
+
+from theme import ADMIN_LAYERS, LINE_COLORS, lines_for_network
 
 
 TRANSPORT_LINE_ORDER = {
-    "metro": ["M1", "M2", "M3", "M4"],
-    "s-tog": ["A", "B", "C", "F"],
-}
-
-NETWORK_COLORS = {
-    "metro": {
-        "M1": "#00a650",
-        "M2": "#f5c400",
-        "M3": "#e03b3b",
-        "M4": "#0072bc",
-    },
-    "s-tog": {
-        "A": "#1f4e9e",
-        "B": "#2f9e44",
-        "C": "#f28e2b",
-        "F": "#f2a900",
-    },
-}
-
-NETWORK_LINE_LABELS = {
-    "metro": {"M1": "M1", "M2": "M2", "M3": "M3", "M4": "M4"},
-    "s-tog": {"A": "A", "B": "B", "C": "C", "F": "F"},
+    network: [line["line"] for line in lines_for_network(network)]
+    for network in ("metro", "s-tog")
 }
 
 ADMIN_LAYER_SPECS = [
     {
-        "id": "municipalities",
-        "label": "Kommune",
-        "path": Path("web/public/data/municipalities.geojson"),
-        "color": "#1565c0",
-        "width": 2.6,
-        "dash": None,
-        "priority": 1,
-        "visible_by_default": True,
-        "description": "Medium-priority civic boundary. Good default overlay.",
-    },
-    {
-        "id": "opstillingskredse",
-        "label": "Valgkreds / Opstillingskreds",
-        "path": Path("web/public/data/opstillingskredse.geojson"),
-        "color": "#ad1457",
-        "width": 2.2,
-        "dash": None,
-        "priority": 2,
-        "visible_by_default": True,
-        "description": "Useful political boundary layer. Keep subtle.",
-    },
-    {
-        "id": "postnumre",
-        "label": "Postområde",
-        "path": Path("web/public/data/postnumre.geojson"),
-        "color": "#00796b",
-        "width": 1.8,
-        "dash": None,
-        "priority": 3,
-        "visible_by_default": True,
-        "description": "Dense layer. Use only if the map remains readable.",
-    },
-    {
-        "id": "sogne",
-        "label": "Sogn",
-        "path": Path("web/public/data/sogne.geojson"),
-        "color": "#6d4c41",
-        "width": 1.6,
-        "dash": None,
-        "priority": 4,
-        "visible_by_default": True,
-        "description": "Most detailed layer. Best as a faint overlay or legend note.",
-    },
+        "id": Path(layer["dataFile"]).stem,
+        "path": Path("web/public/data") / layer["dataFile"],
+        "color": layer["color"],
+        "width": layer["pdfWidth"],
+    }
+    for layer in ADMIN_LAYERS
 ]
 
 DEFAULT_INPUT_LINES = Path("web/public/data/transport-lines.geojson")
@@ -112,7 +56,6 @@ DEFAULT_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 class PdfMapConfig:
     """Rendering knobs that can be tuned from the CLI."""
 
-    page_size_name: str = "A4"
     orientation: str = "auto"
     margin: float = 16.0
     line_width: float = 2.45
@@ -154,25 +97,6 @@ class StationRecord:
     lines: tuple[str, ...]
     networks: tuple[str, ...]
     point: ProjectedPoint
-
-
-@dataclass(frozen=True)
-class LabelRecord:
-    text: str
-    kind: str
-    color: str
-    center: ProjectedPoint
-    priority: int
-    angle: float = 0.0
-    max_width: float = 0.0
-
-
-@dataclass(frozen=True)
-class MapData:
-    line_records: list[LineRecord]
-    station_records: list[StationRecord]
-    boundary_rings: list[list[ProjectedPoint]]
-    bounds: MapBounds
 
 
 @dataclass(frozen=True)
@@ -329,7 +253,7 @@ def build_render_data(
             LineRecord(
                 network=network,
                 line_id=line_id,
-                color=str(properties.get("color") or NETWORK_COLORS[network][line_id]),
+                color=str(properties.get("color") or LINE_COLORS[line_id]),
                 coordinates=projected,
             )
         )
@@ -359,30 +283,6 @@ def build_render_data(
         raise ValueError("No geometry found in the transport datasets")
 
     return line_records, station_records, bounds
-
-
-def build_map_data(
-    lines_geojson: dict,
-    stations_geojson: dict,
-    boundary_geojson: dict,
-) -> MapData:
-    line_records, station_records, bounds = build_render_data(lines_geojson, stations_geojson)
-    transformer = Transformer.from_crs(WGS84, WEB_MERCATOR, always_xy=True)
-    boundary_rings: list[list[ProjectedPoint]] = []
-
-    for ring in extract_boundary_rings(boundary_geojson):
-        projected_ring = project_coordinates(ring, transformer)
-        if len(projected_ring) < 2:
-            continue
-        boundary_rings.append(projected_ring)
-        bounds = merge_bounds(bounds, projected_ring)
-
-    return MapData(
-        line_records=line_records,
-        station_records=station_records,
-        boundary_rings=boundary_rings,
-        bounds=bounds,
-    )
 
 
 def line_groups(line_records: list[LineRecord]) -> dict[tuple[str, str], list[LineRecord]]:
@@ -428,33 +328,6 @@ def point_along_polyline(coordinates: list[ProjectedPoint], fraction: float = 0.
     left = coordinates[-2]
     right = coordinates[-1]
     return right, (right.x - left.x, right.y - left.y)
-
-
-def nearest_station_index(stations: list[StationRecord], point: ProjectedPoint, network: str) -> int | None:
-    best_index: int | None = None
-    best_distance = float("inf")
-    for index, station in enumerate(stations):
-        if network not in station.networks:
-            continue
-        distance = math.hypot(station.point.x - point.x, station.point.y - point.y)
-        if distance < best_distance:
-            best_distance = distance
-            best_index = index
-    return best_index
-
-
-def choose_terminal_stations(
-    grouped_lines: dict[tuple[str, str], list[LineRecord]],
-    stations: list[StationRecord],
-) -> set[str]:
-    labels: set[str] = set()
-    for (network, _line_id), records in grouped_lines.items():
-        representative = longest_record(records)
-        for endpoint in (representative.coordinates[0], representative.coordinates[-1]):
-            station_index = nearest_station_index(stations, endpoint, network)
-            if station_index is not None:
-                labels.add(stations[station_index].name)
-    return labels
 
 
 def orient_page(bounds: MapBounds, config: PdfMapConfig) -> tuple[tuple[float, float], MapBounds, float, float, float]:
@@ -573,16 +446,12 @@ def draw_geojson_layer(
     geojson: dict,
     color: str,
     width: float,
-    dash: tuple[float, ...] | None = None,
 ) -> None:
     canvas.setStrokeColor(HexColor(color))
     canvas.setLineWidth(width)
     canvas.setLineJoin(1)
     canvas.setLineCap(1)
-    if dash:
-        canvas.setDash(*dash)
-    else:
-        canvas.setDash()
+    canvas.setDash()
 
     for feature in geojson.get("features", []):
         geometry = feature.get("geometry") or {}
@@ -612,8 +481,8 @@ def draw_admin_layers(canvas: Canvas, transform: PageTransform, transformer: Tra
         geojson = admin_layers.get(spec["id"])
         if not geojson:
             continue
-        draw_geojson_layer(canvas, transform, transformer, geojson, "#ffffff", spec["width"] + 0.8, spec["dash"])
-        draw_geojson_layer(canvas, transform, transformer, geojson, spec["color"], spec["width"], spec["dash"])
+        draw_geojson_layer(canvas, transform, transformer, geojson, "#ffffff", spec["width"] + 0.8)
+        draw_geojson_layer(canvas, transform, transformer, geojson, spec["color"], spec["width"])
 
 
 def line_display_name(network: str, line_id: str) -> str:
@@ -702,35 +571,6 @@ def draw_station(canvas: Canvas, transform: PageTransform, station: StationRecor
     canvas.circle(x, y, radius, stroke=1, fill=1)
 
 
-def split_label(text: str, font_name: str, font_size: float, max_width: float) -> list[str]:
-    words = [part for part in re.split(r"\s+", text.strip()) if part]
-    if not words:
-        return [text]
-
-    lines: list[str] = []
-    current = words[0]
-    for word in words[1:]:
-        candidate = f"{current} {word}"
-        if pdfmetrics.stringWidth(candidate, font_name, font_size) <= max_width:
-            current = candidate
-        else:
-            lines.append(current)
-            current = word
-    lines.append(current)
-
-    if len(lines) > 3:
-        lines = lines[:2] + [" ".join(lines[2:])]
-
-    return lines
-
-
-def label_box(lines: list[str], font_name: str, font_size: float, padding_x: float, padding_y: float) -> tuple[float, float]:
-    widths = [pdfmetrics.stringWidth(line, font_name, font_size) for line in lines]
-    width = max(widths) + padding_x * 2
-    height = len(lines) * font_size * 1.18 + padding_y * 2
-    return width, height
-
-
 def rectangles_intersect(left: tuple[float, float, float, float], right: tuple[float, float, float, float]) -> bool:
     return not (
         left[2] <= right[0]
@@ -767,57 +607,6 @@ class LabelPlacer:
 
     def reserve(self, box: tuple[float, float, float, float]) -> None:
         self.occupied.append(box)
-
-
-def draw_label_box(
-    canvas: Canvas,
-    center_x: float,
-    center_y: float,
-    width: float,
-    height: float,
-    fill_color: str,
-    stroke_color: str,
-    stroke_width: float,
-    radius: float,
-) -> tuple[float, float, float, float]:
-    x0 = center_x - width / 2.0
-    y0 = center_y - height / 2.0
-    canvas.setFillColor(HexColor(fill_color))
-    canvas.setStrokeColor(HexColor(stroke_color))
-    canvas.setLineWidth(stroke_width)
-    canvas.roundRect(x0, y0, width, height, radius, stroke=1, fill=1)
-    return x0, y0, x0 + width, y0 + height
-
-
-def draw_multiline_text(
-    canvas: Canvas,
-    center_x: float,
-    center_y: float,
-    lines: list[str],
-    font_name: str,
-    font_size: float,
-    text_color: str,
-) -> None:
-    canvas.setFillColor(HexColor(text_color))
-    canvas.setFont(font_name, font_size)
-    leading = font_size * 1.18
-    top = center_y + (len(lines) - 1) * leading / 2.0
-    for index, line in enumerate(lines):
-        y = top - index * leading
-        canvas.drawCentredString(center_x, y - font_size * 0.34, line)
-
-
-def station_candidate_positions(anchor_x: float, anchor_y: float, box_width: float, box_height: float, gap: float) -> list[tuple[float, float]]:
-    return [
-        (anchor_x + box_width / 2.0 + gap, anchor_y + box_height / 2.0 + gap),
-        (anchor_x + box_width / 2.0 + gap, anchor_y - box_height / 2.0 - gap),
-        (anchor_x - box_width / 2.0 - gap, anchor_y + box_height / 2.0 + gap),
-        (anchor_x - box_width / 2.0 - gap, anchor_y - box_height / 2.0 - gap),
-        (anchor_x + box_width / 2.0 + gap, anchor_y),
-        (anchor_x - box_width / 2.0 - gap, anchor_y),
-        (anchor_x, anchor_y + box_height / 2.0 + gap),
-        (anchor_x, anchor_y - box_height / 2.0 - gap),
-    ]
 
 
 def line_candidate_positions(
@@ -908,7 +697,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lines", type=Path, default=DEFAULT_INPUT_LINES, help="Input transport-lines GeoJSON")
     parser.add_argument("--stations", type=Path, default=DEFAULT_INPUT_STATIONS, help="Input transport-stations GeoJSON")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="Output PDF path")
-    parser.add_argument("--page-size", choices=["A4"], default="A4", help="PDF page size")
     parser.add_argument("--orientation", choices=["auto", "portrait", "landscape"], default="auto", help="Page orientation")
     parser.add_argument("--margin", type=float, default=18.0, help="Page margin in points")
     parser.add_argument("--line-width", type=float, default=1.6, help="Transit line width in points")
@@ -924,7 +712,6 @@ def parse_args() -> argparse.Namespace:
 
 def config_from_args(args: argparse.Namespace) -> PdfMapConfig:
     return PdfMapConfig(
-        page_size_name=args.page_size,
         orientation=args.orientation,
         margin=args.margin,
         line_width=args.line_width,
@@ -943,8 +730,8 @@ def main() -> None:
     stations_geojson = load_geojson(args.stations)
     boundary_geojson = load_geojson(args.boundary)
     admin_layers = {} if args.hide_admin_divisions else {spec["id"]: load_geojson(spec["path"]) for spec in ADMIN_LAYER_SPECS}
-    map_data = build_map_data(lines_geojson, stations_geojson, boundary_geojson)
-    draw_transit_map(args.output, boundary_geojson, map_data.line_records, map_data.station_records, admin_layers, config)
+    line_records, station_records, _bounds = build_render_data(lines_geojson, stations_geojson)
+    draw_transit_map(args.output, boundary_geojson, line_records, station_records, admin_layers, config)
     print(f"Wrote {args.output}")
 
 

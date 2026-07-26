@@ -21,67 +21,41 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Flowable, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from theme import TRANSIT_LINES
+
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 LINES_PATH = BASE_DIR / "web/public/data/transport-lines.geojson"
 STATIONS_PATH = BASE_DIR / "web/public/data/transport-stations.geojson"
 DEFAULT_OUTPUT = BASE_DIR / "guide-onepager.pdf"
 
-METRO_META = {
-    "M1": {"title": "M1", "route": "Vanløse – Vestamager", "color": "#00a650", "network": "Metro"},
-    "M2": {"title": "M2", "route": "Vanløse – Lufthavnen", "color": "#f5c400", "network": "Metro"},
-    "M3": {"title": "M3", "route": "Cityringen", "color": "#e03b3b", "network": "Metro"},
-    "M4": {"title": "M4", "route": "Orientkaj – København Syd", "color": "#0072bc", "network": "Metro"},
-}
-
-STOG_META = {
-    "A": {"title": "A-linje", "route": "Hillerød – Køge (Tilladt Lyngby - Vallensbæk)", "color": "#1f4e9e", "network": "S-tog"},
-    "B": {"title": "B-linje", "route": "Farum – Høje Taastrup (Tilladt Buddinge - Glostrup)", "color": "#2f9e44", "network": "S-tog"},
-    "C": {"title": "C-linje", "route": "Klampenborg – Frederikssund (Tilladt Klampenborg - Herlev)", "color": "#f28e2b", "network": "S-tog"},
-    "F": {"title": "F-linje", "route": "Hellerup – København Syd", "color": "#f2a900", "network": "S-tog"},
-}
+GAME_PHASES = [
+    ("Forberedelsesfase", "Hvert hold får 15 minutter til at forberede sig, før de gemmer sig."),
+    ("Spillet", "Gemmerne vælger en station og skal blive inden for 500 meter af den. Man har 30 minutter til at komme hen til sin zone."),
+    ("Slutfase", "Når søgerne når ind i gemmezonen, må gemmerne ikke flytte sig mere."),
+    ("Vinder", "Holdet med den længste samlede gemmetid efter begge runder vinder."),
+]
 
 RULES = [
+    "Vi spiller Small Game.",
+    "Du må kun bruge offentlig transport: Metro og S-tog.",
     "Gemmerne må højst have 6 kort på hånden.",
-    "I transportsektionen må kun Metro og S-tog bruges.",
+    "Når gemmerne har valgt deres gemmezone, skal de være højst 3 meter fra en offentlig vej eller sti.",
+    "Svar altid ærligt. Svaret gælder, selv om I krydser en grænse bagefter.",
+    "Hver gang der stilles et spørgsmål med en beslutning, der vedrører søgerne, skal søgerne sende deres position.",
+    "Google Maps er det nemmeste værktøj til at måle afstand — brug «Mål distance», så får du afstanden i fugleflugt.",
     "AI og Google Street View må ikke bruges.",
+    "En administrativ inddeling er et område: kommune, opstillingskreds, postnummer eller sogn.",
 ]
 
-GAME_PHASES = [
-    "Forberedelse: Hvert hold får 15 minutter, før de skal gemme sig.",
-    "Gemmefase: Gemmerne har 30 minutter til at vælge en station og blive inden for 500 meter af den.",
-    "Slutfase: Når søgerne kommer ind i gemmezonen, må gemmerne ikke flytte sig mere.",
-    "Sejr: Holdet med den længste samlede gemmetid efter begge runder vinder.",
-]
-
-QUESTION_EXPLANATIONS = [
-    (
-        "Hvad er en administrativ inddeling?",
-        "En administrativ inddeling er et geografisk område som kommune, opstillingskreds, postnummer eller sogn.",
-    ),
-    (
-        "Hvordan besvares spørgsmål?",
-        "Spørgsmål besvares ærligt inden for svarfristen, og svaret gælder stadig, hvis I krydser en grænse efter, at spørgsmålet er stillet.",
-    ),
-    (
-        "Hvordan bruges Google Maps og Google Street View korrekt?",
-        "Google Maps må bruges til at måle afstand i fugleflugt, men Google Street View må ikke bruges.",
-    ),
-]
-
+# Hver type følges direkte af sit eksempel: (type, forklaring, eksempel).
+# Small Game — tentakelspørgsmål bruges ikke.
 QUESTION_TYPES = [
-    "Matching, nærmest og samme bruges til korte ja/nej-vurderinger.",
-    "Måling bruges, når afstanden eller relationen skal oplyses.",
-    "Termometer og radar bruges til henholdsvis retning og nærhed.",
-    "Billedspørgsmål har længere svarfrist og kræver et konkret foto.",
-]
-
-EXAMPLE_QUESTIONS = [
-    "Har vi samme nærmeste punkt?",
-    "Hvem af os er tættest på rådhuset?",
-    "Hvad er afstanden i fugleflugt til station X?",
-    "Er vi blevet varmere eller koldere siden sidste måling?",
-    "Tag et billede fra din station.",
+    ("Matchning", "«Er jeres nærmeste ___ det samme som vores?» Svar: ja eller nej.", "Er jeres nærmeste station den samme som vores?"),
+    ("Måling", "«Sammenlignet med os, er I tættere på eller længere fra ___?» Svar: tættere eller længere.", "Sammenlignet med os, er I tættere på eller længere fra en kyst?"),
+    ("Radar", "«Er I inden for ___ fra os?» Svar: ja eller nej.", "Er I inden for 1 km fra os?"),
+    ("Termometer", "«Efter vi har bevæget os ___, er vi blevet varmere eller koldere?» Søgerne sender deres position, rejser afstanden og spørger så. Svar: varmere eller koldere.", "Efter vi har bevæget os 800 m, er vi varmere eller koldere?"),
+    ("Billede", "«Send os et billede af ___.» Gemmerne må tage billeder på forhånd, men billeder taget på forhånd må ikke bruges i slutfasen. Kan motivet ikke nås — især i slutfasen, eller hvis det ikke findes i området — svarer de «Det er ikke muligt».", "Send os et billede af himlen."),
 ]
 
 
@@ -101,7 +75,7 @@ class TransitLineDiagram(Flowable):
         self.width = width
         self.color = HexColor(color)
         self.stations = stations
-        self.height = 31 * mm
+        self.height = 19 * mm
 
     def wrap(self, availWidth: float, availHeight: float) -> tuple[float, float]:
         self.width = min(self.width, availWidth)
@@ -120,55 +94,68 @@ class TransitLineDiagram(Flowable):
     def draw(self) -> None:
         canvas = self.canv
         n = len(self.stations)
-        left = 9 * mm
-        right = self.width - 9 * mm
+        left = 5 * mm
+        right = self.width - 5 * mm
         center_y = self.height / 2
         step = 0 if n < 2 else (right - left) / (n - 1)
+        dot_radius = 1.5 * mm
+        label_step = 3.1 * mm
+        label_color = HexColor("#213a5f")
 
         canvas.saveState()
         canvas.setStrokeColor(self.color)
-        canvas.setLineWidth(3.2)
+        canvas.setLineWidth(2.4)
         canvas.setLineCap(1)
         canvas.line(left, center_y, right, center_y)
 
-        for index, (name, is_transfer) in enumerate(self.stations):
+        for index, (name, _is_transfer) in enumerate(self.stations):
             x = left + step * index if n > 1 else (left + right) / 2
             label_lines = self._label_lines(name)
-            label_color = HexColor("#835900") if is_transfer else HexColor("#213a5f")
-            font_name = "Helvetica-Bold" if is_transfer else "Helvetica"
-            label_y = center_y + 7.4 * mm if index % 2 == 0 else center_y - 9.4 * mm
-            label_step = 4.4 * mm
 
             canvas.setFillColor(colors.white)
             canvas.setStrokeColor(self.color)
-            canvas.setLineWidth(1.4)
-            canvas.circle(x, center_y, 2.7 * mm, stroke=1, fill=1)
+            canvas.setLineWidth(1.2)
+            canvas.circle(x, center_y, dot_radius, stroke=1, fill=1)
 
             canvas.setFillColor(label_color)
-            canvas.setFont(font_name, 7.2)
+            canvas.setFont("Helvetica", 6.4)
             if index % 2 == 0:
-                baseline = label_y
+                nearest = center_y + dot_radius + 2.4 * mm
+                for line_index, line in enumerate(label_lines):
+                    y = nearest + (len(label_lines) - 1 - line_index) * label_step
+                    canvas.drawCentredString(x, y, line)
             else:
-                baseline = label_y + (len(label_lines) - 1) * label_step
-
-            for line_index, line in enumerate(label_lines):
-                y = baseline - line_index * label_step
-                canvas.drawCentredString(x, y, line)
+                nearest = center_y - dot_radius - 3.0 * mm
+                for line_index, line in enumerate(label_lines):
+                    y = nearest - line_index * label_step
+                    canvas.drawCentredString(x, y, line)
 
         canvas.restoreState()
 
 
 def choose_font() -> str:
     candidates = [
-        Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf"),
-        Path("/Library/Fonts/Arial Unicode.ttf"),
-        Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
-        Path("/Library/Fonts/Arial.ttf"),
+        (
+            Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf"),
+            Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
+        ),
+        (
+            Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
+            Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
+        ),
+        (
+            Path("/Library/Fonts/Arial.ttf"),
+            Path("/Library/Fonts/Arial Bold.ttf"),
+        ),
     ]
-    for font_path in candidates:
-        if font_path.exists():
-            pdfmetrics.registerFont(TTFont("GuideSans", str(font_path)))
-            return "GuideSans"
+    for regular_path, bold_path in candidates:
+        if not regular_path.exists():
+            continue
+        pdfmetrics.registerFont(TTFont("GuideSans", str(regular_path)))
+        if bold_path.exists():
+            pdfmetrics.registerFont(TTFont("GuideSans-Bold", str(bold_path)))
+            pdfmetrics.registerFontFamily("GuideSans", normal="GuideSans", bold="GuideSans-Bold")
+        return "GuideSans"
     return "Helvetica"
 
 
@@ -269,44 +256,18 @@ def bullet_paragraph(text: str, style: ParagraphStyle, indent: int = 0) -> Parag
     return Paragraph(f"{prefix}• {text}", style)
 
 
-def box(width: float, title: str, body: list, title_style: ParagraphStyle, accent: str, fill: str) -> Table:
-    content = [paragraph(title, title_style), Spacer(1, 1.3 * mm)]
-    content.extend(body)
-    table = Table([[content]], colWidths=[width])
+def two_columns(left: list, right: list, width: float, gap: float) -> Table:
+    col_width = (width - gap) / 2
+    table = Table([[left, right]], colWidths=[col_width, col_width], hAlign="LEFT")
     table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, -1), fill),
-                ("LINEBEFORE", (0, 0), (-1, -1), 4, HexColor(accent)),
-                ("BOX", (0, 0), (-1, -1), 0.7, HexColor("#d8e0ea")),
-                ("LEFTPADDING", (0, 0), (-1, -1), 8),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-                ("TOPPADDING", (0, 0), (-1, -1), 7),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ]
-        )
-    )
-    return table
-
-
-def compact_card(width: float, title: str, body: list, title_style: ParagraphStyle, accent: str, fill: str) -> Table:
-    return box(width, title, body, title_style, accent, fill)
-
-
-def card_grid(cards: list[Table], cols: int, width: float, gap: float) -> Table:
-    if len(cards) % cols != 0:
-        raise ValueError("Card count must be divisible by column count")
-    col_width = (width - gap * (cols - 1)) / cols
-    rows = [cards[index : index + cols] for index in range(0, len(cards), cols)]
-    table = Table(rows, colWidths=[col_width] * cols, hAlign="LEFT")
-    table.setStyle(
-        TableStyle(
-            [
-                ("LEFTPADDING", (0, 0), (-1, -1), 0),
-                ("RIGHTPADDING", (0, 0), (-1, -1), gap),
+                ("LEFTPADDING", (0, 0), (0, 0), 0),
+                ("RIGHTPADDING", (0, 0), (0, 0), gap),
+                ("LEFTPADDING", (1, 0), (1, 0), 0),
+                ("RIGHTPADDING", (1, 0), (1, 0), 0),
                 ("TOPPADDING", (0, 0), (-1, -1), 0),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), gap),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ]
         )
@@ -320,149 +281,94 @@ def build_line_specs() -> list[LineSpec]:
     metro_stations = [feature for feature in stations_geojson.get("features", []) if "metro" in feature.get("properties", {}).get("networks", [])]
     stog_stations = [feature for feature in stations_geojson.get("features", []) if "s-tog" in feature.get("properties", {}).get("networks", [])]
     transfers = transfer_names(metro_stations, stog_stations)
+    stations_by_network = {"metro": metro_stations, "s-tog": stog_stations}
 
     specs: list[LineSpec] = []
-    for line_id in ["M1", "M2", "M3", "M4"]:
-        meta = METRO_META[line_id]
-        line_coords = best_line_coordinates(lines_geojson.get("features", []), line_id)
+    for meta in TRANSIT_LINES:
+        line_coords = best_line_coordinates(lines_geojson.get("features", []), meta["line"])
         specs.append(
             LineSpec(
-                network="Metro",
-                line_id=line_id,
+                network=meta["networkLabel"],
+                line_id=meta["line"],
                 title=meta["title"],
                 route=meta["route"],
                 color=meta["color"],
-                stations=ordered_station_names(line_stations(metro_stations, line_id), line_coords, transfers),
-            )
-        )
-    for line_id in ["A", "B", "C", "F"]:
-        meta = STOG_META[line_id]
-        line_coords = best_line_coordinates(lines_geojson.get("features", []), line_id)
-        specs.append(
-            LineSpec(
-                network="S-tog",
-                line_id=line_id,
-                title=meta["title"],
-                route=meta["route"],
-                color=meta["color"],
-                stations=ordered_station_names(line_stations(stog_stations, line_id), line_coords, transfers),
+                stations=ordered_station_names(
+                    line_stations(stations_by_network[meta["network"]], meta["line"]),
+                    line_coords,
+                    transfers,
+                ),
             )
         )
     return specs
 
 
-def build_title_page(width: float, section_style: ParagraphStyle, body_style: ParagraphStyle, title_style: ParagraphStyle, subtitle_style: ParagraphStyle) -> list:
+def build_reference_page(
+    width: float,
+    title_style: ParagraphStyle,
+    subtitle_style: ParagraphStyle,
+    section_style: ParagraphStyle,
+    item_style: ParagraphStyle,
+    type_style: ParagraphStyle,
+    example_style: ParagraphStyle,
+) -> list:
     story: list = []
-    story.append(paragraph("Spilguide", title_style))
-    story.append(Spacer(1, 1.5 * mm))
-    story.append(paragraph("Et kort, struktureret regelhæfte til Hide & Seek med stationer, regler og spørgsmål samlet i ét rent layout.", subtitle_style))
+    story.append(paragraph("Hide &amp; Seek", title_style))
+    story.append(paragraph("Hurtigguide — find svaret på få sekunder.", subtitle_style))
     story.append(Spacer(1, 5 * mm))
 
-    story.append(
-        box(
-            width,
-            "Hvad finder du her?",
-            [
-                paragraph("Stationerne er vist som enkle linjediagrammer, så ruter og stop er lette at skimme.", body_style),
-                Spacer(1, 1.2 * mm),
-                paragraph("Reglerne er samlet i en kort, dansk form uden gentagelser.", body_style),
-                Spacer(1, 1.2 * mm),
-                paragraph("Spørgsmålene forklarer begreberne og viser den forventede form og sværhedsgrad.", body_style),
-            ],
-            section_style,
-            "#213a5f",
-            "#fbfcfe",
-        )
-    )
-    story.append(Spacer(1, 4 * mm))
+    left_column: list = [paragraph("Sådan spiller I", section_style), Spacer(1, 2 * mm)]
+    for index, (label, text) in enumerate(GAME_PHASES):
+        left_column.append(paragraph(f"<b>{index + 1}. {escape_html(label)}:</b>&nbsp;&nbsp;{escape_html(text)}", item_style))
+    left_column.append(Spacer(1, 4 * mm))
+    left_column.append(paragraph("Regler", section_style))
+    left_column.append(Spacer(1, 2 * mm))
+    for text in RULES:
+        left_column.append(bullet_paragraph(escape_html(text), item_style))
+
+    right_column: list = [paragraph("Spørgsmålstyper", section_style), Spacer(1, 2 * mm)]
+    for name, explanation, example in QUESTION_TYPES:
+        right_column.append(paragraph(f"<b>{escape_html(name)}</b>", type_style))
+        right_column.append(paragraph(escape_html(explanation), item_style))
+        right_column.append(paragraph(f"Eksempel: {escape_html(example)}", example_style))
+        right_column.append(Spacer(1, 2.4 * mm))
+
+    story.append(two_columns(left_column, right_column, width, 8 * mm))
     return story
 
 
-def build_allowed_station_page(width: float, section_style: ParagraphStyle, body_style: ParagraphStyle, card_style: ParagraphStyle) -> list:
+def build_transit_page(
+    width: float,
+    section_style: ParagraphStyle,
+    subtitle_style: ParagraphStyle,
+    network_style: ParagraphStyle,
+    line_header_style: ParagraphStyle,
+) -> list:
     story: list = []
-    story.append(paragraph("Tilladte stationer", section_style))
-    story.append(Spacer(1, 1.5 * mm))
-    story.append(paragraph("Hver linje er vist som et enkelt diagram med farvet linje og stationer placeret i rækkefølge.", body_style))
-    story.append(Spacer(1, 4 * mm))
+    story.append(paragraph("Transitlinjer", section_style))
+    story.append(paragraph("Du må kun rejse med Metro og S-tog. Følg hver linje fra ende til ende.", subtitle_style))
+    story.append(Spacer(1, 3.5 * mm))
 
     specs = build_line_specs()
-    cards = []
+    current_network = None
     for spec in specs:
-        cards.append(
-            compact_card(
-                width / 2 - 2.5 * mm,
-                f"<font color='{spec.color}'><b>{escape_html(spec.title)}</b></font> <font color='#738195'>{escape_html(spec.network)}</font>",
-                [
-                    paragraph(f"<b>{escape_html(spec.route)}</b>", body_style),
-                    Spacer(1, 1.5 * mm),
-                    TransitLineDiagram(width / 2 - 7 * mm, spec.color, spec.stations),
-                ],
-                card_style,
-                spec.color,
-                "#ffffff",
-            )
+        if spec.network != current_network:
+            if current_network is not None:
+                story.append(Spacer(1, 1.5 * mm))
+            story.append(paragraph(spec.network, network_style))
+            story.append(Spacer(1, 1 * mm))
+            current_network = spec.network
+
+        header = (
+            f"<font color='{spec.color}'><b>{escape_html(spec.title)}</b></font>"
+            f"&nbsp;&nbsp;<font color='#5b6c80'>{escape_html(spec.route)}</font>"
         )
-    story.append(card_grid(cards, 2, width, 4 * mm))
+        story.append(paragraph(header, line_header_style))
+        story.append(TransitLineDiagram(width, spec.color, spec.stations))
+        story.append(Spacer(1, 1 * mm))
+
     return story
 
-
-def build_rules_page(width: float, section_style: ParagraphStyle, body_style: ParagraphStyle, card_style: ParagraphStyle) -> list:
-    story: list = []
-    story.append(paragraph("Regler", section_style))
-    story.append(Spacer(1, 1.5 * mm))
-    story.append(paragraph("Reglerne er skrevet kort og samler kun det, spillerne skal huske undervejs.", body_style))
-    story.append(Spacer(1, 3 * mm))
-    story.append(
-        box(
-            width,
-            "Regler",
-            [paragraph(text, body_style) for text in RULES],
-            card_style,
-            "#c0392b",
-            "#fff8f5",
-        )
-    )
-    story.append(Spacer(1, 4 * mm))
-    story.append(
-        box(
-            width,
-            "Spilfaser",
-            [paragraph(f"{index + 1}. {text}", body_style) for index, text in enumerate(GAME_PHASES)],
-            card_style,
-            "#2f9e44",
-            "#f6fff8",
-        )
-    )
-    return story
-
-
-def build_questions_page(width: float, section_style: ParagraphStyle, body_style: ParagraphStyle, card_style: ParagraphStyle) -> list:
-    story: list = []
-    story.append(paragraph("Spørgsmål", section_style))
-    story.append(Spacer(1, 1.5 * mm))
-    story.append(paragraph("Spørgsmålsafsnittet forklarer begreberne kort og viser både spørgsmålstyper og eksempler.", body_style))
-    story.append(Spacer(1, 4 * mm))
-
-    note_cards = [
-        box(
-            width / 3 - 2.5 * mm,
-            title,
-            [paragraph(text, body_style)],
-            card_style,
-            "#835900",
-            "#fffaf0",
-        )
-        for title, text in QUESTION_EXPLANATIONS
-    ]
-    story.append(card_grid(note_cards, 3, width, 4 * mm))
-    story.append(Spacer(1, 4 * mm))
-
-    question_cards = [
-        box(width / 2 - 2.5 * mm, "Spørgsmålstyper", [paragraph(text, body_style) for text in QUESTION_TYPES], card_style, "#213a5f", "#fbfcfe"),
-        box(width / 2 - 2.5 * mm, "Eksempelspørgsmål", [paragraph(text, body_style) for text in EXAMPLE_QUESTIONS], card_style, "#213a5f", "#fbfcfe"),
-    ]
-    story.append(card_grid(question_cards, 2, width, 4 * mm))
-    return story
 
 
 def draw_page_frame(canvas: Canvas, doc: SimpleDocTemplate, label: str, font_name: str) -> None:
@@ -509,7 +415,7 @@ def build_pdf(output_path: Path) -> None:
         parent=styles["BodyText"],
         fontName=font_name,
         fontSize=9.0,
-        leading=11.0,
+        leading=11.5,
         textColor=HexColor("#4d6077"),
         alignment=TA_LEFT,
         spaceAfter=0,
@@ -518,27 +424,57 @@ def build_pdf(output_path: Path) -> None:
         "SectionTitle",
         parent=styles["Heading2"],
         fontName=font_name,
-        fontSize=16,
-        leading=18,
+        fontSize=13,
+        leading=15,
         textColor=HexColor("#213a5f"),
         spaceAfter=0,
     )
-    card_style = ParagraphStyle(
-        "CardTitle",
+    network_style = ParagraphStyle(
+        "NetworkTitle",
         parent=styles["Heading3"],
         fontName=font_name,
         fontSize=10.5,
-        leading=12.0,
-        textColor=HexColor("#172033"),
+        leading=12,
+        textColor=HexColor("#5b6c80"),
         spaceAfter=0,
     )
-    body_style = ParagraphStyle(
-        "GuideBody",
+    item_style = ParagraphStyle(
+        "GuideItem",
         parent=styles["BodyText"],
         fontName=font_name,
-        fontSize=8.2,
-        leading=10.0,
+        fontSize=8.6,
+        leading=11.4,
         textColor=HexColor("#27384f"),
+        alignment=TA_LEFT,
+        spaceAfter=2,
+    )
+    type_style = ParagraphStyle(
+        "QuestionType",
+        parent=styles["BodyText"],
+        fontName=font_name,
+        fontSize=9.4,
+        leading=11.5,
+        textColor=HexColor("#172033"),
+        alignment=TA_LEFT,
+        spaceAfter=0,
+    )
+    example_style = ParagraphStyle(
+        "QuestionExample",
+        parent=styles["BodyText"],
+        fontName=font_name,
+        fontSize=8.4,
+        leading=10.6,
+        textColor=HexColor("#738195"),
+        alignment=TA_LEFT,
+        spaceAfter=0,
+    )
+    line_header_style = ParagraphStyle(
+        "LineHeader",
+        parent=styles["BodyText"],
+        fontName=font_name,
+        fontSize=9.2,
+        leading=11,
+        textColor=HexColor("#172033"),
         alignment=TA_LEFT,
         spaceAfter=0,
     )
@@ -548,28 +484,35 @@ def build_pdf(output_path: Path) -> None:
         pagesize=A4,
         leftMargin=14 * mm,
         rightMargin=14 * mm,
-        topMargin=20 * mm,
+        topMargin=18 * mm,
         bottomMargin=14 * mm,
         title="Spilguide",
         author="hide_and_seek",
-        subject="Editorial rulebook-style guide for the hide_and_seek game",
+        subject="Quick-reference guide for the hide_and_seek game",
         creator="hide_and_seek/scripts/generate_guide_pdf.py",
     )
 
     story: list = []
-    story.extend(build_title_page(doc.width, section_style, body_style, title_style, subtitle_style))
+    story.extend(
+        build_reference_page(
+            doc.width,
+            title_style,
+            subtitle_style,
+            section_style,
+            item_style,
+            type_style,
+            example_style,
+        )
+    )
     story.append(PageBreak())
-    story.extend(build_allowed_station_page(doc.width, section_style, body_style, card_style))
-    story.append(PageBreak())
-    story.extend(build_rules_page(doc.width, section_style, body_style, card_style))
-    story.append(PageBreak())
-    story.extend(build_questions_page(doc.width, section_style, body_style, card_style))
+    story.extend(build_transit_page(doc.width, section_style, subtitle_style, network_style, line_header_style))
 
     doc.build(
         story,
-        onFirstPage=lambda canvas, document: draw_page_frame(canvas, document, "Overview", font_name),
-        onLaterPages=lambda canvas, document: draw_page_frame(canvas, document, "Rulebook", font_name),
+        onFirstPage=lambda canvas, document: draw_page_frame(canvas, document, "Hurtigguide", font_name),
+        onLaterPages=lambda canvas, document: draw_page_frame(canvas, document, "Transitlinjer", font_name),
     )
+
 
 
 def parse_args() -> argparse.Namespace:

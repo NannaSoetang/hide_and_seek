@@ -15,6 +15,8 @@ import requests
 from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
 
+from theme import lines_for_network
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
@@ -35,14 +37,9 @@ ADMIN_SIMPLIFY_TOLERANCE = {
     "opstillingskredse": 0.00010,
     "sogne": 0.00008,
 }
-METRO_LINE_COLORS = {"M1": "#00a650", "M2": "#f5c400", "M3": "#e03b3b", "M4": "#0072bc"}
-STOG_LINES = {"A", "B", "C", "F"}
-STOG_LINE_COLORS = {
-    "A": "#1f4e9e",
-    "B": "#2f9e44",
-    "C": "#f28e2b",
-    "F": "#f2a900",
-}
+METRO_LINE_COLORS = {line["line"]: line["color"] for line in lines_for_network("metro")}
+STOG_LINE_COLORS = {line["line"]: line["color"] for line in lines_for_network("s-tog")}
+STOG_LINES = set(STOG_LINE_COLORS)
 STOG_LINE_ENDPOINTS = {
     "A": ("lyngby", "vallensbaek"),
     "B": ("buddinge", "glostrup"),

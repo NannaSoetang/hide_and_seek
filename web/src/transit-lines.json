@@ -1,0 +1,10 @@
+[
+  { "network": "metro", "networkLabel": "Metro", "line": "M1", "title": "M1", "route": "Vanløse – Vestamager", "color": "#00a650" },
+  { "network": "metro", "networkLabel": "Metro", "line": "M2", "title": "M2", "route": "Vanløse – Lufthavnen", "color": "#f5c400" },
+  { "network": "metro", "networkLabel": "Metro", "line": "M3", "title": "M3", "route": "Cityringen", "color": "#e03b3b" },
+  { "network": "metro", "networkLabel": "Metro", "line": "M4", "title": "M4", "route": "Orientkaj – København Syd", "color": "#0072bc" },
+  { "network": "s-tog", "networkLabel": "S-tog", "line": "A", "title": "A-linje", "route": "Hillerød – Køge (Tilladt Lyngby - Vallensbæk)", "color": "#1f4e9e" },
+  { "network": "s-tog", "networkLabel": "S-tog", "line": "B", "title": "B-linje", "route": "Farum – Høje Taastrup (Tilladt Buddinge - Glostrup)", "color": "#2f9e44" },
+  { "network": "s-tog", "networkLabel": "S-tog", "line": "C", "title": "C-linje", "route": "Klampenborg – Frederikssund (Tilladt Klampenborg - Herlev)", "color": "#f28e2b" },
+  { "network": "s-tog", "networkLabel": "S-tog", "line": "F", "title": "F-linje", "route": "Hellerup – København Syd", "color": "#f2a900" }
+]

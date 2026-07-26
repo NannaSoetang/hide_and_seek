@@ -3,37 +3,7 @@ import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
 import { addTransportLayers, clearSelectedStation, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
-
-const ADMIN_BOUNDARY_STYLES = {
-  kommuner: {
-    color: '#1565c0',
-    weight: 3.0,
-    opacity: 0.8,
-    fillColor: '#42a5f5',
-    fillOpacity: 0.14,
-  },
-  postomraader: {
-    color: '#00796b',
-    weight: 2.8,
-    opacity: 0.78,
-    fillColor: '#26a69a',
-    fillOpacity: 0.12,
-  },
-  opstillingskredse: {
-    color: '#ad1457',
-    weight: 2.8,
-    opacity: 0.76,
-    fillColor: '#ec407a',
-    fillOpacity: 0.12,
-  },
-  sogne: {
-    color: '#6d4c41',
-    weight: 2.5,
-    opacity: 0.74,
-    fillColor: '#8d6e63',
-    fillOpacity: 0.1,
-  },
-}
+import { ADMIN_LAYERS, adminLayerStyle } from './theme.js'
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
 
@@ -130,62 +100,17 @@ async function loadAdministrativeLayers(configs) {
   return Object.fromEntries(entries)
 }
 
-const ADMIN_LAYER_CONFIGS = [
-  {
-    id: 'kommuner',
-    displayName: 'Kommuner',
-    dataFile: '/data/municipalities.geojson',
-    style: ADMIN_BOUNDARY_STYLES.kommuner,
-    labelField: 'name',
-    popupTitleField: 'name',
-    popupFields: [],
-    labelMinZoom: 13.8,
-    dedupeLabels: false,
-    minLabelSpacingPx: 64,
-  },
-  {
-    id: 'opstillingskredse',
-    displayName: 'Opstillingskredse',
-    dataFile: '/data/opstillingskredse.geojson',
-    style: ADMIN_BOUNDARY_STYLES.opstillingskredse,
-    labelField: 'name',
-    popupTitleField: 'name',
-    popupFields: [
-      { key: 'name', label: 'Navn' },
-    ],
-    labelMinZoom: 14.1,
-    dedupeLabels: false,
-    minLabelSpacingPx: 70,
-  },
-  {
-    id: 'postomraader',
-    displayName: 'Postområder',
-    dataFile: '/data/postnumre.geojson',
-    style: ADMIN_BOUNDARY_STYLES.postomraader,
-    labelField: 'postnummernavn',
-    popupTitleField: 'postnummernavn',
-    popupFields: [
-      { key: 'postnummernavn', label: 'Postområde' },
-    ],
-    labelMinZoom: 14.2,
-    dedupeLabels: true,
-    minLabelSpacingPx: 72,
-  },
-  {
-    id: 'sogne',
-    displayName: 'Sogne',
-    dataFile: '/data/sogne.geojson',
-    style: ADMIN_BOUNDARY_STYLES.sogne,
-    labelField: 'name',
-    popupTitleField: 'name',
-    popupFields: [
-      { key: 'name', label: 'Sogn' },
-    ],
-    labelMinZoom: 14.7,
-    dedupeLabels: false,
-    minLabelSpacingPx: 76,
-  },
-]
+const ADMIN_LAYER_CONFIGS = ADMIN_LAYERS.map((layer) => ({
+  id: layer.id,
+  displayName: layer.displayName,
+  dataFile: `/data/${layer.dataFile}`,
+  style: adminLayerStyle(layer),
+  labelField: layer.labelField,
+  popupTitleField: layer.popupTitleField,
+  labelMinZoom: layer.labelMinZoom,
+  dedupeLabels: layer.dedupeLabels,
+  minLabelSpacingPx: layer.minLabelSpacingPx,
+}))
 
 function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
   if (!latlng) return

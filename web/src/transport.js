@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { loadJson } from './shared.js'
+import { LINE_COLORS } from './theme.js'
 
 const BASE_TRANSIT_CONFIG = {
   lineTooltipSuffix: '-linjen',
@@ -29,21 +30,6 @@ const NETWORK_CONFIG = {
     label: 'S-tog',
     stationFallback: 'S-tog station',
     counterpart: 'metro',
-  },
-}
-
-const NETWORK_COLORS = {
-  metro: {
-    M1: '#00a650',
-    M2: '#f5c400',
-    M3: '#e03b3b',
-    M4: '#0072bc',
-  },
-  's-tog': {
-    A: '#1f4e9e',
-    B: '#2f9e44',
-    C: '#f28e2b',
-    F: '#f2a900',
   },
 }
 
@@ -177,7 +163,7 @@ export function addTransportLayers(map, data, network, options = {}) {
 
   const lineLayer = L.geoJSON(data.lines, {
     style: (feature) => ({
-      color: NETWORK_COLORS[network][feature.properties?.line] || feature.properties?.color || '#333',
+      color: LINE_COLORS[feature.properties?.line] || feature.properties?.color || '#333',
       weight: config.lineWeight,
       opacity: 1,
       lineCap: 'round',
