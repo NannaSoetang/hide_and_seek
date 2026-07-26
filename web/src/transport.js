@@ -188,15 +188,20 @@ export function addTransportLayers(map, data, network, options = {}) {
   lineLayers.push(lineLayer)
 
   const updateLineStyles = () => {
-    selectedLine = map.__selectedTransitLine?.network === network
-      ? map.__selectedTransitLine.line
+    const selectedTransitLine = map.__selectedTransitLine
+    selectedLine = selectedTransitLine?.network === network
+      ? selectedTransitLine.line
       : null
     lineLayer.eachLayer((candidate) => {
       const candidateLine = candidate.feature?.properties?.line
-      const isSelected = selectedLine && candidateLine === selectedLine
+      const isSelected = Boolean(
+        selectedTransitLine
+        && selectedTransitLine.network === network
+        && candidateLine === selectedTransitLine.line,
+      )
       candidate.setStyle({
         weight: isSelected ? config.selectedLineWeight : config.lineWeight,
-        opacity: selectedLine ? (isSelected ? 1 : config.selectedOpacity) : config.normalOpacity,
+        opacity: selectedTransitLine ? (isSelected ? 1 : config.selectedOpacity) : config.normalOpacity,
       })
     })
     if (selectedLine) {
