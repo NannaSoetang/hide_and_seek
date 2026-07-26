@@ -1,38 +1,32 @@
 import L from 'leaflet'
 import { loadJson } from './shared.js'
 
+const BASE_TRANSIT_CONFIG = {
+  lineTooltipSuffix: '-linjen',
+  lineWeight: 7,
+  selectedLineWeight: 10,
+  normalOpacity: 0.9,
+  selectedOpacity: 0.2,
+  stationRadius: 5,
+  selectedStationRadius: 8.5,
+  stationWeight: 1.5,
+  selectedStationWeight: 3,
+  includeCasing: true,
+  lineCasingWeight: 11,
+}
+
 const NETWORK_CONFIG = {
   metro: {
+    ...BASE_TRANSIT_CONFIG,
     label: 'Metro',
     stationFallback: 'Metrostation',
     counterpart: 's-tog',
-    lineTooltipSuffix: '-linjen',
-    lineWeight: 5,
-    selectedLineWeight: 9,
-    normalOpacity: 0.9,
-    selectedOpacity: 0.2,
-    stationRadius: 5,
-    selectedStationRadius: 8.5,
-    stationWeight: 1.5,
-    selectedStationWeight: 3,
-    includeCasing: true,
-    lineCasingWeight: 11,
   },
   's-tog': {
+    ...BASE_TRANSIT_CONFIG,
     label: 'S-tog',
     stationFallback: 'S-tog station',
     counterpart: 'metro',
-    lineTooltipSuffix: '-linjen',
-    lineWeight: 7,
-    selectedLineWeight: 10,
-    normalOpacity: 0.9,
-    selectedOpacity: 0.2,
-    stationRadius: 5,
-    selectedStationRadius: 8.5,
-    stationWeight: 1.5,
-    selectedStationWeight: 3,
-    includeCasing: true,
-    lineCasingWeight: 11,
   },
 }
 
@@ -48,21 +42,6 @@ const NETWORK_COLORS = {
     B: '#2f9e44',
     C: '#f28e2b',
     F: '#f2a900',
-  },
-}
-
-const NETWORK_PATTERNS = {
-  metro: {
-    M1: null,
-    M2: null,
-    M3: null,
-    M4: null,
-  },
-  's-tog': {
-    A: null,
-    B: null,
-    C: null,
-    F: null,
   },
 }
 
@@ -170,7 +149,6 @@ export function addTransportLayers(map, data, network, options = {}) {
       color: NETWORK_COLORS[network][feature.properties?.line] || feature.properties?.color || '#333',
       weight: config.lineWeight,
       opacity: 1,
-      dashArray: NETWORK_PATTERNS[network][feature.properties?.line] || null,
       lineCap: 'round',
       lineJoin: 'round',
     }),

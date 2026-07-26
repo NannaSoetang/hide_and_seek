@@ -9,7 +9,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(process.cwd(), 'web/index.html'),
-        print: resolve(process.cwd(), 'web/print.html'),
         whereAmI: resolve(process.cwd(), 'web/where-am-i.html'),
         guide: resolve(process.cwd(), 'web/guide.html'),
       },

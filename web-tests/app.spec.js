@@ -16,7 +16,7 @@ test('interactive map loads title, links, and map container', async ({ page }) =
   await page.goto('/')
   await waitForMapReady(page)
 
-  await expect(page.getByRole('heading', { name: 'København Metro og S-tog' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Hide and Seek' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Hvor er jeg?' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Spilguide' })).toBeVisible()
   await expect(page.locator('#map')).toBeVisible()
@@ -34,16 +34,6 @@ test('interactive map can open station context popup', async ({ page }) => {
   })
 
   await expect(page.locator('.leaflet-popup-content')).toContainText('Station:')
-})
-
-test('print page loads map and generated route legend', async ({ page }) => {
-  await page.goto('/print.html')
-
-  await expect(page.getByRole('heading', { name: 'Hide & Seek København - Print' })).toBeVisible()
-  await expect(page.locator('#print-map')).toBeVisible()
-  await expect(page.locator('.legend-footer')).toBeVisible()
-  await expect(page.getByText('Metro')).toBeVisible()
-  await expect(page.getByText('S-tog')).toBeVisible()
 })
 
 test('where-am-i page loads and tabs can switch', async ({ page }) => {

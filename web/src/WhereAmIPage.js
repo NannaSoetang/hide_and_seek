@@ -1,7 +1,10 @@
 import './style.css'
-import { AdministrativeLookup } from './AdministrativeLookup.js'
-import { searchAddresses, resolveAddressToCoordinates } from './AddressLookup.js'
-import { getCurrentPosition } from './LocationLookup.js'
+import {
+  AdministrativeLookup,
+  getCurrentPosition,
+  resolveAddressToCoordinates,
+  searchAddresses,
+} from './LookupService.js'
 
 function debounce(fn, delay = 220) {
   let timer = null

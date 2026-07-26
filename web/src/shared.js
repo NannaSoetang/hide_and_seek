@@ -41,13 +41,3 @@ export function addBoundary(map, geojson) {
     },
   }).addTo(map)
 }
-
-export function fitBoundsWithPadding(map, layer, options = {}) {
-  const bounds = layer.getBounds()
-  if (!bounds.isValid()) return
-  map.fitBounds(bounds, {
-    paddingTopLeft: options.paddingTopLeft || [24, 24],
-    paddingBottomRight: options.paddingBottomRight || [24, 24],
-    maxZoom: options.maxZoom,
-  })
-}
