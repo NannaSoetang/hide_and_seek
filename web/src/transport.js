@@ -15,8 +15,8 @@ const NETWORK_CONFIG = {
     selectedStationRadius: 8.5,
     stationWeight: 1.5,
     selectedStationWeight: 3,
-    includeCasing: false,
-    lineCasingWeight: 0,
+    includeCasing: true,
+    lineCasingWeight: 11,
   },
   's-tog': {
     label: 'S-tog',
