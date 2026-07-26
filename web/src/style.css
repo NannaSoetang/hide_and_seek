@@ -161,23 +161,51 @@ main {
 }
 
 .admin-label--kommuner span {
-  border-color: rgb(63 86 120 / 32%);
+  border-color: rgb(123 31 162 / 32%);
 }
 
 .admin-label--postomraader span {
-  border-color: rgb(93 127 153 / 28%);
+  border-color: rgb(0 131 143 / 28%);
 }
 
 .admin-label--opstillingskredse span {
-  border-color: rgb(77 110 95 / 28%);
+  border-color: rgb(194 24 91 / 28%);
 }
 
 .admin-label--sogne span {
-  border-color: rgb(138 116 142 / 28%);
+  border-color: rgb(109 76 65 / 28%);
 }
 
 .leaflet-control-layers label {
   font-size: 0.92rem;
+}
+
+.map-clear-filter-control {
+  margin-top: 0.45rem;
+}
+
+.map-clear-filter-button {
+  min-height: 36px;
+  min-width: 90px;
+  border: 0;
+  padding: 0.32rem 0.62rem;
+  border-radius: 0;
+  background: #1f4f8f;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.map-clear-filter-button:hover,
+.map-clear-filter-button:focus-visible {
+  background: #153a69;
+}
+
+.map-clear-filter-button.is-disabled,
+.map-clear-filter-button:disabled {
+  background: #8ea2bf;
+  cursor: not-allowed;
 }
 
 @media (max-width: 600px) {

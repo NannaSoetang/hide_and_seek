@@ -65,18 +65,18 @@ class PdfMapConfig:
 
     page_size_name: str = "A4"
     orientation: str = "auto"
-    margin: float = 18.0
-    line_width: float = 1.6
-    line_casing_width: float = 3.8
-    station_radius: float = 1.85
-    station_stroke_width: float = 0.7
-    network_padding: float = 0.07
-    background_zoom: int = 14
-    tile_url: str = DEFAULT_TILE_URL
+    margin: float = 16.0
+    line_width: float = 2.0
+    line_casing_width: float = 4.6
+    station_radius: float = 2.2
+    station_stroke_width: float = 0.9
+    network_padding: float = 0.04
+    background_zoom: int = 15
+    tile_url: str = "https://basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png"
     tile_cache_dir: Path = Path(".cache/transit-map/tiles")
-    boundary_color: str = "#c0392b"
-    boundary_width: float = 1.4
-    boundary_casing_width: float = 3.0
+    boundary_color: str = "#ff4d00"
+    boundary_width: float = 2.0
+    boundary_casing_width: float = 4.4
 
 
 @dataclass(frozen=True)
@@ -693,9 +693,13 @@ def draw_transit_map(
         projected_ring = project_coordinates(ring, transformer)
         if len(projected_ring) >= 2:
             boundary_rings.append(projected_ring)
-            combined_bounds = merge_bounds(combined_bounds, projected_ring)
+    if boundary_rings:
+        boundary_points = [point for ring in boundary_rings for point in ring]
+        render_bounds = merge_bounds(None, boundary_points)
+    else:
+        render_bounds = combined_bounds
 
-    (page_width, page_height), padded_bounds, scale, offset_x, offset_y = orient_page(combined_bounds, config)
+    (page_width, page_height), padded_bounds, scale, offset_x, offset_y = orient_page(render_bounds, config)
     transform = make_transform(page_width, page_height, padded_bounds, scale, offset_x, offset_y)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -709,7 +713,6 @@ def draw_transit_map(
     canvas.rect(0, 0, page_width, page_height, stroke=0, fill=1)
 
     draw_tile_background(canvas, transform, config)
-    draw_boundary(canvas, transform, boundary_rings, config)
 
     for network in ("metro", "s-tog"):
         for line_id in TRANSPORT_LINE_ORDER[network]:
@@ -721,6 +724,8 @@ def draw_transit_map(
 
     for station in station_records:
         draw_station(canvas, transform, station, config.station_radius, config.station_stroke_width)
+
+    draw_boundary(canvas, transform, boundary_rings, config)
 
     canvas.showPage()
     canvas.save()

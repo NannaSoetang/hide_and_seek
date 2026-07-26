@@ -9,10 +9,10 @@ const METRO_LINE_META = {
 }
 
 const STOG_LINE_META = {
-  A: { title: 'A-linje', route: 'Hillerød – Vallensbæk', color: '#1f4e9e', network: 'S-tog' },
-  B: { title: 'B-linje', route: 'Farum – Høje Taastrup', color: '#2f9e44', network: 'S-tog' },
-  C: { title: 'C-linje', route: 'Klampenborg – Frederikssund', color: '#f28e2b', network: 'S-tog' },
-  F: { title: 'F-linje', route: 'Hellerup – Ny Ellebjerg', color: '#f2a900', network: 'S-tog' },
+  A: { title: 'A-linje', route: 'Hillerød – Køge (Tilladt Lyngby - Vallensbæk)', color: '#1f4e9e', network: 'S-tog' },
+  B: { title: 'B-linje', route: 'Farum – Høje Taastrup (Tilladt Budding - Glostrup)', color: '#2f9e44', network: 'S-tog' },
+  C: { title: 'C-linje', route: 'Klampenborg – Frederikssund (Tilladt Klampenborg - Herlev)', color: '#f28e2b', network: 'S-tog' },
+  F: { title: 'F-linje', route: 'Hellerup – København Syd', color: '#f2a900', network: 'S-tog' },
 }
 
 function distance(a, b) {

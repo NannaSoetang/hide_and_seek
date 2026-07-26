@@ -130,8 +130,9 @@ export function addTransportLayers(map, data, network, options = {}) {
   }
 
   const lineLayers = []
+  let lineCasingLayer = null
   if (config.includeCasing) {
-    const casingLayer = L.geoJSON(data.lines, {
+    lineCasingLayer = L.geoJSON(data.lines, {
       interactive: false,
       style: {
         color: '#ffffff',
@@ -141,7 +142,7 @@ export function addTransportLayers(map, data, network, options = {}) {
         lineJoin: 'round',
       },
     })
-    lineLayers.push(casingLayer)
+    lineLayers.push(lineCasingLayer)
   }
 
   const lineLayer = L.geoJSON(data.lines, {
@@ -170,20 +171,41 @@ export function addTransportLayers(map, data, network, options = {}) {
     selectedLine = selectedTransitLine?.network === network
       ? selectedTransitLine.line
       : null
-    lineLayer.eachLayer((candidate) => {
-      const candidateLine = candidate.feature?.properties?.line
+
+    const styleForLine = (candidateLine) => {
       const isSelected = Boolean(
         selectedTransitLine
         && selectedTransitLine.network === network
         && candidateLine === selectedTransitLine.line,
       )
+      return {
+        isSelected,
+        lineOpacity: selectedTransitLine ? (isSelected ? 1 : config.selectedOpacity) : config.normalOpacity,
+      }
+    }
+
+    lineLayer.eachLayer((candidate) => {
+      const candidateLine = candidate.feature?.properties?.line
+      const { isSelected, lineOpacity } = styleForLine(candidateLine)
       candidate.setStyle({
         weight: isSelected ? config.selectedLineWeight : config.lineWeight,
-        opacity: selectedTransitLine ? (isSelected ? 1 : config.selectedOpacity) : config.normalOpacity,
+        opacity: lineOpacity,
       })
     })
+
+    lineCasingLayer?.eachLayer((candidate) => {
+      const candidateLine = candidate.feature?.properties?.line
+      const { isSelected, lineOpacity } = styleForLine(candidateLine)
+      candidate.setStyle({
+        opacity: isSelected ? 0.95 : lineOpacity,
+      })
+    })
+
     if (selectedLine) {
       lineLayer.eachLayer((candidate) => {
+        if (candidate.feature?.properties?.line === selectedLine) candidate.bringToFront()
+      })
+      lineCasingLayer?.eachLayer((candidate) => {
         if (candidate.feature?.properties?.line === selectedLine) candidate.bringToFront()
       })
     }
@@ -221,7 +243,7 @@ export function addTransportLayers(map, data, network, options = {}) {
   })
 
   const group = L.layerGroup([...lineLayers, stationLayer]).addTo(map)
-  return { group, lineLayer, stationLayer, lineCasingLayer: lineLayers[0] || null }
+  return { group, lineLayer, stationLayer, lineCasingLayer }
 }
 
 export function fitTransportLayers(map, transportLayers) {

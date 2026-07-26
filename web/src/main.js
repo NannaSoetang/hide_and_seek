@@ -6,40 +6,83 @@ import { addTransportLayers, filterTransportData, fitTransportLayers, loadTransp
 
 const ADMIN_BOUNDARY_STYLES = {
   kommuner: {
-    color: '#2f4f79',
-    weight: 2.2,
+    color: '#7b1fa2',
+    weight: 4.0,
     opacity: 0.92,
-    dashArray: '11 5',
-    fillColor: '#3f638f',
-    fillOpacity: 0.045,
+    fillColor: '#8e24aa',
+    fillOpacity: 0.18,
   },
   postomraader: {
-    color: '#2f7d9c',
-    weight: 1.55,
-    opacity: 0.78,
-    dashArray: '4 8',
-    fillColor: '#4e9ec0',
-    fillOpacity: 0.028,
+    color: '#00838f',
+    weight: 3.5,
+    opacity: 0.88,
+    fillColor: '#0097a7',
+    fillOpacity: 0.18,
   },
   opstillingskredse: {
-    color: '#3f7b4f',
-    weight: 1.75,
-    opacity: 0.8,
-    dashArray: '9 6',
-    fillColor: '#5c9e6f',
-    fillOpacity: 0.03,
+    color: '#c2185b',
+    weight: 3.2,
+    opacity: 0.88,
+    fillColor: '#d81b60',
+    fillOpacity: 0.18,
   },
   sogne: {
-    color: '#8f5b7f',
-    weight: 1.25,
-    opacity: 0.66,
-    dashArray: '2 8',
-    fillColor: '#b77ba5',
-    fillOpacity: 0.018,
+    color: '#6d4c41',
+    weight: 2.8,
+    opacity: 0.82,
+    fillColor: '#795548',
+    fillOpacity: 0.18,
   },
 }
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
+
+function addClearFilterControl(map, adminLayers) {
+  const control = L.control({ position: 'topright' })
+
+  control.onAdd = () => {
+    const container = L.DomUtil.create('div', 'leaflet-bar map-clear-filter-control')
+    const button = L.DomUtil.create('button', 'map-clear-filter-button', container)
+    button.type = 'button'
+    button.textContent = 'Ryd filter'
+    button.setAttribute('aria-label', 'Ryd linje- og lagfiltrering')
+
+    const updateState = () => {
+      const hasLineFilter = Boolean(map.__selectedTransitLine)
+      const hasOverlayFilter = adminLayers.some((layer) => map.hasLayer(layer.overlay))
+      const hasAnyFilter = hasLineFilter || hasOverlayFilter
+      button.disabled = !hasAnyFilter
+      button.classList.toggle('is-disabled', !hasAnyFilter)
+    }
+
+    L.DomEvent.disableClickPropagation(container)
+    L.DomEvent.disableScrollPropagation(container)
+    L.DomEvent.on(button, 'click', (event) => {
+      L.DomEvent.stopPropagation(event)
+      const hasLineFilter = Boolean(map.__selectedTransitLine)
+      const hasOverlayFilter = adminLayers.some((layer) => map.hasLayer(layer.overlay))
+      if (!hasLineFilter && !hasOverlayFilter) return
+
+      map.__selectedTransitLine = null
+      map.fire('transit-line-selected')
+
+      for (const layer of adminLayers) {
+        if (map.hasLayer(layer.overlay)) {
+          map.removeLayer(layer.overlay)
+        }
+      }
+
+      map.closePopup()
+    })
+
+    map.on('transit-line-selected', updateState)
+    map.on('overlayadd overlayremove', updateState)
+    updateState()
+    return container
+  }
+
+  control.addTo(map)
+}
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -90,20 +133,6 @@ const ADMIN_LAYER_CONFIGS = [
     minLabelSpacingPx: 64,
   },
   {
-    id: 'postomraader',
-    displayName: 'Postområder',
-    dataFile: '/data/postnumre.geojson',
-    style: ADMIN_BOUNDARY_STYLES.postomraader,
-    labelField: 'postnummernavn',
-    popupTitleField: 'postnummernavn',
-    popupFields: [
-      { key: 'postnummernavn', label: 'Postområde' },
-    ],
-    labelMinZoom: 14.2,
-    dedupeLabels: true,
-    minLabelSpacingPx: 72,
-  },
-  {
     id: 'opstillingskredse',
     displayName: 'Opstillingskredse',
     dataFile: '/data/opstillingskredse.geojson',
@@ -116,6 +145,20 @@ const ADMIN_LAYER_CONFIGS = [
     labelMinZoom: 14.1,
     dedupeLabels: false,
     minLabelSpacingPx: 70,
+  },
+  {
+    id: 'postomraader',
+    displayName: 'Postområder',
+    dataFile: '/data/postnumre.geojson',
+    style: ADMIN_BOUNDARY_STYLES.postomraader,
+    labelField: 'postnummernavn',
+    popupTitleField: 'postnummernavn',
+    popupFields: [
+      { key: 'postnummernavn', label: 'Postområde' },
+    ],
+    labelMinZoom: 14.2,
+    dedupeLabels: true,
+    minLabelSpacingPx: 72,
   },
   {
     id: 'sogne',
@@ -202,6 +245,7 @@ async function init() {
       position: 'topright',
     },
   ).addTo(map)
+  addClearFilterControl(map, adminLayers)
   const bounds = boundaryLayer.getBounds()
 
   if (bounds.isValid()) {
