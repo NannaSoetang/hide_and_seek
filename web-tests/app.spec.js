@@ -48,7 +48,7 @@ test('where-am-i page loads and tabs can switch', async ({ page }) => {
   await expect(page.locator('#panel-location')).toHaveClass(/is-hidden/)
 })
 
-test('guide page loads station groups and tabs', async ({ page }) => {
+test('guide page loads station groups and tabs', async ({ page }, testInfo) => {
   await page.goto('/guide.html')
   await waitForGuideReady(page)
 
@@ -57,4 +57,18 @@ test('guide page loads station groups and tabs', async ({ page }) => {
 
   await page.getByRole('tab', { name: 'Regler' }).click()
   await expect(page.locator('#guide-panel-rules')).toBeVisible()
+
+  await page.getByRole('tab', { name: 'Spørgsmål' }).click()
+  await expect(page.locator('#guide-panel-questions')).toBeVisible()
+
+  if (testInfo.project.name === 'phone') {
+    const cards = page.locator('#guide-panel-questions .guide-mini-card')
+    const firstCard = await cards.nth(0).boundingBox()
+    const secondCard = await cards.nth(1).boundingBox()
+
+    expect(secondCard.y).toBeGreaterThan(firstCard.y + firstCard.height)
+    expect(await page.locator('body').evaluate((body) => body.scrollWidth)).toBeLessThanOrEqual(
+      await page.locator('body').evaluate((body) => body.clientWidth),
+    )
+  }
 })

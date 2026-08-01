@@ -11,13 +11,13 @@
       <header class="guide-header">
         <a class="subpage-back-link" href="./index.html" aria-label="Tilbage til kort">Tilbage til kort</a>
         <h1>Spilguide</h1>
-        <p>Kort og struktureret opslagsværk til spillet.</p>
+        <p>Hurtigguide — find svaret på få sekunder.</p>
         <p><a href="https://www.lifack.ch/docs/quick_start_guide/" target="_blank" rel="noopener noreferrer">Quick start guide</a></p>
       </header>
 
       <nav class="guide-tabs" aria-label="Spilguide faner">
         <button id="guide-tab-stations" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="guide-panel-stations">
-          Tilladte stationer
+          Transitlinjer
         </button>
         <button id="guide-tab-rules" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="guide-panel-rules">
           Regler
@@ -30,8 +30,8 @@
       <div class="guide-panels">
         <section id="guide-panel-stations" class="tab-panel" role="tabpanel" aria-labelledby="guide-tab-stations">
           <div class="guide-section-card">
-            <h2>Tilladte stationer</h2>
-            <p>Hver linje vises som et enkelt diagram med farvet linje og stationer i rækkefølge.</p>
+            <h2>Transitlinjer</h2>
+            <p>Du må kun rejse med Metro og S-tog. Følg hver linje fra ende til ende.</p>
             <div id="station-groups" class="station-groups" aria-live="polite"></div>
           </div>
         </section>
@@ -39,69 +39,89 @@
         <section id="guide-panel-rules" class="tab-panel is-hidden" role="tabpanel" aria-labelledby="guide-tab-rules">
           <div class="guide-section-card">
             <h2>Regler</h2>
-            <p>Kun de vigtigste regler er med her.</p>
-            <ul class="guide-rule-list">
-              <li>Gemmerne må højst have 6 kort på hånden.</li>
-              <li>Når gemmerne har valgt deres gemmezone, skal de være højst 3 meter fra en offentlig vej eller sti.</li>
-              <li>Hver gang der stilles et spørgsmål med en beslutning, der vedrører søgerne, skal søgerne sende deres position.</li>
-              <li>I transportsektionen må kun Metro og S-tog bruges.</li>
-              <li>AI og Google Street View må ikke bruges.</li>
-            </ul>
+            <div class="guide-rule-groups">
+              <section class="guide-rule-group">
+                <h3>Spil og bevægelse</h3>
+                <ul class="guide-rule-list">
+                  <li>Vi spiller Small Game.</li>
+                  <li>Du må kun bruge offentlig transport: Metro og S-tog.</li>
+                  <li>Når gemmerne har valgt deres gemmested, skal de være højst 3 meter fra en offentlig vej eller sti.</li>
+                </ul>
+              </section>
+
+              <section class="guide-rule-group">
+                <h3>Spørgsmål</h3>
+                <ul class="guide-rule-list">
+                  <li>Svar altid ærligt. Svaret gælder, selv om I krydser en grænse bagefter indenfor svartiden.</li>
+                  <li>Hver gang der stilles et spørgsmål med en beslutning, der vedrører søgerne, skal søgerne sende deres position.</li>
+                  <li>Hvis man bruger det samme spørgsmål i samme kategori flere gange, stiger betalingen. Anden gang fordobles den: Koster spørgsmålet normalt »træk 2, behold 1«, må gemmerne i stedet trække 4 og beholde 2. Tredje gang tredobles betalingen osv.</li>
+                  <li>Du kan ikke stille et nyt spørgsmål før du har modtaget svar på det forrige.</li>
+                  <li>Hvis spørgsmålet ikke kan besvares inden for svartiden, stopper gemmernes tid indtil spørgsmålet er besvaret og de må ikke trække kort fra dækket.</li>
+                </ul>
+              </section>
+
+              <section class="guide-rule-group">
+                <h3>Kort</h3>
+                <ul class="guide-rule-list">
+                  <li>Gemmerne må højst have 6 kort på hånden (medmindre man har en powerup). Det vil sige hvis man trækker så man har flere end 6 kort, må man spille dem eller smide dem indtil man har 6 kort.</li>
+                  <li>Du kan spille flere curses, men du kan kun have én aktiv curse som stopper seekers fra at ikke handle ad gangen (gennem spørgsmål stilning eller at tage transport).</li>
+                </ul>
+              </section>
+
+              <section class="guide-rule-group">
+                <h3>Værktøjer og områder</h3>
+                <ul class="guide-rule-list">
+                  <li>Google Maps er det nemmeste værktøj til at måle afstand — brug «Mål distance», så får du afstanden i fugleflugt.</li>
+                  <li>AI og Google Street View må ikke bruges.</li>
+                  <li>En administrativ inddeling er et område: kommune, opstillingskreds, postnummer eller sogn.</li>
+                  <li>Man kan ikke bruge elementer som er udenfor spilområdet i sine spørgsmål, f.eks. Billund Lufthavn.</li>
+                </ul>
+              </section>
+            </div>
           </div>
 
           <div class="guide-section-card">
-            <h2>Spilfaser</h2>
+            <h2>Sådan spiller I</h2>
             <ol class="guide-phase-list">
-              <li>Forberedelsesfase: Hvert hold får 15 minutter, før de skal gemme sig.</li>
-              <li>Spillet: Gemmerne har 30 minutter til at vælge en station og blive inden for 500 meter af den.</li>
-              <li>Slutfase: Når søgerne kommer ind i gemmezonen, må gemmerne ikke flytte sig mere.</li>
-              <li>Vinder: Holdet med den længste samlede gemmetid efter begge runder vinder.</li>
+              <li><strong>Forberedelsesfase:</strong> Hvert hold får 15 minutter til at forberede sig, før de gemmer sig.</li>
+              <li><strong>Spillet:</strong> Gemmerne vælger en station og skal blive inden for 500 meter af den. Man har 30 minutter til at komme hen til sin zone.</li>
+              <li><strong>Slutfase:</strong> Når søgerne når ind i gemmezonen (500 meter fra det valgt busstopsted), må gemmerne ikke flytte sig mere.</li>
+              <li><strong>Vinder:</strong> Holdet med den længste samlede gemmetid efter begge runder vinder.</li>
             </ol>
-          </div>
           </div>
         </section>
 
         <section id="guide-panel-questions" class="tab-panel is-hidden" role="tabpanel" aria-labelledby="guide-tab-questions">
           <div class="guide-section-card">
-            <h2>Spørgsmålsforklaringer</h2>
+            <h2>Spørgsmålstyper</h2>
             <div class="guide-text-grid">
               <article class="guide-mini-card">
-                <h3>Hvad er en administrativ inddeling?</h3>
-                <p>En administrativ inddeling er et geografisk område som kommune, opstillingskreds, postnummer eller sogn.</p>
+                <h3>Matchning</h3>
+                <p>«Er jeres nærmeste ___ det samme som vores?» Svar: ja eller nej.</p>
+                <p class="guide-example">Eksempel: Er jeres nærmeste station den samme som vores?</p>
               </article>
               <article class="guide-mini-card">
-                <h3>Hvordan besvares spørgsmål?</h3>
-                <p>Spørgsmål besvares ærligt, og svaret gælder stadig, hvis I krydser en grænse efter, at spørgsmålet er stillet.</p>
+                <h3>Måling</h3>
+                <p>«Sammenlignet med os, er I tættere på eller længere fra ___?» Svar: tættere eller længere.</p>
+                <p class="guide-example">Eksempel: Sammenlignet med os, er I tættere på eller længere fra en kyst?</p>
               </article>
               <article class="guide-mini-card">
-                <h3>Hvordan bruges Google Maps og Google Street View korrekt?</h3>
-                <p>Google Maps er det nemmeste værktøj til at måle afstand — brug «Mål distance», så får du afstanden i fugleflugt. Google Street View må ikke bruges.</p>
+                <h3>Radar</h3>
+                <p>«Er I inden for ___ fra os?» Svar: ja eller nej.</p>
+                <p class="guide-example">Eksempel: Er I inden for 1 km fra os?</p>
+              </article>
+              <article class="guide-mini-card">
+                <h3>Termometer</h3>
+                <p>«Efter vi har bevæget os ___, er vi blevet varmere eller koldere?» Søgerne sender deres position, rejser afstanden og spørger så. Svar: varmere eller koldere.</p>
+                <p class="guide-example">Eksempel: Efter vi har bevæget os 800 m, er vi varmere eller koldere?</p>
+              </article>
+              <article class="guide-mini-card">
+                <h3>Billede</h3>
+                <p>«Send os et billede af ___.» Gemmerne må tage billeder på forhånd, men billeder taget på forhånd må ikke bruges i slutfasen. Kan motivet ikke nås — især i slutfasen, eller hvis det ikke findes i området — svarer de «Det er ikke muligt».</p>
+                <p class="guide-example">Eksempel: Send os et billede af himlen.</p>
               </article>
             </div>
           </div>
-
-          <div class="guide-section-card">
-            <h2>Spørgsmålstyper</h2>
-            <ul class="guide-type-list">
-              <li>Matching, nærmest og samme bruges til korte ja/nej-vurderinger.</li>
-              <li>Måling bruges, når afstanden eller relationen skal oplyses.</li>
-              <li>Termometer og radar bruges til henholdsvis retning og nærhed.</li>
-              <li>Billedspørgsmål kræver et konkret foto, og billeder taget på forhånd må ikke bruges i slutfasen.</li>
-            </ul>
-          </div>
-
-          <div class="guide-section-card">
-            <h2>Eksempelspørgsmål</h2>
-            <ul class="guide-example-list">
-              <li>Har vi samme nærmeste punkt?</li>
-              <li>Hvem af os er tættest på rådhuset?</li>
-              <li>Hvad er afstanden i fugleflugt til station X?</li>
-              <li>Er vi blevet varmere eller koldere siden sidste måling?</li>
-              <li>Tag et billede fra din station.</li>
-            </ul>
-          </div>
-          </div>
-        </section>
       </div>
     </main>
   </body>

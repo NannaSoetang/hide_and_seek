@@ -386,6 +386,25 @@ main {
   font-weight: 700;
 }
 
+.guide-rule-groups {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.guide-rule-group {
+  min-width: 0;
+  padding-top: 0.65rem;
+  border-top: 2px solid #dce5f0;
+}
+
+.guide-rule-group h3 {
+  margin: 0;
+  color: #213a5f;
+  font-size: 0.98rem;
+}
+
 .guide-rule-list,
 .guide-phase-list,
 .guide-type-list,
@@ -405,7 +424,7 @@ main {
 .guide-text-grid {
   margin-top: 0.6rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.65rem;
 }
 
@@ -426,6 +445,10 @@ main {
   margin: 0.35rem 0 0;
   color: #3a4d69;
   line-height: 1.45;
+}
+
+.guide-mini-card .guide-example {
+  color: #66768c;
 }
 
 .where-header h1 {
@@ -567,6 +590,36 @@ main {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .guide-page {
+    padding: calc(var(--safe-top) + 0.65rem) calc(var(--safe-right) + 0.65rem) calc(var(--safe-bottom) + 0.75rem) calc(var(--safe-left) + 0.65rem);
+  }
+
+  .guide-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .guide-header p {
+    font-size: 0.9rem;
+  }
+
+  .guide-tabs {
+    gap: 0.3rem;
+    margin-top: 0.65rem;
+  }
+
+  .guide-tabs .tab-button {
+    padding-inline: 0.35rem;
+    font-size: 0.84rem;
+  }
+
+  .guide-section-card {
+    margin-top: 0.65rem;
+    padding: 0.7rem;
+  }
+
 }
 
 
