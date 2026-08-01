@@ -152,7 +152,7 @@ export class AdministrativeLayer {
   getSummaryAtLatLng(latlng) {
     const properties = this.getPropertiesAtLatLng(latlng)
     if (!properties) return null
-    const value = properties?.[this.config.popupTitleField]
+    const value = properties?.[this.config.labelField]
     if (value === null || value === undefined || value === '') return null
     return String(value)
   }

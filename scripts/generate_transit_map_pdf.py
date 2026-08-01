@@ -30,12 +30,19 @@ TRANSPORT_LINE_ORDER = {
     for network in ("metro", "s-tog")
 }
 
+ADMIN_LAYER_WIDTHS = {
+    "kommuner": 2.6,
+    "opstillingskredse": 2.2,
+    "postomraader": 1.8,
+    "sogne": 1.6,
+}
+
 ADMIN_LAYER_SPECS = [
     {
         "id": Path(layer["dataFile"]).stem,
         "path": Path("web/public/data") / layer["dataFile"],
         "color": layer["color"],
-        "width": layer["pdfWidth"],
+        "width": ADMIN_LAYER_WIDTHS[layer["id"]],
     }
     for layer in ADMIN_LAYERS
 ]

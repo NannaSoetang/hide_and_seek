@@ -115,16 +115,15 @@ async function loadAdministrativeLayers(configs) {
   return Object.fromEntries(entries)
 }
 
-const ADMIN_LAYER_CONFIGS = ADMIN_LAYERS.map((layer) => ({
+const ADMIN_LAYER_CONFIGS = ADMIN_LAYERS.map(layer => ({
   id: layer.id,
-  displayName: layer.displayName,
-  dataFile: `/data/${layer.dataFile}`,
+  displayName: layer.name,
+  dataFile: `/data/${layer.file}`,
   style: adminLayerStyle(layer),
-  labelField: layer.labelField,
-  popupTitleField: layer.popupTitleField,
-  labelMinZoom: layer.labelMinZoom,
-  dedupeLabels: layer.dedupeLabels,
-  minLabelSpacingPx: layer.minLabelSpacingPx,
+  labelField: layer.property,
+  labelMinZoom: 14,
+  dedupeLabels: layer.id === "postomraader",
+  minLabelSpacingPx: 72,
 }))
 
 function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
@@ -164,27 +163,16 @@ async function init() {
   const adminLayers = ADMIN_LAYER_CONFIGS.map((config) => {
     return new AdministrativeLayer(map, config, adminLayerData[config.id])
   })
-  const metroData = filterTransportData(transportData, 'metro')
-  const sTogData = filterTransportData(transportData, 's-tog')
 
-  const metroLayers = addTransportLayers(map, metroData, 'metro', {
-    onLineClick: () => {
-      map[SKIP_CONTEXT_CLICK_FLAG] = true
-    },
-    onStationClick: (stationInfo) => {
-      map[SKIP_CONTEXT_CLICK_FLAG] = true
-      showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
-    },
-  })
-  const sTogLayers = addTransportLayers(map, sTogData, 's-tog', {
-    onLineClick: () => {
-      map[SKIP_CONTEXT_CLICK_FLAG] = true
-    },
-    onStationClick: (stationInfo) => {
-      map[SKIP_CONTEXT_CLICK_FLAG] = true
-      showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
-    },
-  })
+  const transportLayers = {}
+
+  for (const network of ["metro", "s-tog"]) {
+    transportLayers[network] = addTransportLayers(
+      map,
+      filterTransportData(transportData, network),
+      network,
+    )
+  }
 
   map.on('click', (event) => {
     if (map[SKIP_CONTEXT_CLICK_FLAG]) {
@@ -214,9 +202,9 @@ async function init() {
     map.__initialBounds = bounds.pad(0.08)
     map.fitBounds(map.__initialBounds)
   } else {
-    fitTransportLayers(map, metroLayers)
+    fitTransportLayers(map, transportLayers)
   }
-  window.__appDebug = { map, metroLayers, sTogLayers, adminLayers }
+  window.__appDebug = { map, transportLayers, adminLayers }
   document.body.dataset.appReady = 'true'
 }
 

@@ -8,13 +8,6 @@ function distance(a, b) {
   return Math.hypot(dx, dy)
 }
 
-function normalizeStationName(name) {
-  return String(name || '')
-    .replace(/\s*\(Metro\)\s*/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase()
-}
 
 function lineLength(coords) {
   let sum = 0
@@ -66,8 +59,8 @@ function lineStations(stations, lineId) {
 }
 
 function transferNames(metroStations, stogStations) {
-  const metro = new Set((metroStations.features || []).map((f) => normalizeStationName(f.properties?.name)))
-  const stog = new Set((stogStations.features || []).map((f) => normalizeStationName(f.properties?.name)))
+  const metro = new Set((metroStations.features || []).map((f) => f.properties.name))
+  const stog = new Set((stogStations.features || []).map((f) => f.properties.name))
   const transfers = new Set()
   for (const name of metro) {
     if (stog.has(name)) transfers.add(name)
@@ -142,9 +135,8 @@ function renderLineDiagram({ parent, meta, stations, lineCoords, transfers }) {
   svg.append(baseLine)
 
   ordered.forEach((station, index) => {
-    const stationName = (station.properties?.name || '').replace(/\s*\(Metro\)\s*/gi, '').trim()
-    const normalizedName = normalizeStationName(stationName)
-    const isTransfer = transfers.has(normalizedName)
+    const stationName = station.properties.name 
+    const isTransfer = transfers.has(stationName)
     const x = ordered.length > 1 ? left + step * index : svgWidth / 2
     const labelLines = splitStationLabel(stationName)
     const labelTop = index % 2 === 0 ? 24 : 118
@@ -240,22 +232,30 @@ export class GuidePage {
     container.replaceChildren()
 
     const networks = [
-      { label: 'Metro', data: metro },
-      { label: 'S-tog', data: stog },
-    ]
+      {
+          id: "metro",
+          label: "Metro",
+          data: metro,
+      },
+      {
+          id: "s-tog",
+          label: "S-tog",
+          data: stog,
+      },
+  ]
 
-    for (const { label, data } of networks) {
+    for (const network of networks) {
       const header = document.createElement('h3')
       header.className = 'guide-network-title'
-      header.textContent = label
+      header.textContent = network.label
       container.append(header)
 
-      for (const meta of linesForNetwork(label === 'Metro' ? 'metro' : 's-tog')) {
+      for (const meta of linesForNetwork(network.id)) {
         renderLineDiagram({
           parent: container,
           meta,
-          stations: lineStations(data.stations, meta.line),
-          lineCoords: bestLineCoordinates(data.lines.features || [], meta.line),
+          stations: lineStations(network.data.stations, meta.line),
+          lineCoords: bestLineCoordinates(network.data.lines.features || [], meta.line),
           transfers,
         })
       }

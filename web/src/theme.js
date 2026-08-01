@@ -15,12 +15,12 @@ export function linesForNetwork(network) {
   return transitLines.filter((line) => line.network === network)
 }
 
-export function adminLayerStyle(layer) {
+function adminLayerStyle(layer) {
   return {
     color: layer.color,
-    weight: layer.weight,
-    opacity: layer.opacity,
-    fillColor: layer.fillColor,
-    fillOpacity: layer.fillOpacity,
+    fillColor: layer.color,
+    weight: 2.8,
+    opacity: 0.8,
+    fillOpacity: 0.12,
   }
 }

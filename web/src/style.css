@@ -405,7 +405,7 @@ main {
 .guide-text-grid {
   margin-top: 0.6rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 0.65rem;
 }
 
@@ -426,6 +426,37 @@ main {
   margin: 0.35rem 0 0;
   color: #3a4d69;
   line-height: 1.45;
+}
+
+.guide-question-list {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.guide-question {
+  border: 1px solid #dfe6ef;
+  border-radius: 0.7rem;
+  background: #fbfcfe;
+  padding: 0.72rem;
+}
+
+.guide-question h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #213a5f;
+}
+
+.guide-question p {
+  margin: 0.35rem 0 0;
+  color: #3a4d69;
+  line-height: 1.45;
+}
+
+.guide-question-example {
+  color: #4a617f;
+  font-style: italic;
 }
 
 .where-header h1 {

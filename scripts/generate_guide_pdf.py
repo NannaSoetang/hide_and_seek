@@ -32,7 +32,7 @@ DEFAULT_OUTPUT = BASE_DIR / "guide-onepager.pdf"
 GAME_PHASES = [
     ("Forberedelsesfase", "Hvert hold får 15 minutter til at forberede sig, før de gemmer sig."),
     ("Spillet", "Gemmerne vælger en station og skal blive inden for 500 meter af den. Man har 30 minutter til at komme hen til sin zone."),
-    ("Slutfase", "Når søgerne når ind i gemmezonen, må gemmerne ikke flytte sig mere."),
+    ("Slutfase", "Når søgerne når ind i gemmezonen, må gemmerne ikke flytte sig mere. Gemmerne kan hele tiden følge søgerne på Google Maps."),
     ("Vinder", "Holdet med den længste samlede gemmetid efter begge runder vinder."),
 ]
 
