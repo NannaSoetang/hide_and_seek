@@ -32,20 +32,45 @@ DEFAULT_OUTPUT = BASE_DIR / "guide-onepager.pdf"
 GAME_PHASES = [
     ("Forberedelsesfase", "Hvert hold får 15 minutter til at forberede sig, før de gemmer sig."),
     ("Spillet", "Gemmerne vælger en station og skal blive inden for 500 meter af den. Man har 30 minutter til at komme hen til sin zone."),
-    ("Slutfase", "Når søgerne når ind i gemmezonen, må gemmerne ikke flytte sig mere. Gemmerne kan hele tiden følge søgerne på Google Maps."),
+    ("Slutfase", "Når søgerne når ind i gemmezonen (500 meter fra det valgt busstopsted), må gemmerne ikke flytte sig mere. Gemmerne kan hele tiden følge søgerne på Google Maps."),
     ("Vinder", "Holdet med den længste samlede gemmetid efter begge runder vinder."),
 ]
 
-RULES = [
-    "Vi spiller Small Game.",
-    "Du må kun bruge offentlig transport: Metro og S-tog.",
-    "Gemmerne må højst have 6 kort på hånden.",
-    "Når gemmerne har valgt deres gemmezone, skal de være højst 3 meter fra en offentlig vej eller sti.",
-    "Svar altid ærligt. Svaret gælder, selv om I krydser en grænse bagefter.",
-    "Hver gang der stilles et spørgsmål med en beslutning, der vedrører søgerne, skal søgerne sende deres position.",
-    "Google Maps er det nemmeste værktøj til at måle afstand — brug «Mål distance», så får du afstanden i fugleflugt.",
-    "AI og Google Street View må ikke bruges.",
-    "En administrativ inddeling er et område: kommune, opstillingskreds, postnummer eller sogn.",
+RULE_GROUPS = [
+    (
+        "Spil og bevægelse",
+        [
+            "Vi spiller Small Game.",
+            "Du må kun bruge offentlig transport: Metro og S-tog.",
+            "Når gemmerne har valgt deres gemmested, skal de være højst 3 meter fra en offentlig vej eller sti.",
+        ],
+    ),
+    (
+        "Spørgsmål",
+        [
+            "Svar altid ærligt. Svaret gælder, selv om I krydser en grænse bagefter indenfor svartiden.",
+            "Hver gang der stilles et spørgsmål med en beslutning, der vedrører søgerne, skal søgerne sende deres position.",
+            "Hvis man bruger det samme spørgsmål i samme kategori flere gange, stiger betalingen. Anden gang fordobles den: Koster spørgsmålet normalt »træk 2, behold 1«, må gemmerne i stedet trække 4 og beholde 2. Tredje gang tredobles betalingen osv.",
+            "Du kan ikke stille et nyt spørgsmål før du har modtaget svar på det forrige.",
+            "Hvis spørgsmålet ikke kan besvares inden for svartiden, stopper gemmernes tid indtil spørgsmålet er besvaret og de må ikke trække kort fra dækket.",
+        ],
+    ),
+    (
+        "Kort",
+        [
+            "Gemmerne må højst have 6 kort på hånden (medmindre man har en powerup). Det vil sige hvis man trækker så man har flere end 6 kort, må man spille dem eller smide dem indtil man har 6 kort.",
+            "Du kan spille flere curses, men du kan kun have én aktiv curse som stopper seekers fra at ikke handle ad gangen (gennem spørgsmål stilning eller at tage transport).",
+        ],
+    ),
+    (
+        "Værktøjer og områder",
+        [
+            "Google Maps er det nemmeste værktøj til at måle afstand — brug «Mål distance», så får du afstanden i fugleflugt.",
+            "AI og Google Street View må ikke bruges.",
+            "En administrativ inddeling er et område: kommune, opstillingskreds, postnummer eller sogn.",
+            "Man kan ikke bruge elementer som er udenfor spilområdet i sine spørgsmål, f.eks. Billund Lufthavn.",
+        ],
+    ),
 ]
 
 # Hver type følges direkte af sit eksempel: (type, forklaring, eksempel).
@@ -317,16 +342,19 @@ def build_reference_page(
     story.append(paragraph("Hurtigguide — find svaret på få sekunder.", subtitle_style))
     story.append(Spacer(1, 5 * mm))
 
-    left_column: list = [paragraph("Sådan spiller I", section_style), Spacer(1, 2 * mm)]
-    for index, (label, text) in enumerate(GAME_PHASES):
-        left_column.append(paragraph(f"<b>{index + 1}. {escape_html(label)}:</b>&nbsp;&nbsp;{escape_html(text)}", item_style))
-    left_column.append(Spacer(1, 4 * mm))
-    left_column.append(paragraph("Regler", section_style))
-    left_column.append(Spacer(1, 2 * mm))
-    for text in RULES:
-        left_column.append(bullet_paragraph(escape_html(text), item_style))
+    left_column: list = [paragraph("Regler", section_style), Spacer(1, 2 * mm)]
+    for group_name, rules in RULE_GROUPS:
+        left_column.append(paragraph(f"<b>{escape_html(group_name)}</b>", type_style))
+        for text in rules:
+            left_column.append(bullet_paragraph(escape_html(text), item_style))
+        left_column.append(Spacer(1, 1.5 * mm))
 
-    right_column: list = [paragraph("Spørgsmålstyper", section_style), Spacer(1, 2 * mm)]
+    right_column: list = [paragraph("Sådan spiller I", section_style), Spacer(1, 2 * mm)]
+    for index, (label, text) in enumerate(GAME_PHASES):
+        right_column.append(paragraph(f"<b>{index + 1}. {escape_html(label)}:</b>&nbsp;&nbsp;{escape_html(text)}", item_style))
+    right_column.append(Spacer(1, 4 * mm))
+    right_column.append(paragraph("Spørgsmålstyper", section_style))
+    right_column.append(Spacer(1, 2 * mm))
     for name, explanation, example in QUESTION_TYPES:
         right_column.append(paragraph(f"<b>{escape_html(name)}</b>", type_style))
         right_column.append(paragraph(escape_html(explanation), item_style))

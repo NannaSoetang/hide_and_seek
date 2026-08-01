@@ -15,7 +15,7 @@ export function linesForNetwork(network) {
   return transitLines.filter((line) => line.network === network)
 }
 
-function adminLayerStyle(layer) {
+export function adminLayerStyle(layer) {
   return {
     color: layer.color,
     fillColor: layer.color,
