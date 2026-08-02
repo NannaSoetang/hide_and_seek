@@ -27,7 +27,7 @@ from theme import TRANSIT_LINES
 BASE_DIR = Path(__file__).resolve().parents[1]
 LINES_PATH = BASE_DIR / "web/public/data/transport-lines.geojson"
 STATIONS_PATH = BASE_DIR / "web/public/data/transport-stations.geojson"
-DEFAULT_OUTPUT = BASE_DIR / "guide-onepager.pdf"
+DEFAULT_OUTPUT = BASE_DIR / "output/maps/guide-onepager.pdf"
 
 GAME_PHASES = [
     ("Forberedelsesfase", "Hvert hold får 15 minutter til at forberede sig, før de gemmer sig."),
@@ -432,6 +432,7 @@ def draw_page_frame(canvas: Canvas, doc: SimpleDocTemplate, label: str, font_nam
 
 
 def build_pdf(output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     font_name = choose_font()
     styles = getSampleStyleSheet()
 
