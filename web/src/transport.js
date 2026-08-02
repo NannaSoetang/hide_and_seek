@@ -7,18 +7,18 @@ const RENDER_CONFIG = {
   lineWeight: 7,
   selectedLineWeight: 12,
   normalOpacity: 0.95,
-  selectedOpacity: 0.12,
-  stationRadius: 5,
-  selectedStationRadius: 8.5,
-  stationWeight: 1.5,
-  selectedStationWeight: 3,
+  inactiveLineColor: '#c8d0dc',
   includeCasing: true,
   lineCasingWeight: 11,
-  selectedLineCasingOpacity: 0.64,
-  fadedLineCasingOpacity: 0.005,
 }
 
+const STATION_PANE = 'transitStationPane'
 
+function ensureStationPane(map) {
+  if (map.getPane(STATION_PANE)) return
+  const pane = map.createPane(STATION_PANE)
+  pane.style.zIndex = '430'
+}
 
 function createStationGroup(latlng, style) {
   const marker = L.circleMarker(latlng, style)
@@ -27,6 +27,7 @@ function createStationGroup(latlng, style) {
     marker,
     group: L.featureGroup([
       L.circleMarker(latlng, {
+        pane: STATION_PANE,
         radius: 14,
         opacity: 0,
         fillOpacity: 0,
@@ -83,8 +84,10 @@ function stationNetworkIndex(map, network, stations) {
 
 export function addTransportLayers(map, data, network, options = {}) {
   stationNetworkIndex(map, network, data.stations)
+  ensureStationPane(map)
 
   const baseStationStyle = {
+      pane: STATION_PANE,
       color:"#172033",
       fillColor:"#fff",
       fillOpacity:1,
@@ -120,6 +123,8 @@ export function addTransportLayers(map, data, network, options = {}) {
   }
 
   const lineLayer = L.geoJSON(data.lines, {
+    bubblingMouseEvents: false,
+    className: 'transit-line',
     style: (feature) => ({
       color: LINE_COLORS[feature.properties.line],
       weight: RENDER_CONFIG.lineWeight,
@@ -147,28 +152,32 @@ export function addTransportLayers(map, data, network, options = {}) {
   const updateLineStyles = () => {
     const selection = map.__selectedTransitLine
 
+    const isSelected = layer => selection?.network === network
+      && selection.line === layer.feature.properties.line
+
+    lineCasingLayer?.eachLayer(layer => {
+      const selected = isSelected(layer)
+      layer.setStyle({
+        weight: selected
+          ? RENDER_CONFIG.selectedLineWeight + 4
+          : RENDER_CONFIG.lineCasingWeight,
+        opacity: RENDER_CONFIG.normalOpacity,
+      })
+      if (selected) layer.bringToFront()
+    })
+
     lineLayer.eachLayer(layer => {
-
-        const selected =
-            selection?.network === network &&
-            selection.line === layer.feature.properties.line
-
-        layer.setStyle({
-
-            weight:
-                selected
-                ? config.selectedLineWeight
-                : config.lineWeight,
-
-            opacity:
-                !selection
-                    ? config.normalOpacity
-                    : selected
-                        ? 1
-                        : config.selectedOpacity,
-
-        })
-
+      const selected = isSelected(layer)
+      layer.setStyle({
+        color: selection && !selected
+          ? RENDER_CONFIG.inactiveLineColor
+          : LINE_COLORS[layer.feature.properties.line],
+        weight: selected
+          ? RENDER_CONFIG.selectedLineWeight
+          : RENDER_CONFIG.lineWeight,
+        opacity: selected ? 1 : RENDER_CONFIG.normalOpacity,
+      })
+      if (selected) layer.bringToFront()
     })
   }
   map.on('transit-line-selected', updateLineStyles)

@@ -176,8 +176,8 @@ const ADDRESS_DETAIL_ENDPOINTS = [
   'https://api.dataforsyningen.dk/adresser',
 ]
 
-async function fetchJson(url) {
-  const response = await fetch(url)
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, options)
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   return response.json()
 }
@@ -210,20 +210,29 @@ function toSuggestion(item) {
   return { id, text, lon, lat }
 }
 
-export async function searchAddresses(query) {
+export async function searchAddresses(query, { signal } = {}) {
   if (!query || query.trim().length < 3) return []
 
+  let receivedResponse = false
   for (const endpoint of AUTOCOMPLETE_ENDPOINTS) {
     try {
-      const payload = await fetchJson(buildUrl(endpoint, { q: query, fuzzy: '' }))
+      const payload = await fetchJson(
+        buildUrl(endpoint, { q: query, fuzzy: '' }),
+        { signal },
+      )
+      receivedResponse = true
       const candidates = Array.isArray(payload)
         ? payload
         : (payload?.resultater || payload?.hits || [])
       const suggestions = candidates.map(toSuggestion).filter((item) => item.text)
       if (suggestions.length) return suggestions.slice(0, 5)
-    } catch {
+    } catch (error) {
+      if (error.name === 'AbortError') throw error
       // try next endpoint
     }
+  }
+  if (!receivedResponse) {
+    throw new Error('Adressesøgning er midlertidigt utilgængelig. Prøv igen senere.')
   }
   return []
 }

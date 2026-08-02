@@ -1,3 +1,5 @@
+import 'leaflet/dist/leaflet.css'
+import './map.css'
 import './style.css'
 import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
@@ -171,6 +173,12 @@ async function init() {
       map,
       filterTransportData(transportData, network),
       network,
+      {
+        onStationClick: (stationInfo) => {
+          map[SKIP_CONTEXT_CLICK_FLAG] = true
+          showContextPopup(map, adminLayers, stationInfo.latlng, stationInfo)
+        },
+      },
     )
   }
 

@@ -1,10 +1,12 @@
 import './style.css'
+import './where-am-i.css'
 import {
   AdministrativeLookup,
   getCurrentPosition,
   resolveAddressToCoordinates,
   searchAddresses,
 } from './LookupService.js'
+import { Tabs } from './Tabs.js'
 
 function debounce(fn, delay = 220) {
   let timer = null
@@ -21,6 +23,8 @@ function formatCoord(value) {
 export class WhereAmIPage {
   constructor() {
     this.lookup = null
+    this.lookupPromise = null
+    this.addressSearchController = null
     this.currentSuggestions = []
 
     this.elements = {
@@ -40,29 +44,35 @@ export class WhereAmIPage {
       resultAddress: document.querySelector('#result-address'),
       resultCoordinates: document.querySelector('#result-coordinates'),
     }
+    this.tabs = new Tabs([
+      { id: 'location', tab: this.elements.tabLocation, panel: this.elements.panelLocation },
+      { id: 'address', tab: this.elements.tabAddress, panel: this.elements.panelAddress },
+    ], {
+      onShow: (tab) => {
+        if (tab === 'address') this.elements.addressQuery.focus()
+      },
+    })
   }
 
   async init() {
-    this.lookup = await AdministrativeLookup.create()
-    this.bindTabs()
+    this.tabs.bind()
     this.bindLocationTab()
     this.bindAddressTab()
   }
 
-  bindTabs() {
-    this.elements.tabLocation.addEventListener('click', () => this.showTab('location'))
-    this.elements.tabAddress.addEventListener('click', () => this.showTab('address'))
-  }
-
-  showTab(tab) {
-    const isLocation = tab === 'location'
-    this.elements.tabLocation.classList.toggle('is-active', isLocation)
-    this.elements.tabLocation.setAttribute('aria-selected', String(isLocation))
-    this.elements.tabAddress.classList.toggle('is-active', !isLocation)
-    this.elements.tabAddress.setAttribute('aria-selected', String(!isLocation))
-    this.elements.panelLocation.classList.toggle('is-hidden', !isLocation)
-    this.elements.panelAddress.classList.toggle('is-hidden', isLocation)
-    if (!isLocation) this.elements.addressQuery.focus()
+  async getLookup() {
+    if (!this.lookupPromise) {
+      this.lookupPromise = AdministrativeLookup.create()
+        .then((lookup) => {
+          this.lookup = lookup
+          return lookup
+        })
+        .catch((error) => {
+          this.lookupPromise = null
+          throw error
+        })
+    }
+    return this.lookupPromise
   }
 
   bindLocationTab() {
@@ -73,10 +83,12 @@ export class WhereAmIPage {
         const lat = position.coords.latitude
         const lon = position.coords.longitude
         const accuracy = position.coords.accuracy
-        this.applyLookupResult({ lat, lon, addressLabel: null, accuracy })
-        this.elements.locationStatus.textContent = accuracy > 80
-          ? 'Placering fundet. Nøjagtigheden er lav, så resultatet kan være omtrentligt.'
-          : 'Placering fundet.'
+        const hasMatch = await this.applyLookupResult({ lat, lon, addressLabel: null })
+        this.elements.locationStatus.textContent = hasMatch
+          ? accuracy > 80
+            ? 'Placering fundet. Nøjagtigheden er lav, så resultatet kan være omtrentligt.'
+            : 'Placering fundet.'
+          : 'Vi kunne ikke matche placeringen til et administrativt område.'
       } catch (error) {
         this.elements.locationStatus.textContent = error.message
       }
@@ -86,19 +98,34 @@ export class WhereAmIPage {
   bindAddressTab() {
     const runSearch = debounce(async (query) => {
       if (!query || query.trim().length < 3) {
+        this.currentSuggestions = []
         this.renderAddressSuggestions([])
+        this.elements.addressStatus.textContent = ''
         return
       }
+
+      const controller = new AbortController()
+      this.addressSearchController = controller
       this.elements.addressStatus.textContent = 'Søger adresser...'
-      const suggestions = await searchAddresses(query)
-      this.currentSuggestions = suggestions
-      this.renderAddressSuggestions(suggestions)
-      this.elements.addressStatus.textContent = suggestions.length
-        ? 'Vælg en adresse fra listen.'
-        : 'Ingen adresser fundet.'
+      try {
+        const suggestions = await searchAddresses(query, { signal: controller.signal })
+        if (this.addressSearchController !== controller) return
+        this.currentSuggestions = suggestions
+        this.renderAddressSuggestions(suggestions)
+        this.elements.addressStatus.textContent = suggestions.length
+          ? 'Vælg en adresse fra listen.'
+          : 'Ingen adresser fundet.'
+      } catch (error) {
+        if (error.name === 'AbortError') return
+        this.currentSuggestions = []
+        this.renderAddressSuggestions([])
+        this.elements.addressStatus.textContent = error.message
+      }
     })
 
     this.elements.addressQuery.addEventListener('input', (event) => {
+      this.addressSearchController?.abort()
+      this.addressSearchController = null
       runSearch(event.target.value)
     })
   }
@@ -125,21 +152,23 @@ export class WhereAmIPage {
       const resolved = await resolveAddressToCoordinates(selected)
       this.elements.addressQuery.value = resolved.label
       this.renderAddressSuggestions([])
-      this.applyLookupResult({
+      const hasMatch = await this.applyLookupResult({
         lat: resolved.lat,
         lon: resolved.lon,
         addressLabel: resolved.label,
-        accuracy: null,
       })
-      this.elements.addressStatus.textContent = 'Adresse fundet.'
+      this.elements.addressStatus.textContent = hasMatch
+        ? 'Adresse fundet.'
+        : 'Vi kunne ikke matche adressen til et administrativt område.'
     } catch (error) {
       this.elements.addressStatus.textContent = error.message
     }
   }
 
-  applyLookupResult({ lat, lon, addressLabel, accuracy }) {
-    const result = this.lookup.lookup(lat, lon)
-    const hasMatch = this.lookup.hasAny(result)
+  async applyLookupResult({ lat, lon, addressLabel }) {
+    const lookup = await this.getLookup()
+    const result = lookup.lookup(lat, lon)
+    const hasMatch = lookup.hasAny(result)
 
     this.elements.resultMunicipality.textContent = result.municipality || '-'
     this.elements.resultPostalArea.textContent = result.postalArea || '-'
@@ -148,15 +177,7 @@ export class WhereAmIPage {
     this.elements.resultAddress.textContent = addressLabel || 'Fra din placering'
     this.elements.resultCoordinates.textContent = `${formatCoord(lat)}, ${formatCoord(lon)}`
 
-    if (!hasMatch) {
-      const message = 'Vi kunne ikke matche placeringen til et administrativt område.'
-      this.elements.locationStatus.textContent = message
-      this.elements.addressStatus.textContent = message
-    }
-
-    if (accuracy && Number.isFinite(accuracy) && accuracy > 80) {
-      this.elements.locationStatus.textContent = 'Placering fundet. Nøjagtigheden er lav, så resultatet kan være omtrentligt.'
-    }
+    return hasMatch
   }
 }
 

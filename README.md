@@ -148,8 +148,17 @@ Data loading:
 Reusable modules:
 
 - `web/src/LookupService.js` powers spatial indexing, administrative lookup, device geolocation, and address search for the "Where am I?" page.
+- `web/src/Tabs.js` provides click and keyboard behavior for accessible tab interfaces.
+- `web/src/GuideLineDiagram.js` owns transit-line ordering and diagram rendering.
 - `web/src/GuidePage.js` builds the station guide and transfer summaries.
 - `web/src/WhereAmIPage.js` provides page-specific startup logic for location and address tabs.
+
+Stylesheet ownership:
+
+- `web/src/style.css` contains shared page foundations, links, and tab controls.
+- `web/src/map.css`, `web/src/where-am-i.css`, and `web/src/guide.css` contain styles used only by their corresponding entry points.
+
+The "Where am I?" page becomes interactive without downloading administrative polygons. It loads and indexes those files only after geolocation succeeds or an address is selected. Address autocomplete requests are cancellable so an older response cannot replace newer suggestions.
 
 Overlays and station data:
 
@@ -174,7 +183,7 @@ npm test
 If Playwright browsers are missing:
 
 ```bash
-npx playwright install chromium
+npx playwright install chromium-headless-shell
 ```
 
 Verify a production build locally:

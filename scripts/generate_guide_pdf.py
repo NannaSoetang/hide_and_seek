@@ -31,8 +31,8 @@ DEFAULT_OUTPUT = BASE_DIR / "guide-onepager.pdf"
 
 GAME_PHASES = [
     ("Forberedelsesfase", "Hvert hold får 15 minutter til at forberede sig, før de gemmer sig."),
-    ("Spillet", "Gemmerne vælger en station og skal blive inden for 500 meter af den. Man har 30 minutter til at komme hen til sin zone."),
-    ("Slutfase", "Når søgerne når ind i gemmezonen (500 meter fra det valgt busstopsted), må gemmerne ikke flytte sig mere. Gemmerne kan hele tiden følge søgerne på Google Maps."),
+    ("Spillet", "Gemmerne vælger en station og skal blive inden for 500 meter af den. De har 30 minutter til at nå frem til deres zone."),
+    ("Slutfase", "Når søgerne kommer inden for 500 meter af den valgte station, må gemmerne ikke længere flytte sig. Gemmerne kan hele tiden følge søgerne på Google Maps."),
     ("Vinder", "Holdet med den længste samlede gemmetid efter begge runder vinder."),
 ]
 
@@ -48,18 +48,18 @@ RULE_GROUPS = [
     (
         "Spørgsmål",
         [
-            "Svar altid ærligt. Svaret gælder, selv om I krydser en grænse bagefter indenfor svartiden.",
+            "Svar altid ærligt. I må bruge hele svartiden på at flytte jer. Svaret skal tage udgangspunkt i jeres placering på det tidspunkt, hvor I svarer, medmindre spørgsmålet specifikt handler om gemmestationens placering. Svaret gælder fortsat, hvis I krydser en grænse, efter at I har svaret.",
             "Hver gang der stilles et spørgsmål med en beslutning, der vedrører søgerne, skal søgerne sende deres position.",
             "Hvis man bruger det samme spørgsmål i samme kategori flere gange, stiger betalingen. Anden gang fordobles den: Koster spørgsmålet normalt »træk 2, behold 1«, må gemmerne i stedet trække 4 og beholde 2. Tredje gang tredobles betalingen osv.",
-            "Du kan ikke stille et nyt spørgsmål før du har modtaget svar på det forrige.",
-            "Hvis spørgsmålet ikke kan besvares inden for svartiden, stopper gemmernes tid indtil spørgsmålet er besvaret og de må ikke trække kort fra dækket.",
+            "Du kan ikke stille et nyt spørgsmål, før du har modtaget svar på det forrige.",
+            "Hvis spørgsmålet ikke kan besvares inden for svartiden, sættes gemmernes tid på pause, indtil spørgsmålet er besvaret. Imens må de ikke trække kort fra dækket.",
         ],
     ),
     (
         "Kort",
         [
-            "Gemmerne må højst have 6 kort på hånden (medmindre man har en powerup). Det vil sige hvis man trækker så man har flere end 6 kort, må man spille dem eller smide dem indtil man har 6 kort.",
-            "Du kan spille flere curses, men du kan kun have én aktiv curse som stopper seekers fra at ikke handle ad gangen (gennem spørgsmål stilning eller at tage transport).",
+            "Gemmerne må højst have 6 kort på hånden, medmindre de har en powerup. Hvis de efter at have trukket har mere end 6 kort, skal de spille eller smide kort, indtil de har 6.",
+            "Du kan spille flere curses, men kun én curse, der forhindrer søgerne i at handle, må være aktiv ad gangen. Det gælder både spørgsmål og brug af transport.",
         ],
     ),
     (
@@ -67,20 +67,25 @@ RULE_GROUPS = [
         [
             "Google Maps er det nemmeste værktøj til at måle afstand — brug «Mål distance», så får du afstanden i fugleflugt.",
             "AI og Google Street View må ikke bruges.",
-            "En administrativ inddeling er et område: kommune, opstillingskreds, postnummer eller sogn.",
-            "Man kan ikke bruge elementer som er udenfor spilområdet i sine spørgsmål, f.eks. Billund Lufthavn.",
+            "En administrativ inddeling er et af følgende områder: 1. kommune, 2. opstillingskreds, 3. postnummer eller 4. sogn.",
+            "Man kan ikke bruge elementer, der ligger uden for spilområdet, i sine spørgsmål, f.eks. Billund Lufthavn.",
         ],
     ),
 ]
 
-# Hver type følges direkte af sit eksempel: (type, forklaring, eksempel).
+# Hver type følges direkte af sit eksempel: (type, forklaring, eksempel, valgfri note).
 # Small Game — tentakelspørgsmål bruges ikke.
 QUESTION_TYPES = [
-    ("Matchning", "«Er jeres nærmeste ___ det samme som vores?» Svar: ja eller nej.", "Er jeres nærmeste station den samme som vores?"),
-    ("Måling", "«Sammenlignet med os, er I tættere på eller længere fra ___?» Svar: tættere eller længere.", "Sammenlignet med os, er I tættere på eller længere fra en kyst?"),
-    ("Radar", "«Er I inden for ___ fra os?» Svar: ja eller nej.", "Er I inden for 1 km fra os?"),
-    ("Termometer", "«Efter vi har bevæget os ___, er vi blevet varmere eller koldere?» Søgerne sender deres position, rejser afstanden og spørger så. Svar: varmere eller koldere.", "Efter vi har bevæget os 800 m, er vi varmere eller koldere?"),
-    ("Billede", "«Send os et billede af ___.» Gemmerne må tage billeder på forhånd, men billeder taget på forhånd må ikke bruges i slutfasen. Kan motivet ikke nås — især i slutfasen, eller hvis det ikke findes i området — svarer de «Det er ikke muligt».", "Send os et billede af himlen."),
+    ("Matchning", "«Er jeres nærmeste ___ det samme som vores?» Svar: ja eller nej.", "Er jeres nærmeste station den samme som vores?", None),
+    ("Måling", "«Sammenlignet med os, er I tættere på eller længere fra ___?» Svar: tættere eller længere.", "Sammenlignet med os, er I tættere på eller længere fra en kyst?", None),
+    ("Radar", "«Er I inden for ___ fra os?» Svar: ja eller nej.", "Er I inden for 1 km fra os?", None),
+    ("Termometer", "«Efter vi har bevæget os ___, er vi blevet varmere eller koldere?» Søgerne sender deres position, rejser afstanden og spørger så. Svar: varmere eller koldere.", "Efter vi har bevæget os 800 m, er vi varmere eller koldere?", None),
+    (
+        "Billede",
+        "«Send os et billede af ___.» Gemmerne må tage billeder på forhånd, men billeder taget på forhånd må ikke bruges i slutfasen. Kan motivet ikke nås — især i slutfasen, eller hvis det ikke findes i området — svarer de «Det er ikke muligt».",
+        "Send os et billede af den bredeste vej.",
+        "(Bredeste vej referer til området inden for 500 m af gemmernes station, ikke sightline. Hvis der er flere veje med samme bredde, må gemmerne vælge hvilken som helst af dem.)",
+    ),
 ]
 
 
@@ -338,7 +343,7 @@ def build_reference_page(
     example_style: ParagraphStyle,
 ) -> list:
     story: list = []
-    story.append(paragraph("Hide &amp; Seek", title_style))
+    story.append(paragraph("Spilguide", title_style))
     story.append(paragraph("Hurtigguide — find svaret på få sekunder.", subtitle_style))
     story.append(Spacer(1, 5 * mm))
 
@@ -355,10 +360,12 @@ def build_reference_page(
     right_column.append(Spacer(1, 4 * mm))
     right_column.append(paragraph("Spørgsmålstyper", section_style))
     right_column.append(Spacer(1, 2 * mm))
-    for name, explanation, example in QUESTION_TYPES:
+    for name, explanation, example, note in QUESTION_TYPES:
         right_column.append(paragraph(f"<b>{escape_html(name)}</b>", type_style))
         right_column.append(paragraph(escape_html(explanation), item_style))
         right_column.append(paragraph(f"Eksempel: {escape_html(example)}", example_style))
+        if note:
+            right_column.append(paragraph(escape_html(note), example_style))
         right_column.append(Spacer(1, 2.4 * mm))
 
     story.append(two_columns(left_column, right_column, width, 8 * mm))
@@ -409,7 +416,7 @@ def draw_page_frame(canvas: Canvas, doc: SimpleDocTemplate, label: str, font_nam
 
     canvas.setFillColor(HexColor("#172033"))
     canvas.setFont(font_name, 8.4)
-    canvas.drawString(left, top, "Hide and Seek guide")
+    canvas.drawString(left, top, "Spilguide")
     canvas.setFillColor(HexColor("#5b6c80"))
     canvas.setFont(font_name, 7.1)
     canvas.drawRightString(right, top, label)
