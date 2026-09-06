@@ -71,11 +71,11 @@ Open the local URL printed by Vite preview.
 
 ## Repository structure
 
-- `scripts/`: preprocessing build script (`build_data.py`)
+- `scripts/`: preprocessing orchestration, focused data modules, and PDF generators
 - `data/`: downloaded raw source data cached by preprocessing
 - `docs/`: short source notes and documentation index
 - `web/`: the frontend source, HTML entry points, and Vite configuration
-- `web/src/`: reusable browser modules for maps, lookups, overlays, and page setup
+- `web/src/`: reusable browser modules grouped into map, lookup, config, and UI folders
 - `web/public/`: static assets copied by Vite into the production build
 - `web/public/data/`: generated runtime GeoJSON consumed by the frontend
 - `web-tests/`: Playwright end-to-end tests
@@ -83,7 +83,15 @@ Open the local URL printed by Vite preview.
 
 ## Data pipeline
 
-The preprocessing pipeline lives in `scripts/build_data.py`.
+The preprocessing entry point is `python -m scripts.build_data`. Its implementation is split by domain:
+
+- `scripts/config/`: source URLs, paths, transit configuration, and shared theme metadata
+- `scripts/io/`: downloads, JSON output, and GTFS archive I/O
+- `scripts/geography/`: boundary, Movia zones, and administrative datasets
+- `scripts/transit/`: GTFS service filtering, route selection, stop filtering, and route geometry
+- `scripts/pdf/`: guide and transit-map PDF entry points
+
+`build_data.py` keeps the command-line orchestration and compatibility exports used by the tests.
 
 Downloaded data:
 
@@ -134,10 +142,7 @@ The frontend is a multi-page Leaflet app built from `web/index.html` and `web/wh
 
 Map architecture:
 
-- `web/src/main.js` initializes the main interactive map.
-- `web/src/shared.js` provides shared map and data loading helpers.
-- `web/src/AdministrativeLayer.js` handles overlays and zoom-sensitive labels.
-- `web/src/transport.js` renders Metro and S-tog lines and stations.
+- `web/src/map/` contains the map entry point, Leaflet helpers, administrative layers, transport rendering, and map CSS.
 
 Data loading:
 
@@ -145,16 +150,18 @@ Data loading:
 - Transport layers are fetched from the generated line and station files and filtered by network in the browser.
 - The boundary file is used to fit the initial map view to the playable area.
 
-Reusable modules:
+Reusable browser modules:
 
-- `web/src/LookupService.js` powers spatial indexing, administrative lookup, device geolocation, and address search for the "Where am I?" page.
-- `web/src/Tabs.js` provides click and keyboard behavior for accessible tab interfaces.
-- `web/src/WhereAmIPage.js` provides page-specific startup logic for location and address tabs.
+- `web/src/lookup/admin/` contains geometry and administrative lookup logic.
+- `web/src/lookup/address/` handles Dataforsyningen address search and browser location access.
+- `web/src/lookup/page/` contains the "Where Am I?" page and its CSS.
+- `web/src/lookup/LookupService.js` remains a compatibility export for the focused lookup modules.
+- `web/src/ui/` provides shared CSS and accessible tab behavior.
 
 Stylesheet ownership:
 
-- `web/src/style.css` contains shared page foundations, links, and tab controls.
-- `web/src/map.css` and `web/src/where-am-i.css` contain the styles used by their corresponding entry points.
+- `web/src/ui/style.css` contains shared page foundations, links, and tab controls.
+- `web/src/map/map.css` and `web/src/lookup/page/where-am-i.css` contain page-specific styles.
 
 The "Where am I?" page becomes interactive without downloading administrative polygons. It loads and indexes those files only after geolocation succeeds or an address is selected. Address autocomplete requests are cancellable so an older response cannot replace newer suggestions.
 
@@ -266,7 +273,7 @@ No manual upload step is required.
 - `package.json`: defines the Node scripts used locally and in CI.
 - `package-lock.json`: pins the Node dependency tree used by `npm ci`.
 - `pyproject.toml`: defines the Python project metadata and runtime dependencies.
-- `scripts/build_data.py`: downloads, filters, and writes generated GeoJSON.
+- `scripts/build_data.py`: orchestrates downloads, filtering, and generated GeoJSON output.
 - `web/vite.config.js`: configures the multi-page Vite build and output directory.
 - `playwright.config.js`: configures browser-based verification against the production preview server.
 

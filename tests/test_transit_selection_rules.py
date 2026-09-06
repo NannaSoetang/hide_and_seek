@@ -1,10 +1,18 @@
 import io
+import json
+import sys
 import zipfile
 from pathlib import Path
 
+import pytest
 from shapely.geometry import Polygon
 
-from scripts.build_data import build_transit_features_for_rules, clip_route_to_zone_shapes, load_selected_stop_rows, load_transit_config, load_transit_rules, matches_transit_rule, merge_route_segments, select_best_route_shape
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from scripts.build_data import _service_id_active_on_day, build_transit_features_for_rules, clip_route_to_zone_shapes, load_selected_stop_rows, load_transit_config, load_transit_rules, matches_transit_rule, merge_route_segments, select_best_route_shape
+from scripts import build_data
 
 
 def test_matches_transit_rule_handles_all_rule_classes():
@@ -70,6 +78,49 @@ def test_load_transit_config_supports_service_day_and_time_window():
         "end_time": "16:00",
     }
     assert config["zones"] == ["1"]
+
+
+def test_service_date_uses_matching_gtfs_exceptions():
+    calendar = [
+        {
+            "service_id": "weekday-service",
+            "saturday": "1",
+            "start_date": "20260101",
+            "end_date": "20261231",
+        }
+    ]
+    exceptions = [{"service_id": "weekday-service", "date": "20260905", "exception_type": "2"}]
+
+    assert _service_id_active_on_day("weekday-service", {"day": "saturday"}, calendar, exceptions) is True
+    assert _service_id_active_on_day("weekday-service", {"date": "2026-09-05"}, calendar, exceptions) is False
+    assert _service_id_active_on_day("weekday-service", {"date": "2026-09-12"}, calendar, exceptions) is True
+
+
+def test_load_movia_zone_shapes_fails_for_missing_configured_zone(tmp_path, monkeypatch):
+    zones_path = tmp_path / "movia-zones.geojson"
+    zones_path.write_text(
+        json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {"name": "Zone 1"},
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
+                        },
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(build_data, "MOVIA_ZONES_GEOJSON", zones_path)
+    monkeypatch.setattr(build_data, "download_if_missing", lambda _url, _destination: None)
+
+    with pytest.raises(RuntimeError, match="2"):
+        build_data.load_movia_zone_shapes(Polygon([(0, 0), (0, 2), (2, 2), (2, 0)]), {"1", "2"})
 
 
 def test_load_selected_stop_rows_respects_zone_filter_for_missing_zone_metadata():

@@ -1,27 +1,21 @@
-import json
+import sys
 from pathlib import Path
 
-from scripts.generate_game_guide_pdf import load_line_stops, load_transit_line_catalog
+from reportlab.platypus import PageBreak
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TRANSPORT_STATIONS = ROOT / "web" / "public" / "data" / "transport-stations.geojson"
+sys.path.insert(0, str(ROOT))
+
+from scripts.pdf import generate_game_guide_pdf as guide
 
 
-def test_game_guide_uses_line_stops_from_generated_map_data():
-    guide_lines = load_transit_line_catalog()
-    generated = load_line_stops()
-    map_stops = json.loads(TRANSPORT_STATIONS.read_text(encoding="utf-8"))
+def test_game_guide_contains_only_the_rules_list():
+    guide.create_styles()
 
-    station_names_by_line = {}
-    for feature in map_stops.get("features", []):
-        props = feature.get("properties") or {}
-        for line in props.get("lines") or []:
-            station_names_by_line.setdefault(str(line), [])
-            name = str(props.get("name") or "").strip()
-            if name and name not in station_names_by_line[str(line)]:
-                station_names_by_line[str(line)].append(name)
+    story = guide.build_story()
+    rendered_text = " ".join(flowable.getPlainText() for flowable in story if hasattr(flowable, "getPlainText"))
 
-    assert guide_lines
-    for line in guide_lines:
-        assert generated.get(line) == station_names_by_line.get(line, [])
+    assert guide.TITLE in rendered_text
+    assert all(title in rendered_text for title, _bullets in guide.RULES)
+    assert not any(isinstance(flowable, PageBreak) for flowable in story)

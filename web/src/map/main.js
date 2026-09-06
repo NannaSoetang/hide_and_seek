@@ -1,12 +1,12 @@
 import 'leaflet/dist/leaflet.css'
 import './map.css'
-import './style.css'
+import '../ui/style.css'
 import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
-import { addTransportLayers, clearSelectedStation, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
-import { ADMIN_LAYERS, adminLayerStyle, getAdminLayerContextLabel, getAdminLayerLabel, TRANSIT_NETWORKS } from './theme.js'
-import { APP_CONTENT } from './app-content.js'
+import { addTransportLayers, clearSelectedStation, filterTransportData, loadTransportData } from './transport.js'
+import { ADMIN_LAYERS, adminLayerStyle, getAdminLayerContextLabel, getAdminLayerLabel, TRANSIT_NETWORKS } from '../config/theme.js'
+import { APP_CONTENT } from '../config/app-content.js'
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
 const UI = APP_CONTENT.mapPage
@@ -131,10 +131,6 @@ const ADMIN_LAYER_CONFIGS = ADMIN_LAYERS.map(layer => ({
 }))
 
 function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
-  if (!latlng) return
-  const valuesById = Object.fromEntries(
-    adminLayers.map((layer) => [layer.config.id, layer.getSummaryAtLatLng(latlng)]),
-  )
   // When a stationInfo object is provided (station click), do not show administrative
   // summaries — only show station name and lines. For map/context clicks, include admin info.
   let context
@@ -148,13 +144,14 @@ function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
       lines: stationInfo.lines || null,
     }
   } else {
+    const valuesById = Object.fromEntries(
+      adminLayers.map((layer) => [layer.config.id, layer.getSummaryAtLatLng(latlng)]),
+    )
     context = {
       kommune: valuesById.kommuner,
       postomraade: valuesById.postomraader,
       opstillingskreds: valuesById.opstillingskredse,
       sogn: valuesById.sogne,
-      stationName: stationInfo?.stationName || null,
-      lines: stationInfo?.lines || null,
     }
   }
 

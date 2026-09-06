@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config web/vite.config.js",
-    "build:data": "uv run python scripts/build_data.py",
-    "build:maps": ".venv/bin/python scripts/generate_transit_map_pdf.py --all-maps",
+    "build:data": "uv run python -m scripts.build_data",
+    "build:maps": ".venv/bin/python -m scripts.pdf.generate_transit_map_pdf --all-maps",
     "build:site": "vite build --config web/vite.config.js",
     "build": "npm run build:site",
     "preview": "vite preview --config web/vite.config.js",

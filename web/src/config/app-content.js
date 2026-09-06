@@ -55,7 +55,6 @@ export const APP_CONTENT = {
       noAddressResults: 'No addresses found.',
       findingArea: 'Finding area information...',
       addressFound: 'Address found.',
-      unavailable: 'Address search is temporarily unavailable. Please try again later.',
     },
   },
 }

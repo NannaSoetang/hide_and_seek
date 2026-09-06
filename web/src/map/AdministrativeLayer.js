@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { pointInGeometry } from './LookupService.js'
+import { pointInGeometry } from '../lookup/admin/geometry.js'
 
 function labelPoint(featureGeometry) {
   const temp = L.geoJSON({ type: 'Feature', properties: {}, geometry: featureGeometry })

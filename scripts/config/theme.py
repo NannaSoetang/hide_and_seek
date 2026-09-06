@@ -1,6 +1,6 @@
 """Single source of truth for transit line and administrative layer styling.
 
-Reads the same JSON definitions used by the web app (web/src/*.json) so the
+Reads the same JSON definitions used by the web app (web/src/config/*.json) so the
 interactive map and the generated PDFs stay in sync.
 """
 
@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-_SRC_DIR = Path(__file__).resolve().parents[1] / "web" / "src"
+_SRC_DIR = Path(__file__).resolve().parents[2] / "web" / "src" / "config"
 
 TRANSIT_LINES: list[dict] = json.loads((_SRC_DIR / "transit-lines.json").read_text())
 ADMIN_LAYERS: list[dict] = json.loads((_SRC_DIR / "admin-layers.json").read_text())

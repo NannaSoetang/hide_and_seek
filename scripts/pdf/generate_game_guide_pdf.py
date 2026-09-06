@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 from reportlab.lib import colors
@@ -15,52 +14,12 @@ from reportlab.lib.units import mm
 from reportlab.platypus import (
     ListFlowable,
     Paragraph,
-    PageBreak,
     SimpleDocTemplate,
     Spacer,
-    BaseDocTemplate,
-    Frame,
-    PageTemplate,
 )
 
 
-TITLE = "Copenhagen Hide & Seek – Quick Reference Guide"
-
-ROOT = Path(__file__).resolve().parents[1]
-TRANSIT_LINES_PATH = ROOT / "web" / "src" / "transit-lines.json"
-TRANSPORT_STATIONS_PATH = ROOT / "web" / "public" / "data" / "transport-stations.geojson"
-
-
-def load_transit_line_catalog() -> list[str]:
-    """Return the canonical transit-line names from the shared frontend metadata source."""
-    data = json.loads(TRANSIT_LINES_PATH.read_text(encoding="utf-8"))
-    return [str(entry["line"]) for entry in data]
-
-
-def load_line_stops() -> dict[str, list[str]]:
-    """Return station names for each line from the generated GeoJSON."""
-    data = json.loads(TRANSPORT_STATIONS_PATH.read_text(encoding="utf-8"))
-    lines_by_station: dict[str, list[str]] = {}
-
-    for feature in data.get("features", []):
-        properties = feature.get("properties") or {}
-        station_name = str(properties.get("name") or "").strip()
-
-        if not station_name:
-            continue
-
-        for line_name in properties.get("lines") or []:
-            line_key = str(line_name).strip()
-
-            if not line_key:
-                continue
-
-            lines_by_station.setdefault(line_key, [])
-
-            if station_name not in lines_by_station[line_key]:
-                lines_by_station[line_key].append(station_name)
-
-    return lines_by_station
+TITLE = "Copenhagen Hide & Seek - Rules"
 
 
 RULES = [
@@ -185,53 +144,16 @@ def build_rule_sections() -> list:
     return story
 
 
-def build_steps_story() -> list:
-    """Build a compact, user-facing steps story with key actionable sections."""
+def build_story() -> list:
     story = [
-        Paragraph("Quick Steps", styles["GuideTitle"]),
+        Paragraph(TITLE, styles["GuideTitle"]),
         Spacer(1, 4 * mm),
     ]
-
-    selected = {"Core setup", "Hiding period", "Timing & question flow", "Hiding zone & endgame", "Cards & rewards"}
-
-    for title, bullets in RULES:
-        if title not in selected:
-            continue
-
-        story.append(Paragraph(title, styles["GuideSectionTitle"]))
-        story.append(
-            ListFlowable(
-                [Paragraph(bullet, styles["GuideBodyText"]) for bullet in bullets],
-                bulletType="bullet",
-                leftIndent=12,
-                bulletFontName="Helvetica",
-                bulletText="•",
-            )
-        )
-        story.append(Spacer(1, 4 * mm))
-
+    story.extend(build_rule_sections())
     return story
 
 
-def generate_steps_pdf(output_path: Path) -> None:
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    doc = BaseDocTemplate(
-        str(output_path),
-        pagesize=A4,
-        leftMargin=8 * mm,
-        rightMargin=8 * mm,
-        topMargin=8 * mm,
-        bottomMargin=8 * mm,
-    )
-    frame_width = (doc.width / 2.0) - (4 * mm)
-    frame_height = doc.height
-    frame1 = Frame(doc.leftMargin, doc.bottomMargin, frame_width, frame_height, id="col1")
-    frame2 = Frame(doc.leftMargin + frame_width + 8 * mm, doc.bottomMargin, frame_width, frame_height, id="col2")
-    doc.addPageTemplates([PageTemplate(id="TwoCol", frames=[frame1, frame2])])
-    doc.build(build_steps_story())
-
-
-def generate_rules_pdf(output_path: Path) -> None:
+def generate_pdf(output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     doc = SimpleDocTemplate(
         str(output_path),
@@ -241,94 +163,7 @@ def generate_rules_pdf(output_path: Path) -> None:
         topMargin=14 * mm,
         bottomMargin=14 * mm,
     )
-    story = [Paragraph(TITLE, styles["GuideTitle"]), Spacer(1, 4 * mm)]
-    story.extend(build_rule_sections())
-    doc.build(story)
-
-
-def build_line_sections() -> list:
-    story = []
-
-    story.append(
-        Paragraph(
-            "Transit lines and stops",
-            styles["GuideSectionTitle"],
-        )
-    )
-    story.append(Spacer(1, 4 * mm))
-
-    stops_by_line = load_line_stops()
-
-    for line_name in load_transit_line_catalog():
-        stops = stops_by_line.get(line_name, [])
-
-        if not stops:
-            continue
-
-        stops_text = "; ".join(stops)
-
-        story.append(
-            Paragraph(
-                f"<b>{line_name}</b> — {len(stops)} stops",
-                styles["GuideSubheading"],
-            )
-        )
-
-        story.append(
-            Paragraph(
-                stops_text,
-                styles["GuideBodyText"],
-            )
-        )
-
-        story.append(Spacer(1, 4 * mm))
-
-    return story
-
-
-def build_story() -> list:
-    story = [
-        Paragraph(TITLE, styles["GuideTitle"]),
-        Spacer(1, 4 * mm),
-    ]
-
-    story.extend(build_rule_sections())
-
-    story.append(PageBreak())
-    story.extend(build_line_sections())
-
-    return story
-
-
-def generate_pdf(output_path: Path, compact: bool = False) -> None:
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    if compact:
-        doc = BaseDocTemplate(
-            str(output_path),
-            pagesize=A4,
-            leftMargin=8 * mm,
-            rightMargin=8 * mm,
-            topMargin=8 * mm,
-            bottomMargin=8 * mm,
-        )
-
-        frame_width = (doc.width / 2.0) - (4 * mm)
-        frame_height = doc.height
-        frame1 = Frame(doc.leftMargin, doc.bottomMargin, frame_width, frame_height, id="col1")
-        frame2 = Frame(doc.leftMargin + frame_width + 8 * mm, doc.bottomMargin, frame_width, frame_height, id="col2")
-        doc.addPageTemplates([PageTemplate(id="TwoCol", frames=[frame1, frame2])])
-        doc.build(build_story())
-    else:
-        doc = SimpleDocTemplate(
-            str(output_path),
-            pagesize=A4,
-            leftMargin=16 * mm,
-            rightMargin=16 * mm,
-            topMargin=14 * mm,
-            bottomMargin=14 * mm,
-        )
-        doc.build(build_story())
+    doc.build(build_story())
 
 
 def parse_args() -> argparse.Namespace:
@@ -342,10 +177,6 @@ def parse_args() -> argparse.Namespace:
         default=Path("output/copenhagen-hide-and-seek-guide.pdf"),
         help="Where to save the generated PDF.",
     )
-    parser.add_argument("--compact", action="store_true", help="Produce a compact, two-column one-page PDF (best-effort)")
-    parser.add_argument("--steps-output", type=Path, help="Write a compact steps PDF to this path")
-    parser.add_argument("--rules-output", type=Path, help="Write a rules-only PDF to this path")
-
     return parser.parse_args()
 
 
@@ -381,18 +212,6 @@ def create_styles() -> None:
 
     styles.add(
         ParagraphStyle(
-            name="GuideSubheading",
-            parent=styles["Heading3"],
-            fontName="Helvetica-Bold",
-            fontSize=9,
-            leading=11,
-            spaceBefore=2,
-            spaceAfter=2,
-        )
-    )
-
-    styles.add(
-        ParagraphStyle(
             name="GuideBodyText",
             parent=styles["BodyText"],
             fontName="Helvetica",
@@ -406,18 +225,7 @@ def create_styles() -> None:
 if __name__ == "__main__":
     args = parse_args()
     create_styles()
-
-    # Generate main guide (default)
-    generate_pdf(args.output, compact=bool(getattr(args, "compact", False)))
+    generate_pdf(args.output)
     print(f"PDF generated: {args.output.resolve()}")
-
-    # Optional separate outputs
-    if getattr(args, "steps_output", None):
-        generate_steps_pdf(args.steps_output)
-        print(f"Steps PDF generated: {args.steps_output.resolve()}")
-
-    if getattr(args, "rules_output", None):
-        generate_rules_pdf(args.rules_output)
-        print(f"Rules PDF generated: {args.rules_output.resolve()}")
 
 

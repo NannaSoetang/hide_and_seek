@@ -21,14 +21,14 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
-from shapely.geometry import Point, Polygon
 
-from theme import ADMIN_LAYERS, LINE_COLORS, lines_for_network
+from scripts.config.theme import ADMIN_LAYERS, LINE_COLORS, TRANSIT_LINES, lines_for_network
 
 
+TRANSPORT_NETWORK_ORDER = tuple(dict.fromkeys(line["network"] for line in TRANSIT_LINES))
 TRANSPORT_LINE_ORDER = {
     network: [line["line"] for line in lines_for_network(network)]
-    for network in ("metro", "s-tog")
+    for network in TRANSPORT_NETWORK_ORDER
 }
 
 ADMIN_LAYER_WIDTHS = {
@@ -36,6 +36,13 @@ ADMIN_LAYER_WIDTHS = {
     "opstillingskredse": 2.2,
     "postomraader": 1.8,
     "sogne": 1.6,
+}
+
+COMBINED_ADMIN_LAYER_WIDTHS = {
+    "kommuner": 2.4,
+    "opstillingskredse": 2.0,
+    "postomraader": 1.6,
+    "sogne": 1.2,
 }
 
 ADMIN_LAYER_SPECS = [
@@ -63,30 +70,15 @@ ORIGIN_SHIFT = 20037508.342789244
 DEFAULT_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 TITLE_BAND_HEIGHT = 24.0
 SCALE_BAND_HEIGHT = 58.0
-BUFFER_RADIUS_METERS = 500.0
-BUFFER_PALETTE = (
-    "#0072B2",
-    "#D55E00",
-    "#009E73",
-    "#CC79A7",
-    "#E69F00",
-    "#56B4E9",
-    "#000000",
-    "#F0E442",
-)
 
 MAP_SPECS = (
-    ("kort", "Kort", None, False),
-    ("kommunegraenser", "Kommunegrænser", "kommuner", False),
-    ("sogne", "Sogne", "sogne", False),
-    ("opstillingskredse", "Opstillingskredse", "opstillingskredse", False),
-    ("postomraader", "Postområder", "postomraader", False),
-    ("stationer-500m", "500 meter fra stationer", None, True),
+    ("kort", "Kort", ()),
+    ("kommunegraenser", "Kommunegrænser", ("kommuner",)),
+    ("sogne", "Sogne", ("sogne",)),
+    ("opstillingskredse", "Opstillingskredse", ("opstillingskredse",)),
+    ("postomraader", "Postområder", ("postomraader",)),
+    ("alle-administrative-graenser", "Alle administrative grænser", tuple(spec["id"] for spec in ADMIN_LAYER_SPECS)),
 )
-
-# Compact single-page map: a simple convenience to render a scaled map fitting
-# everything onto a single A4 portrait page. Use with the `--single-page` flag.
-
 
 @dataclass(frozen=True)
 class PdfMapConfig:
@@ -133,15 +125,6 @@ class StationRecord:
     lines: tuple[str, ...]
     networks: tuple[str, ...]
     point: ProjectedPoint
-
-
-@dataclass(frozen=True)
-class StationBuffer:
-    station_name: str
-    center_utm: ProjectedPoint
-    geometry_utm: Polygon
-    ring_web_mercator: list[ProjectedPoint]
-    color: str
 
 
 @dataclass(frozen=True)
@@ -555,68 +538,27 @@ def draw_admin_layer(
     draw_geojson_layer(canvas, transform, transformer, geojson, spec["color"], spec["width"])
 
 
-def station_centers_utm(station_records: list[StationRecord]) -> list[ProjectedPoint]:
-    transformer = Transformer.from_crs(WEB_MERCATOR, ETRS89_UTM32, always_xy=True)
-    return [ProjectedPoint(*transformer.transform(station.point.x, station.point.y)) for station in station_records]
-
-
-def color_station_graph(centers: list[ProjectedPoint]) -> list[int]:
-    adjacency = [set() for _ in centers]
-    for left_index, left in enumerate(centers):
-        for right_index in range(left_index + 1, len(centers)):
-            right = centers[right_index]
-            if math.hypot(right.x - left.x, right.y - left.y) < BUFFER_RADIUS_METERS * 2:
-                adjacency[left_index].add(right_index)
-                adjacency[right_index].add(left_index)
-
-    colors = [-1] * len(centers)
-    for station_index in sorted(range(len(centers)), key=lambda index: (-len(adjacency[index]), index)):
-        used = {colors[neighbor] for neighbor in adjacency[station_index] if colors[neighbor] >= 0}
-        color_index = next((index for index in range(len(BUFFER_PALETTE)) if index not in used), None)
-        if color_index is None:
-            raise ValueError("The station overlap graph requires more colors than BUFFER_PALETTE provides")
-        colors[station_index] = color_index
-    return colors
-
-
-def build_station_buffers(station_records: list[StationRecord]) -> list[StationBuffer]:
-    ordered = sorted(station_records, key=lambda station: (station.name, station.point.x, station.point.y))
-    centers = station_centers_utm(ordered)
-    color_indexes = color_station_graph(centers)
-    to_web_mercator = Transformer.from_crs(ETRS89_UTM32, WEB_MERCATOR, always_xy=True)
-    buffers = []
-    for station, center, color_index in zip(ordered, centers, color_indexes):
-        geometry_utm = Point(center.x, center.y).buffer(BUFFER_RADIUS_METERS, quad_segs=128)
-        ring_web_mercator = [
-            ProjectedPoint(*to_web_mercator.transform(x, y))
-            for x, y in geometry_utm.exterior.coords
-        ]
-        buffers.append(
-            StationBuffer(
-                station_name=station.name,
-                center_utm=center,
-                geometry_utm=geometry_utm,
-                ring_web_mercator=ring_web_mercator,
-                color=BUFFER_PALETTE[color_index],
+def draw_combined_admin_layers(
+    canvas: Canvas,
+    transform: PageTransform,
+    transformer: Transformer,
+    admin_layers: dict[str, dict],
+    active_layer_ids: tuple[str, ...],
+) -> None:
+    specs = [spec for spec in ADMIN_LAYER_SPECS if spec["id"] in active_layer_ids]
+    for spec in sorted(specs, key=lambda item: COMBINED_ADMIN_LAYER_WIDTHS[item["id"]], reverse=True):
+        geojson = admin_layers.get(spec["id"])
+        if geojson:
+            width = COMBINED_ADMIN_LAYER_WIDTHS[spec["id"]]
+            draw_geojson_layer(canvas, transform, transformer, geojson, "#ffffff", width + 0.7)
+            draw_geojson_layer(
+                canvas,
+                transform,
+                transformer,
+                geojson,
+                spec["color"],
+                width,
             )
-        )
-    return buffers
-
-
-def draw_station_buffers(canvas: Canvas, transform: PageTransform, station_buffers: list[StationBuffer]) -> None:
-    for station_buffer in station_buffers:
-        path = canvas.beginPath()
-        first_x, first_y = transform.map_point(station_buffer.ring_web_mercator[0])
-        path.moveTo(first_x, first_y)
-        for point in station_buffer.ring_web_mercator[1:]:
-            path.lineTo(*transform.map_point(point))
-        path.close()
-        canvas.saveState()
-        canvas.setStrokeColor(HexColor(station_buffer.color))
-        canvas.setStrokeAlpha(0.95)
-        canvas.setLineWidth(1.5)
-        canvas.drawPath(path, stroke=1, fill=0)
-        canvas.restoreState()
 
 
 def calculate_scale_info(transform: PageTransform) -> ScaleInfo:
@@ -703,7 +645,11 @@ def draw_line_labels(canvas: Canvas, transform: PageTransform, line_records: lis
         placer.reserve((x - 9, y - 9, x + 9, y + 9))
 
     grouped = line_groups(line_records)
-    ordered_keys = [(network, line_id) for network in ("metro", "s-tog") for line_id in TRANSPORT_LINE_ORDER[network]]
+    ordered_keys = [
+        (network, line_id)
+        for network in TRANSPORT_NETWORK_ORDER
+        for line_id in TRANSPORT_LINE_ORDER[network]
+    ]
     for network, line_id in ordered_keys:
         records = grouped.get((network, line_id))
         if not records:
@@ -850,8 +796,7 @@ def render_map_page(
     boundary_rings: list[list[ProjectedPoint]],
     admin_layers: dict[str, dict],
     config: PdfMapConfig,
-    active_admin_layer: str | None = None,
-    station_buffers: list[StationBuffer] | None = None,
+    admin_layer_ids: tuple[str, ...] = (),
 ) -> None:
     transformer = Transformer.from_crs(WGS84, WEB_MERCATOR, always_xy=True)
     font_name = choose_font()
@@ -871,11 +816,12 @@ def render_map_page(
     )
     canvas.clipPath(clip_path, stroke=0, fill=0)
     draw_tile_background(canvas, transform, config)
-    draw_admin_layer(canvas, transform, transformer, admin_layers, active_admin_layer)
-    if station_buffers:
-        draw_station_buffers(canvas, transform, station_buffers)
+    if len(admin_layer_ids) == 1:
+        draw_admin_layer(canvas, transform, transformer, admin_layers, admin_layer_ids[0])
+    elif admin_layer_ids:
+        draw_combined_admin_layers(canvas, transform, transformer, admin_layers, admin_layer_ids)
 
-    for network in ("metro", "s-tog"):
+    for network in TRANSPORT_NETWORK_ORDER:
         for line_id in TRANSPORT_LINE_ORDER[network]:
             matching = [record for record in line_records if record.network == network and record.line_id == line_id]
             for record in matching:
@@ -896,7 +842,7 @@ def configure_canvas(canvas: Canvas) -> None:
     canvas.setTitle("København kortsæt")
     canvas.setAuthor("hide_and_seek")
     canvas.setSubject("Printklare kort over Københavns transportnet")
-    canvas.setCreator("hide_and_seek/scripts/generate_transit_map_pdf.py")
+    canvas.setCreator("hide_and_seek/scripts/pdf/generate_transit_map_pdf.py")
 
 
 def draw_transit_map(
@@ -906,7 +852,7 @@ def draw_transit_map(
     station_records: list[StationRecord],
     admin_layers: dict[str, dict],
     config: PdfMapConfig,
-    active_admin_layer: str | None = None,
+    admin_layer_ids: tuple[str, ...] = (),
 ) -> None:
     transform = build_page_transform(boundary_geojson, config)
     transformer = Transformer.from_crs(WGS84, WEB_MERCATOR, always_xy=True)
@@ -923,7 +869,7 @@ def draw_transit_map(
         boundary_rings,
         admin_layers,
         config,
-        active_admin_layer=active_admin_layer,
+        admin_layer_ids=admin_layer_ids,
     )
     canvas.save()
 
@@ -940,7 +886,6 @@ def draw_all_maps(
     transform = build_page_transform(boundary_geojson, config)
     transformer = Transformer.from_crs(WGS84, WEB_MERCATOR, always_xy=True)
     boundary_rings = [project_coordinates(ring, transformer) for ring in extract_boundary_rings(boundary_geojson)]
-    station_buffers = build_station_buffers(station_records)
     combined_output.parent.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -950,8 +895,7 @@ def draw_all_maps(
         pageCompression=1,
     )
     configure_canvas(combined_canvas)
-    for filename, title, admin_layer, show_buffers in MAP_SPECS:
-        page_buffers = station_buffers if show_buffers else None
+    for filename, title, admin_layer_ids in MAP_SPECS:
         render_map_page(
             combined_canvas,
             title,
@@ -961,8 +905,7 @@ def draw_all_maps(
             boundary_rings,
             admin_layers,
             config,
-            active_admin_layer=admin_layer,
-            station_buffers=page_buffers,
+            admin_layer_ids=admin_layer_ids,
         )
 
         page_path = output_dir / f"{filename}.pdf"
@@ -981,8 +924,7 @@ def draw_all_maps(
             boundary_rings,
             admin_layers,
             config,
-            active_admin_layer=admin_layer,
-            station_buffers=page_buffers,
+            admin_layer_ids=admin_layer_ids,
         )
         page_canvas.save()
         print(f"Wrote {page_path}")
@@ -1007,10 +949,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--boundary", type=Path, default=DEFAULT_INPUT_BOUNDARY, help="Input boundary GeoJSON")
     parser.add_argument("--hide-admin-divisions", action="store_true", help="Omit administrative division layers from the map")
     parser.add_argument("--admin-layer", choices=[spec["id"] for spec in ADMIN_LAYER_SPECS], help="Administrative layer for a single map")
-    parser.add_argument("--all-maps", action="store_true", help="Build maps.pdf and all six individual map PDFs")
+    parser.add_argument("--all-maps", action="store_true", help="Build maps.pdf plus the base, four division, and combined division maps")
     parser.add_argument("--maps-output", type=Path, default=DEFAULT_MAP_SET_OUTPUT, help="Combined six-page PDF path")
     parser.add_argument("--maps-dir", type=Path, default=DEFAULT_MAPS_DIR, help="Directory for individual map PDFs")
-    parser.add_argument("--single-page", action="store_true", help="Render a compact single A4 page containing the full map (portrait)")
     return parser.parse_args()
 
 
@@ -1048,7 +989,7 @@ def main() -> None:
         print(f"Wrote {args.maps_output}")
         print(f"Scale: {scale_info.centimeter_text}; {scale_info.ratio_text}")
     else:
-        active_admin_layer = None if args.hide_admin_divisions else args.admin_layer
+        admin_layer_ids = () if args.hide_admin_divisions or args.admin_layer is None else (args.admin_layer,)
         draw_transit_map(
             args.output,
             boundary_geojson,
@@ -1056,7 +997,7 @@ def main() -> None:
             station_records,
             admin_layers,
             config,
-            active_admin_layer=active_admin_layer,
+            admin_layer_ids=admin_layer_ids,
         )
         print(f"Wrote {args.output}")
 

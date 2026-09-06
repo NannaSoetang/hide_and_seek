@@ -1,13 +1,10 @@
-import './style.css'
+import '../../ui/style.css'
 import './where-am-i.css'
-import {
-  AdministrativeLookup,
-  getCurrentPosition,
-  resolveAddressToCoordinates,
-  searchAddresses,
-} from './LookupService.js'
-import { Tabs } from './Tabs.js'
-import { APP_CONTENT } from './app-content.js'
+import { AdministrativeLookup } from '../admin/AdministrativeLookup.js'
+import { getCurrentPosition } from '../address/GeolocationService.js'
+import { resolveAddressToCoordinates, searchAddresses } from '../address/AddressService.js'
+import { Tabs } from '../../ui/Tabs.js'
+import { APP_CONTENT } from '../../config/app-content.js'
 
 function debounce(fn, delay = 220) {
   let timer = null
@@ -25,7 +22,6 @@ const UI = APP_CONTENT.whereAmIPage
 
 export class WhereAmIPage {
   constructor() {
-    this.lookup = null
     this.lookupPromise = null
     this.addressSearchController = null
     this.currentSuggestions = []
@@ -66,10 +62,6 @@ export class WhereAmIPage {
   async getLookup() {
     if (!this.lookupPromise) {
       this.lookupPromise = AdministrativeLookup.create()
-        .then((lookup) => {
-          this.lookup = lookup
-          return lookup
-        })
         .catch((error) => {
           this.lookupPromise = null
           throw error
