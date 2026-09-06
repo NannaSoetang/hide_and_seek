@@ -67,21 +67,42 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Aved\u00f8re St.",
+        "name": "Amagerbro St. (Amagerbrogade)",
         "lines": [
-          "A"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600765",
+        "stop_id": "000000027526",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.454256,
-          55.625183
+          12.601275,
+          55.663509
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Amagerbro St. (Amagerbrogade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000027527",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.602233,
+          55.66268
         ]
       }
     },
@@ -109,21 +130,64 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Bernstorffsvej St.",
+        "name": "Bellah\u00f8j (Frederikssundsvej)",
         "lines": [
-          "A"
+          "250S",
+          "350S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600672",
+        "stop_id": "000000002149",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.557488,
-          55.743052
+          12.51715,
+          55.706638
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bellah\u00f8j (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000052838",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.514966,
+          55.70662
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bellah\u00f8j (Frederikssundsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000055952",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.516326,
+          55.706689
         ]
       }
     },
@@ -151,63 +215,126 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Br\u00f8ndby Strand St.",
+        "name": "Borups Plads",
         "lines": [
-          "A"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600766",
+        "stop_id": "000000000352",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.42266,
-          55.620936
+          12.538869,
+          55.691483
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Br\u00f8ndby\u00f8ster St.",
+        "name": "Borups Plads (Lundtoftegade)",
         "lines": [
-          "B"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600679",
+        "stop_id": "000000052840",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.440211,
-          55.665068
+          12.538792,
+          55.691683
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Buddinge St.",
+        "name": "Br\u00f8nderslev All\u00e9 (Englandsvej)",
         "lines": [
-          "B"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600690",
+        "stop_id": "000000000843",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.494038,
-          55.747383
+          12.606339,
+          55.618112
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Br\u00f8nderslev All\u00e9 (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000849",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.605717,
+          55.618949
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Br\u00f8nsh\u00f8j Torv (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002010",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.498931,
+          55.704488
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Br\u00f8nsh\u00f8j Torv (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002022",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.498319,
+          55.704587
         ]
       }
     },
@@ -217,7 +344,8 @@
         "name": "Carlsberg St.",
         "lines": [
           "B",
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -230,28 +358,6 @@
         "coordinates": [
           12.537353,
           55.663257
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Charlottenlund St.",
-        "lines": [
-          "C",
-          "F"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600657",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.572144,
-          55.751851
         ]
       }
     },
@@ -274,6 +380,48 @@
         "coordinates": [
           12.591385,
           55.672054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Christianshavn St. (Torvegade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000027524",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.591321,
+          55.672397
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Christianshavn St. (Torvegade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000027525",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.591794,
+          55.672176
         ]
       }
     },
@@ -323,11 +471,75 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Drag\u00f8r Skole (Vestgr\u00f8nningen)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000821",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.670314,
+          55.593021
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Drag\u00f8r Skole (Vestgr\u00f8nningen)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000822",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.670338,
+          55.593614
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Drag\u00f8r Stationsplads",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000775",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.669273,
+          55.595301
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Dybb\u00f8lsbro St.",
         "lines": [
           "A",
           "B",
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -346,21 +558,42 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Dysseg\u00e5rd St.",
+        "name": "Elmegade (N\u00f8rrebrogade)",
         "lines": [
-          "B"
+          "350S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600780",
+        "stop_id": "000000045740",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.535743,
-          55.732629
+          12.558912,
+          55.68852
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Elmegade (N\u00f8rrebrogade)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000045739",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.55759,
+          55.689044
         ]
       }
     },
@@ -446,6 +679,48 @@
         "coordinates": [
           12.523102,
           55.681669
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fasanv\u00e6nget (M\u00f8llevej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000832",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.635331,
+          55.588553
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Fasanv\u00e6nget (M\u00f8llevej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000811",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.635351,
+          55.588426
         ]
       }
     },
@@ -539,6 +814,48 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Forum St. (Rosen\u00f8rns All\u00e9)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000678",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.552789,
+          55.681918
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Forum St. (Rosen\u00f8rns All\u00e9)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000715",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.552757,
+          55.681919
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Frederiksberg All\u00e9 St.",
         "lines": [
           "M3"
@@ -577,27 +894,6 @@
         "coordinates": [
           12.531719,
           55.681223
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Friheden St.",
-        "lines": [
-          "A"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600764",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.482553,
-          55.628887
         ]
       }
     },
@@ -647,48 +943,6 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Gentofte St.",
-        "lines": [
-          "A"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600673",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.54162,
-          55.753509
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Glostrup St.",
-        "lines": [
-          "B"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600622",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.397827,
-          55.663148
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "name": "Gr\u00f8ndal St.",
         "lines": [
           "F"
@@ -704,6 +958,90 @@
         "coordinates": [
           12.516007,
           55.690738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hans Knudsens Plads (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001369",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.559843,
+          55.712932
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hans Knudsens Plads (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001406",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.559749,
+          55.712593
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Haraldsgade (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001407",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.56139,
+          55.709282
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Haraldsgade (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001368",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.561142,
+          55.709703
         ]
       }
     },
@@ -731,44 +1069,149 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Hellerup St.",
+        "name": "Hiller\u00f8dmotorvejen, Tingbjerg (Hiller\u00f8dmotorvejen)",
         "lines": [
-          "A",
-          "C",
-          "F"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600655",
+        "stop_id": "000000054886",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.567658,
-          55.731022
+          12.487801,
+          55.724317
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Herlev St.",
+        "name": "Holl\u00e6nderv\u00e6nget (Krudtt\u00e5rnsvej)",
         "lines": [
-          "C"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600706",
+        "stop_id": "000000000827",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.443674,
-          55.718919
+          12.65185,
+          55.584348
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Holl\u00e6nderv\u00e6nget (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000816",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.651483,
+          55.584331
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hovedbaneg\u00e5rden, Tivoli (Bernstorffsgade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000010844",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.56619,
+          55.672843
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hovedbaneg\u00e5rden, Tivoli (Bernstorffsgade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000010843",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.56705,
+          55.672332
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hulg\u00e5rds Plads (Frederikssundsvej)",
+        "lines": [
+          "250S",
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002161",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.520439,
+          55.706202
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hulg\u00e5rds Plads (Frederikssundsvej)",
+        "lines": [
+          "250S",
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002150",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.522579,
+          55.705745
         ]
       }
     },
@@ -777,7 +1220,8 @@
       "properties": {
         "name": "Husum St.",
         "lines": [
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -796,21 +1240,316 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Hvidovre St.",
+        "name": "Husum St. (Islevhusvej)",
         "lines": [
-          "B"
+          "200S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600600",
+        "stop_id": "000000002948",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.474346,
-          55.66451
+          12.463781,
+          55.709271
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husum St. (Islevhusvej)",
+        "lines": [
+          "200S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002961",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.464222,
+          55.709394
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husum Torv (Frederikssundsvej)",
+        "lines": [
+          "200S",
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000258",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.471629,
+          55.712098
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husum Torv (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002148",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.472235,
+          55.711937
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husum Torv (Islevhusvej)",
+        "lines": [
+          "200S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002947",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.471872,
+          55.711605
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husumvej (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002275",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.478172,
+          55.710276
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Husumvej (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002121",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.476155,
+          55.710881
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "H\u00f8sterk\u00f8bgade (Lundtoftegade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000054680",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.538248,
+          55.694297
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "H\u00f8sterk\u00f8bgade (Lundtoftegade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000054679",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.538276,
+          55.694962
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Idr\u00e6tsstien (S\u00f8ndre Strandvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000819",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.66541,
+          55.587269
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Idr\u00e6tsstien (S\u00f8ndre Strandvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000824",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.665462,
+          55.587313
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ingstrup All\u00e9 (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000844",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.608931,
+          55.615887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ingstrup All\u00e9 (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000848",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.608724,
+          55.616055
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Irlandsvej (T\u00e5rnbyvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001017",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.611887,
+          55.634368
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Irlandsvej (T\u00e5rnbyvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001022",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.608991,
+          55.633986
         ]
       }
     },
@@ -840,7 +1579,8 @@
       "properties": {
         "name": "Islev St.",
         "lines": [
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -859,9 +1599,52 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Jagtvej (\u00c5gade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000235",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.54089,
+          55.688304
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jagtvej (\u00c5gade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000228",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.541997,
+          55.687355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Jyllingevej St.",
         "lines": [
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -874,27 +1657,6 @@
         "coordinates": [
           12.477206,
           55.69081
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "J\u00e6gersborg St.",
-        "lines": [
-          "A"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600674",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.521561,
-          55.761621
         ]
       }
     },
@@ -943,49 +1705,6 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Kildebakke St.",
-        "lines": [
-          "B"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600781",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.508535,
-          55.744614
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Klampenborg St.",
-        "lines": [
-          "C",
-          "F"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600659",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.58773,
-          55.777446
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "name": "Kongens Nytorv St.",
         "lines": [
           "M1",
@@ -1004,6 +1723,69 @@
         "coordinates": [
           12.585228,
           55.679185
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kongevejen (Stationsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000768",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.670205,
+          55.594571
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Korsvejens Skole (Amager Landevej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000792",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.619376,
+          55.636117
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Korsvejens Skole (T\u00e5rnbyvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001020",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.618696,
+          55.635291
         ]
       }
     },
@@ -1036,7 +1818,8 @@
         "lines": [
           "A",
           "B",
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -1121,7 +1904,8 @@
       "properties": {
         "name": "Langgade St.",
         "lines": [
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -1183,21 +1967,42 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Lyngby St.",
+        "name": "L\u00f8jteg\u00e5rdsvej (Englandsvej)",
         "lines": [
-          "A"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600675",
+        "stop_id": "000000000850",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.503101,
-          55.768084
+          12.604498,
+          55.623849
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "L\u00f8jteg\u00e5rdsvej (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000842",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.60456,
+          55.622796
         ]
       }
     },
@@ -1226,6 +2031,48 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Mellemvangen (Hareskovvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000241",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.508644,
+          55.709453
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mellemvangen (Hareskovvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000223",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.509179,
+          55.709033
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Mozarts Plads St.",
         "lines": [
           "M4"
@@ -1241,6 +2088,48 @@
         "coordinates": [
           12.533956,
           55.649049
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "M\u00e5gev\u00e6nget (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000814",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.642722,
+          55.583846
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "M\u00e5gev\u00e6nget (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000829",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.641286,
+          55.583763
         ]
       }
     },
@@ -1312,6 +2201,69 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "N\u00f8rre Campus (N\u00f8rre All\u00e9)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006024",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.561665,
+          55.697081
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rre Campus (Tagensvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006017",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.562429,
+          55.695863
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rre Farimagsgade (Frederiksborggade)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002157",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.567467,
+          55.685286
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "N\u00f8rrebro St.",
         "lines": [
           "M3"
@@ -1354,6 +2306,70 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "N\u00f8rrebro St. (Folmer Bendtsens Plads)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000053198",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.537999,
+          55.700167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebro St. (Frederikssundsvej)",
+        "lines": [
+          "250S",
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000052657",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.537526,
+          55.701107
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebro St. (N\u00f8rrebrogade)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002151",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.538958,
+          55.700562
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "N\u00f8rrebros Runddel St.",
         "lines": [
           "M3"
@@ -1369,6 +2385,48 @@
         "coordinates": [
           12.548899,
           55.693945
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebros Runddel St. (N\u00f8rrebrogade)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002159",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.549302,
+          55.694014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rrebros Runddel St. (N\u00f8rrebrogade)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002152",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.549527,
+          55.693854
         ]
       }
     },
@@ -1420,22 +2478,66 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Ordrup St.",
+        "name": "N\u00f8rreport St. (N\u00f8rre Voldgade)",
         "lines": [
-          "C",
-          "F"
+          "150S",
+          "350S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600658",
+        "stop_id": "000000006584",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.583649,
-          55.76307
+          12.572622,
+          55.684048
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rreport St. (N\u00f8rre Voldgade)",
+        "lines": [
+          "250S",
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000028329",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.572034,
+          55.683706
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "N\u00f8rreport St. (N\u00f8rre Voldgade)",
+        "lines": [
+          "150S",
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000050460",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.573346,
+          55.684486
         ]
       }
     },
@@ -1465,7 +2567,8 @@
       "properties": {
         "name": "Peter Bangs Vej St.",
         "lines": [
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -1505,6 +2608,48 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Rigshospitalet Syd (Fredensgade)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006018",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.567154,
+          55.693199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rigshospitalet Syd (Tagensvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006023",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.565619,
+          55.694008
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Ryparken St.",
         "lines": [
           "B",
@@ -1521,6 +2666,48 @@
         "coordinates": [
           12.559492,
           55.715362
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ryparken St. (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006660",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.558819,
+          55.715498
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ryparken St. (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006524",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.558149,
+          55.714969
         ]
       }
     },
@@ -1549,21 +2736,42 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "R\u00f8dovre St.",
+        "name": "R\u00e5dhuspladsen St. (H.C. Andersens Boulevard)",
         "lines": [
-          "B"
+          "250S"
         ],
         "networks": [
-          "s-tog"
+          "bus"
         ],
-        "stop_id": "000008600680",
+        "stop_id": "000000047029",
         "source": "Rejseplanen GTFS"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.458641,
-          55.66482
+          12.567367,
+          55.676333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "R\u00e5dhuspladsen St. (Vesterbrogade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000047229",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.567041,
+          55.675551
         ]
       }
     },
@@ -1612,6 +2820,27 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Slotsherrensvej (T\u00e5rnvej)",
+        "lines": [
+          "200S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000448",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.452521,
+          55.701865
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Sluseholmen St.",
         "lines": [
           "M4"
@@ -1633,6 +2862,90 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Store Magleby (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000782",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.633899,
+          55.596239
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Store Magleby (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000762",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.634431,
+          55.596151
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Store Magleby Strandvej (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000813",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.637616,
+          55.583566
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Store Magleby Strandvej (M\u00f8llevej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000830",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.636387,
+          55.584007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Sundby St.",
         "lines": [
           "M1"
@@ -1648,6 +2961,48 @@
         "coordinates": [
           12.585728,
           55.645199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sundbyvester Plads (Amagerbrogade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001217",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.614324,
+          55.646319
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sundbyvester Plads (Amagerbrogade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000003000",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.614193,
+          55.646628
         ]
       }
     },
@@ -1698,6 +3053,90 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "S\u00f8lvtorvet (S\u00f8lvgade)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000028274",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.575103,
+          55.689074
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S\u00f8lvtorvet (S\u00f8lvgade)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006022",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.575129,
+          55.68919
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S\u00f8ndre R\u00f8sevej (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000828",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.646424,
+          55.584051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S\u00f8ndre R\u00f8sevej (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000815",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.647462,
+          55.58411
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Trianglen St.",
         "lines": [
           "M3"
@@ -1719,10 +3158,158 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Tuborgvej (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006522",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.551005,
+          55.726802
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "T\u00e5rnby St. (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000840",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.602065,
+          55.630062
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "T\u00e5rnby St. (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000852",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.60222,
+          55.630705
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "T\u00f8mmerup (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000761",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.615257,
+          55.608849
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "T\u00f8mmerup (Englandsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000846",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.614536,
+          55.609814
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Universitetsparken (N\u00f8rre All\u00e9)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006025",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.561972,
+          55.699761
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Universitetsparken (N\u00f8rre All\u00e9)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000006016",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.562025,
+          55.700164
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Valby St.",
         "lines": [
           "B",
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -1735,48 +3322,6 @@
         "coordinates": [
           12.51445,
           55.663997
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Vallensb\u00e6k St.",
-        "lines": [
-          "A"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600767",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.388444,
-          55.623253
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Vangede St.",
-        "lines": [
-          "B"
-        ],
-        "networks": [
-          "s-tog"
-        ],
-        "stop_id": "000008600689",
-        "source": "Rejseplanen GTFS"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          12.523342,
-          55.739658
         ]
       }
     },
@@ -1807,7 +3352,8 @@
       "properties": {
         "name": "Vanl\u00f8se St.",
         "lines": [
-          "C"
+          "C",
+          "F"
         ],
         "networks": [
           "s-tog"
@@ -1820,6 +3366,48 @@
         "coordinates": [
           12.490603,
           55.687355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Veks\u00f8vej (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002008",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.487907,
+          55.706754
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Veks\u00f8vej (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002024",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.486258,
+          55.707376
         ]
       }
     },
@@ -1891,6 +3479,90 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "Vibenshus Runddel St. (Lyngbyvej)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000001367",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.562899,
+          55.706091
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vibenshus Runddel St. (N\u00f8rre All\u00e9)",
+        "lines": [
+          "150S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002693",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.562776,
+          55.705609
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vierdiget (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000826",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.657123,
+          55.584037
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vierdiget (Krudtt\u00e5rnsvej)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000817",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.657775,
+          55.583703
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "Vigerslev Alle St.",
         "lines": [
           "F"
@@ -1906,6 +3578,48 @@
         "coordinates": [
           12.498686,
           55.659898
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00c5fl\u00f8jen (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002146",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.462322,
+          55.715094
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00c5fl\u00f8jen (Frederikssundsvej)",
+        "lines": [
+          "350S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000002164",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.460523,
+          55.715819
         ]
       }
     },
@@ -1975,6 +3689,48 @@
     {
       "type": "Feature",
       "properties": {
+        "name": "\u00d8restads Boulevard (Amager Boulevard)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000738",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.58865,
+          55.667566
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8restads Boulevard (Amager Boulevard)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000806",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.586818,
+          55.66788
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "name": "\u00d8resund St.",
         "lines": [
           "M2"
@@ -1990,6 +3746,48 @@
         "coordinates": [
           12.628453,
           55.661701
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8resundsvej (Amagerbrogade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000729",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.607143,
+          55.658651
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "\u00d8resundsvej (Amagerbrogade)",
+        "lines": [
+          "250S"
+        ],
+        "networks": [
+          "bus"
+        ],
+        "stop_id": "000000000664",
+        "source": "Rejseplanen GTFS"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.608047,
+          55.657932
         ]
       }
     },

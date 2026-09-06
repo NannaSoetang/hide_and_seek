@@ -2,6 +2,14 @@
   {
     "id": "kommuner",
     "name": "Kommuner",
+    "labels": {
+      "da": "Kommuner",
+      "en": "Municipalities"
+    },
+    "context": {
+      "da": "Kommune",
+      "en": "Municipality"
+    },
     "file": "municipalities.geojson",
     "property": "name",
     "color": "#1565c0"
@@ -9,6 +17,14 @@
   {
     "id": "opstillingskredse",
     "name": "Opstillingskredse",
+    "labels": {
+      "da": "Opstillingskredse",
+      "en": "Constituencies"
+    },
+    "context": {
+      "da": "Opstillingskreds",
+      "en": "Constituency"
+    },
     "file": "opstillingskredse.geojson",
     "property": "name",
     "color": "#ad1457"
@@ -16,6 +32,14 @@
   {
     "id": "postomraader",
     "name": "Postområder",
+    "labels": {
+      "da": "Postområder",
+      "en": "Postal areas"
+    },
+    "context": {
+      "da": "Postområde",
+      "en": "Postal area"
+    },
     "file": "postnumre.geojson",
     "property": "postnummernavn",
     "color": "#00796b"
@@ -23,6 +47,14 @@
   {
     "id": "sogne",
     "name": "Sogne",
+    "labels": {
+      "da": "Sogne",
+      "en": "Parishes"
+    },
+    "context": {
+      "da": "Sogn",
+      "en": "Parish"
+    },
     "file": "sogne.geojson",
     "property": "name",
     "color": "#6d4c41"

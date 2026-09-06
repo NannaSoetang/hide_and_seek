@@ -1,18 +1,20 @@
 import L from 'leaflet'
 import { loadJson } from './shared.js'
-import { LINE_COLORS } from './theme.js'
+import { TRANSIT_LINE_THEME, TRANSIT_NETWORKS, buildTransitLineStyle, getTransitLineColor } from './theme.js'
 
 const RENDER_CONFIG = {
-  lineTooltipSuffix: '-linjen',
-  lineWeight: 7,
-  selectedLineWeight: 12,
-  normalOpacity: 0.95,
-  inactiveLineColor: '#c8d0dc',
+  lineTooltipSuffix: ' line',
   includeCasing: true,
-  lineCasingWeight: 11,
 }
 
 const STATION_PANE = 'transitStationPane'
+const TRANSIT_LINE_PANE = 'transitLinePane'
+
+function ensureTransitPane(map) {
+  if (map.getPane(TRANSIT_LINE_PANE)) return
+  const pane = map.createPane(TRANSIT_LINE_PANE)
+  pane.style.zIndex = '360'
+}
 
 function ensureStationPane(map) {
   if (map.getPane(STATION_PANE)) return
@@ -28,7 +30,7 @@ function createStationGroup(latlng, style) {
     group: L.featureGroup([
       L.circleMarker(latlng, {
         pane: STATION_PANE,
-        radius: 14,
+        radius: 16,
         opacity: 0,
         fillOpacity: 0,
         weight: 0,
@@ -46,10 +48,10 @@ export function clearSelectedStation(map) {
   const selectedLayer = map.__selectedStationLayer
   if (!selectedLayer) return
   applyStationStyle(selectedLayer, selectedLayer.__defaultStyle || {
-    radius: 5,
-    color: '#172033',
+    radius: TRANSIT_LINE_THEME.stationRadius,
+    color: TRANSIT_LINE_THEME.stationColor,
     weight: 1.5,
-    fillColor: '#fff',
+    fillColor: TRANSIT_LINE_THEME.stationFill,
     fillOpacity: 1,
   })
   map.__selectedStationLayer = null
@@ -68,7 +70,7 @@ export function filterTransportData(data, network) {
   return {
     lines: {
       type: 'FeatureCollection',
-      features: (data.lines.features || []).filter((feature) => feature.properties?.network === network),
+      features: (data.lines.features || []).filter((feature) => feature.properties?.network === network && feature.geometry),
     },
     stations: {
       type: 'FeatureCollection',
@@ -78,65 +80,63 @@ export function filterTransportData(data, network) {
 }
 
 function stationNetworkIndex(map, network, stations) {
-  map.__stationIndex = map.__stationIndex || { metro: [], 's-tog': [] }
+  map.__stationIndex = map.__stationIndex || Object.fromEntries(TRANSIT_NETWORKS.map((item) => [item, []]))
   map.__stationIndex[network] = stations.features.map((feature) => feature.properties?.name || '')
 }
 
 export function addTransportLayers(map, data, network, options = {}) {
   stationNetworkIndex(map, network, data.stations)
+  ensureTransitPane(map)
   ensureStationPane(map)
 
   const baseStationStyle = {
-      pane: STATION_PANE,
-      color:"#172033",
-      fillColor:"#fff",
-      fillOpacity:1,
+    pane: STATION_PANE,
+    color: TRANSIT_LINE_THEME.stationColor,
+    fillColor: TRANSIT_LINE_THEME.stationFill,
+    fillOpacity: 1,
   }
 
   const stationStyle = {
-      ...baseStationStyle,
-      radius:5,
-      weight:1.5,
+    ...baseStationStyle,
+    radius: TRANSIT_LINE_THEME.stationRadius,
+    weight: 1.5,
   }
 
   const selectedStationStyle = {
-      ...baseStationStyle,
-      radius:8.5,
-      weight:3,
-      fillColor:"#ffd54a",
+    ...baseStationStyle,
+    radius: TRANSIT_LINE_THEME.selectedStationRadius,
+    weight: 2.5,
+    fillColor: TRANSIT_LINE_THEME.stationSelectionFill,
   }
 
   const lineLayers = []
   let lineCasingLayer = null
   if (RENDER_CONFIG.includeCasing) {
     lineCasingLayer = L.geoJSON(data.lines, {
+      pane: TRANSIT_LINE_PANE,
       interactive: false,
-      style: {
-        color: '#ffffff',
-        weight: RENDER_CONFIG.lineCasingWeight,
+      style: () => ({
+        color: TRANSIT_LINE_THEME.lineCasingColor,
+        weight: TRANSIT_LINE_THEME.casingWeight,
         opacity: 0.95,
+        fill: false,
         lineCap: 'round',
         lineJoin: 'round',
-      },
+      }),
     })
     lineLayers.push(lineCasingLayer)
   }
 
   const lineLayer = L.geoJSON(data.lines, {
+    pane: TRANSIT_LINE_PANE,
     bubblingMouseEvents: false,
     className: 'transit-line',
-    style: (feature) => ({
-      color: LINE_COLORS[feature.properties.line],
-      weight: RENDER_CONFIG.lineWeight,
-      opacity: 1,
-      lineCap: 'round',
-      lineJoin: 'round',
-    }),
+    style: (feature) => buildTransitLineStyle(feature),
     onEachFeature: (feature, layer) => {
       const line = feature.properties?.line
-      layer.bindTooltip(`${line || ''}${RENDER_CONFIG.lineTooltipSuffix}`, { sticky: true })
+      layer.bindTooltip(`${line || ''}${RENDER_CONFIG.lineTooltipSuffix}`, { sticky: true, direction: 'center' })
       layer.on('click', () => {
-          options.onLineClick?.({ network, line })
+        options.onLineClick?.({ network, line })
         if (map.__selectedStationLayer) {
           clearSelectedStation(map)
         }
@@ -151,41 +151,35 @@ export function addTransportLayers(map, data, network, options = {}) {
 
   const updateLineStyles = () => {
     const selection = map.__selectedTransitLine
+    const hasSelection = Boolean(selection)
+    const isSelected = (featureLine) => selection?.network === network && selection.line === featureLine
 
-    const isSelected = layer => selection?.network === network
-      && selection.line === layer.feature.properties.line
-
-    lineCasingLayer?.eachLayer(layer => {
-      const selected = isSelected(layer)
+    lineCasingLayer?.eachLayer((layer) => {
+      const lineName = layer.feature?.properties?.line
+      const selected = isSelected(lineName)
       layer.setStyle({
-        weight: selected
-          ? RENDER_CONFIG.selectedLineWeight + 4
-          : RENDER_CONFIG.lineCasingWeight,
-        opacity: RENDER_CONFIG.normalOpacity,
+        color: selected ? getTransitLineColor(layer.feature) : TRANSIT_LINE_THEME.lineCasingColor,
+        weight: selected ? TRANSIT_LINE_THEME.casingWeight + 5 : TRANSIT_LINE_THEME.casingWeight,
+        opacity: TRANSIT_LINE_THEME.mutedOpacity,
       })
       if (selected) layer.bringToFront()
     })
 
-    lineLayer.eachLayer(layer => {
-      const selected = isSelected(layer)
-      layer.setStyle({
-        color: selection && !selected
-          ? RENDER_CONFIG.inactiveLineColor
-          : LINE_COLORS[layer.feature.properties.line],
-        weight: selected
-          ? RENDER_CONFIG.selectedLineWeight
-          : RENDER_CONFIG.lineWeight,
-        opacity: selected ? 1 : RENDER_CONFIG.normalOpacity,
-      })
+    lineLayer.eachLayer((layer) => {
+      const lineName = layer.feature?.properties?.line
+      const selected = isSelected(lineName)
+      layer.setStyle(buildTransitLineStyle(layer.feature, { selected, hasSelection }))
       if (selected) layer.bringToFront()
     })
   }
   map.on('transit-line-selected', updateLineStyles)
 
   const stationLayer = L.geoJSON(data.stations, {
+    pane: STATION_PANE,
     pointToLayer: (feature, latlng) => {
-    const station = createStationGroup(latlng, stationStyle)
-    return station.group},
+      const station = createStationGroup(latlng, stationStyle)
+      return station.group
+    },
     onEachFeature: (feature, layer) => {
       const name = feature.properties.name
       const lines = (feature.properties?.lines || []).map((line) => String(line))

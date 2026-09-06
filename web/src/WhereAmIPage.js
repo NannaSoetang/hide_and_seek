@@ -7,6 +7,7 @@ import {
   searchAddresses,
 } from './LookupService.js'
 import { Tabs } from './Tabs.js'
+import { APP_CONTENT } from './app-content.js'
 
 function debounce(fn, delay = 220) {
   let timer = null
@@ -19,6 +20,8 @@ function debounce(fn, delay = 220) {
 function formatCoord(value) {
   return Number(value).toFixed(6)
 }
+
+const UI = APP_CONTENT.whereAmIPage
 
 export class WhereAmIPage {
   constructor() {
@@ -77,7 +80,7 @@ export class WhereAmIPage {
 
   bindLocationTab() {
     this.elements.locationButton.addEventListener('click', async () => {
-      this.elements.locationStatus.textContent = 'Finder din placering...'
+      this.elements.locationStatus.textContent = UI.statuses.findingLocation
       try {
         const position = await getCurrentPosition()
         const lat = position.coords.latitude
@@ -86,9 +89,9 @@ export class WhereAmIPage {
         const hasMatch = await this.applyLookupResult({ lat, lon, addressLabel: null })
         this.elements.locationStatus.textContent = hasMatch
           ? accuracy > 80
-            ? 'Placering fundet. Nøjagtigheden er lav, så resultatet kan være omtrentligt.'
-            : 'Placering fundet.'
-          : 'Vi kunne ikke matche placeringen til et administrativt område.'
+            ? UI.statuses.lowAccuracy
+            : UI.statuses.locationFound
+          : UI.statuses.noMatch
       } catch (error) {
         this.elements.locationStatus.textContent = error.message
       }
@@ -106,15 +109,15 @@ export class WhereAmIPage {
 
       const controller = new AbortController()
       this.addressSearchController = controller
-      this.elements.addressStatus.textContent = 'Søger adresser...'
+      this.elements.addressStatus.textContent = UI.statuses.addressSearching
       try {
         const suggestions = await searchAddresses(query, { signal: controller.signal })
         if (this.addressSearchController !== controller) return
         this.currentSuggestions = suggestions
         this.renderAddressSuggestions(suggestions)
         this.elements.addressStatus.textContent = suggestions.length
-          ? 'Vælg en adresse fra listen.'
-          : 'Ingen adresser fundet.'
+          ? UI.statuses.chooseAddress
+          : UI.statuses.noAddressResults
       } catch (error) {
         if (error.name === 'AbortError') return
         this.currentSuggestions = []
@@ -147,7 +150,7 @@ export class WhereAmIPage {
   async selectAddress(index) {
     const selected = this.currentSuggestions[index]
     if (!selected) return
-    this.elements.addressStatus.textContent = 'Finder områdeoplysninger...'
+    this.elements.addressStatus.textContent = UI.statuses.findingArea
     try {
       const resolved = await resolveAddressToCoordinates(selected)
       this.elements.addressQuery.value = resolved.label
@@ -158,8 +161,8 @@ export class WhereAmIPage {
         addressLabel: resolved.label,
       })
       this.elements.addressStatus.textContent = hasMatch
-        ? 'Adresse fundet.'
-        : 'Vi kunne ikke matche adressen til et administrativt område.'
+        ? UI.statuses.addressFound
+        : UI.statuses.noMatch
     } catch (error) {
       this.elements.addressStatus.textContent = error.message
     }
@@ -170,11 +173,11 @@ export class WhereAmIPage {
     const result = lookup.lookup(lat, lon)
     const hasMatch = lookup.hasAny(result)
 
-    this.elements.resultMunicipality.textContent = result.municipality || '-'
-    this.elements.resultPostalArea.textContent = result.postalArea || '-'
-    this.elements.resultParish.textContent = result.parish || '-'
-    this.elements.resultConstituency.textContent = result.constituency || '-'
-    this.elements.resultAddress.textContent = addressLabel || 'Fra din placering'
+    this.elements.resultMunicipality.textContent = result.municipality || UI.emptyState
+    this.elements.resultPostalArea.textContent = result.postalArea || UI.emptyState
+    this.elements.resultParish.textContent = result.parish || UI.emptyState
+    this.elements.resultConstituency.textContent = result.constituency || UI.emptyState
+    this.elements.resultAddress.textContent = addressLabel || UI.emptyState
     this.elements.resultCoordinates.textContent = `${formatCoord(lat)}, ${formatCoord(lon)}`
 
     return hasMatch
@@ -188,5 +191,5 @@ async function init() {
 }
 
 init().catch((error) => {
-  console.error('Kunne ikke starte Hvor er jeg?-siden.', error)
+  console.error('Could not start the Where Am I page.', error)
 })

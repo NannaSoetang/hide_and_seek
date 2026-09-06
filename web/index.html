@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="da">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,16 +8,14 @@
   </head>
   <body>
     <main>
-      <h1 class="map-title">Hide and Seek</h1>
-      <nav class="quick-links" aria-label="Sider">
-        <a class="where-am-i-link" href="./where-am-i.html" aria-label="Gå til siden Hvor er jeg?">
-          Hvor er jeg?
+      <div class="map-topbar" aria-label="Application controls">
+        <h1 class="map-title">Hide and Seek</h1>
+        <a class="where-am-i-link" href="./where-am-i.html" aria-label="Go to Where Am I page">
+          Where Am I?
         </a>
-        <a class="guide-link" href="./guide.html" aria-label="Gå til siden Spilguide">
-          Spilguide
-        </a>
-      </nav>
-      <div id="map" aria-label="Kort over Metro- og S-togslinjer samt stationer"></div>
+      </div>
+      <div id="map" aria-label="Map of Metro and S-train lines and stations"></div>
+      <div class="map-state is-visible is-loading" role="status" aria-live="polite">Loading map…</div>
     </main>
   </body>
 </html>

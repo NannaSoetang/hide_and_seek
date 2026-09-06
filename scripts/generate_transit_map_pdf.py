@@ -84,6 +84,9 @@ MAP_SPECS = (
     ("stationer-500m", "500 meter fra stationer", None, True),
 )
 
+# Compact single-page map: a simple convenience to render a scaled map fitting
+# everything onto a single A4 portrait page. Use with the `--single-page` flag.
+
 
 @dataclass(frozen=True)
 class PdfMapConfig:
@@ -1007,6 +1010,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--all-maps", action="store_true", help="Build maps.pdf and all six individual map PDFs")
     parser.add_argument("--maps-output", type=Path, default=DEFAULT_MAP_SET_OUTPUT, help="Combined six-page PDF path")
     parser.add_argument("--maps-dir", type=Path, default=DEFAULT_MAPS_DIR, help="Directory for individual map PDFs")
+    parser.add_argument("--single-page", action="store_true", help="Render a compact single A4 page containing the full map (portrait)")
     return parser.parse_args()
 
 

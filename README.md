@@ -117,7 +117,7 @@ Generated GeoJSON output:
 Frontend inputs:
 
 - Administrative overlays read the four administrative GeoJSON files plus the boundary file.
-- The main map, guide page, and transport layers read `transport-lines.geojson` and `transport-stations.geojson`.
+- The main map and transport layers read `transport-lines.geojson` and `transport-stations.geojson`.
 - Vite serves these files from `/data/*.geojson` in development and copies them into `dist/` for production.
 
 ```mermaid
@@ -130,7 +130,7 @@ flowchart TD
 
 ## Frontend architecture
 
-The frontend is a multi-page Leaflet app built from `web/index.html`, `web/where-am-i.html`, and `web/guide.html`.
+The frontend is a multi-page Leaflet app built from `web/index.html` and `web/where-am-i.html`.
 
 Map architecture:
 
@@ -149,21 +149,19 @@ Reusable modules:
 
 - `web/src/LookupService.js` powers spatial indexing, administrative lookup, device geolocation, and address search for the "Where am I?" page.
 - `web/src/Tabs.js` provides click and keyboard behavior for accessible tab interfaces.
-- `web/src/GuideLineDiagram.js` owns transit-line ordering and diagram rendering.
-- `web/src/GuidePage.js` builds the station guide and transfer summaries.
 - `web/src/WhereAmIPage.js` provides page-specific startup logic for location and address tabs.
 
 Stylesheet ownership:
 
 - `web/src/style.css` contains shared page foundations, links, and tab controls.
-- `web/src/map.css`, `web/src/where-am-i.css`, and `web/src/guide.css` contain styles used only by their corresponding entry points.
+- `web/src/map.css` and `web/src/where-am-i.css` contain the styles used by their corresponding entry points.
 
 The "Where am I?" page becomes interactive without downloading administrative polygons. It loads and indexes those files only after geolocation succeeds or an address is selected. Address autocomplete requests are cancellable so an older response cannot replace newer suggestions.
 
 Overlays and station data:
 
 - Administrative overlays cover kommuner, postnumre, opstillingskredse, and sogne.
-- Transport stations are normalized in preprocessing and reused by the map and guide pages.
+- Transport stations are normalized in preprocessing and reused by the map.
 - Metro and S-tog lines are kept as separate networks so the UI can render them with network-specific styling.
 
 ## Development

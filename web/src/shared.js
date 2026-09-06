@@ -7,7 +7,7 @@ function assetUrl(path) {
 
 export async function loadJson(path) {
   const response = await fetch(assetUrl(path))
-  if (!response.ok) throw new Error(`Kunne ikke hente ${path}`)
+  if (!response.ok) throw new Error(`Could not load ${path}`)
   return response.json()
 }
 

@@ -5,9 +5,11 @@ import L from 'leaflet'
 import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
 import { addTransportLayers, clearSelectedStation, filterTransportData, fitTransportLayers, loadTransportData } from './transport.js'
-import { ADMIN_LAYERS, adminLayerStyle } from './theme.js'
+import { ADMIN_LAYERS, adminLayerStyle, getAdminLayerContextLabel, getAdminLayerLabel, TRANSIT_NETWORKS } from './theme.js'
+import { APP_CONTENT } from './app-content.js'
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
+const UI = APP_CONTENT.mapPage
 
 function hasActiveMapState(map, adminLayers) {
   const hasLineFilter = Boolean(map.__selectedTransitLine)
@@ -55,8 +57,8 @@ function addClearFilterControl(map, adminLayers) {
     const container = L.DomUtil.create('div', 'leaflet-bar map-clear-filter-control')
     const button = L.DomUtil.create('button', 'map-clear-filter-button', container)
     button.type = 'button'
-    button.textContent = 'Ryd filter'
-    button.setAttribute('aria-label', 'Ryd linje- og lagfiltrering')
+    button.textContent = UI.controls.clearFilter.text
+    button.setAttribute('aria-label', UI.controls.clearFilter.ariaLabel)
 
     const updateState = () => {
       const hasAnyFilter = hasActiveMapState(map, adminLayers)
@@ -93,12 +95,12 @@ function escapeHtml(value) {
 
 function buildContextPopup(context) {
   const lines = []
-  if (context.kommune) lines.push(`<p><strong>Kommune:</strong> ${escapeHtml(context.kommune)}</p>`)
-  if (context.opstillingskreds) lines.push(`<p><strong>Opstillingskreds:</strong> ${escapeHtml(context.opstillingskreds)}</p>`)
-  if (context.postomraade) lines.push(`<p><strong>Postområde:</strong> ${escapeHtml(context.postomraade)}</p>`)
-  if (context.sogn) lines.push(`<p><strong>Sogn:</strong> ${escapeHtml(context.sogn)}</p>`)
+  if (context.kommune) lines.push(`<p><strong>${getAdminLayerContextLabel('kommuner')}:</strong> ${escapeHtml(context.kommune)}</p>`)
+  if (context.opstillingskreds) lines.push(`<p><strong>${getAdminLayerContextLabel('opstillingskredse')}:</strong> ${escapeHtml(context.opstillingskreds)}</p>`)
+  if (context.postomraade) lines.push(`<p><strong>${getAdminLayerContextLabel('postomraader')}:</strong> ${escapeHtml(context.postomraade)}</p>`)
+  if (context.sogn) lines.push(`<p><strong>${getAdminLayerContextLabel('sogne')}:</strong> ${escapeHtml(context.sogn)}</p>`)
   if (context.stationName) lines.push(`<p><strong>Station:</strong> ${escapeHtml(context.stationName)}</p>`)
-  if (context.lines) lines.push(`<p><strong>Linjer:</strong> ${escapeHtml(context.lines)}</p>`)
+  if (context.lines) lines.push(`<p><strong>Lines:</strong> ${escapeHtml(context.lines)}</p>`)
 
   return [
     '<article class="admin-popup">',
@@ -133,13 +135,27 @@ function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
   const valuesById = Object.fromEntries(
     adminLayers.map((layer) => [layer.config.id, layer.getSummaryAtLatLng(latlng)]),
   )
-  const context = {
-    kommune: valuesById.kommuner,
-    postomraade: valuesById.postomraader,
-    opstillingskreds: valuesById.opstillingskredse,
-    sogn: valuesById.sogne,
-    stationName: stationInfo?.stationName || null,
-    lines: stationInfo?.lines || null,
+  // When a stationInfo object is provided (station click), do not show administrative
+  // summaries — only show station name and lines. For map/context clicks, include admin info.
+  let context
+  if (stationInfo) {
+    context = {
+      kommune: null,
+      postomraade: null,
+      opstillingskreds: null,
+      sogn: null,
+      stationName: stationInfo.stationName || null,
+      lines: stationInfo.lines || null,
+    }
+  } else {
+    context = {
+      kommune: valuesById.kommuner,
+      postomraade: valuesById.postomraader,
+      opstillingskreds: valuesById.opstillingskredse,
+      sogn: valuesById.sogne,
+      stationName: stationInfo?.stationName || null,
+      lines: stationInfo?.lines || null,
+    }
   }
 
   const hasContent = Object.values(context).some((value) => value)
@@ -154,7 +170,17 @@ function showContextPopup(map, adminLayers, latlng, stationInfo = null) {
     .openOn(map)
 }
 
+function setMapState(mode, message = '') {
+  const stateEl = document.querySelector('.map-state')
+  if (!stateEl) return
+  stateEl.textContent = message
+  stateEl.classList.toggle('is-visible', mode !== 'hidden')
+  stateEl.classList.toggle('is-loading', mode === 'loading')
+  stateEl.classList.toggle('is-error', mode === 'error')
+}
+
 async function init() {
+  setMapState('loading', 'Loading map…')
   const map = createBaseMap('map')
   const [boundary, transportData, adminLayerData] = await Promise.all([
     loadBoundary(),
@@ -167,8 +193,11 @@ async function init() {
   })
 
   const transportLayers = {}
+  const englishAdminLayerNames = Object.fromEntries(
+    ADMIN_LAYERS.map((layer) => [layer.id, getAdminLayerLabel(layer.id, 'en')]),
+  )
 
-  for (const network of ["metro", "s-tog"]) {
+  for (const network of TRANSIT_NETWORKS) {
     transportLayers[network] = addTransportLayers(
       map,
       filterTransportData(transportData, network),
@@ -195,27 +224,57 @@ async function init() {
     showContextPopup(map, adminLayers, event.latlng)
   })
 
-  L.control.layers(
+  const layerControl = L.control.layers(
     null,
-    Object.fromEntries(adminLayers.map((layer) => [layer.config.displayName, layer.overlay])),
+    Object.fromEntries(adminLayers.map((layer) => [englishAdminLayerNames[layer.config.id] || layer.config.displayName, layer.overlay])),
     {
-      collapsed: true,
+      collapsed: !window.matchMedia('(min-width: 700px)').matches,
       position: 'topright',
     },
-  ).addTo(map)
+  )
+  layerControl.addTo(map)
+  const updateLayerControlState = () => {
+    const makeCollapsed = !window.matchMedia('(min-width: 700px)').matches
+    if (makeCollapsed) {
+      layerControl.collapse()
+    } else {
+      layerControl.expand()
+    }
+  }
+  window.addEventListener('resize', updateLayerControlState)
+  updateLayerControlState()
   addClearFilterControl(map, adminLayers)
+  // Enable only the `kommuner` admin overlay by default so users see municipalities immediately
+  const defaultAdminId = 'kommuner'
+  for (const layer of adminLayers) {
+    if (layer.config.id === defaultAdminId && !map.hasLayer(layer.overlay)) {
+      map.addLayer(layer.overlay)
+    }
+  }
+  const fallbackBounds = L.latLngBounds([
+    [55.53, 12.30],
+    [55.82, 12.73],
+  ])
   const bounds = boundaryLayer.getBounds()
 
   if (bounds.isValid()) {
-    map.__initialBounds = bounds.pad(0.08)
+    map.__initialBounds = bounds.pad(0.12)
     map.fitBounds(map.__initialBounds)
   } else {
-    fitTransportLayers(map, transportLayers)
+    map.__initialBounds = fallbackBounds
+    map.fitBounds(fallbackBounds)
   }
+
+  if (map.getZoom() > 12) {
+    map.setZoom(12)
+  }
+  setMapState('hidden')
   window.__appDebug = { map, transportLayers, adminLayers }
   document.body.dataset.appReady = 'true'
 }
 
 init().catch((error) => {
   console.error('Could not load map boundary.', error)
+  setMapState('error', 'Map unavailable. Please refresh the page and try again.')
+  document.body.dataset.appReady = 'false'
 })

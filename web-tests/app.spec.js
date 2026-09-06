@@ -4,10 +4,6 @@ async function waitForMapReady(page) {
   await expect(page.locator('body')).toHaveAttribute('data-app-ready', 'true')
 }
 
-async function waitForGuideReady(page) {
-  await expect(page.locator('body')).toHaveAttribute('data-guide-ready', 'true')
-}
-
 async function waitForWhereReady(page) {
   await expect(page.locator('body')).toHaveAttribute('data-page-ready', 'true')
 }
@@ -24,13 +20,14 @@ async function clickExposedTransitLine(page) {
   await page.mouse.click(point.x, point.y)
 }
 
-test('interactive map loads title, links, and map container', async ({ page }) => {
+test('interactive map loads title, links, and English map controls', async ({ page }) => {
   await page.goto('/')
   await waitForMapReady(page)
 
   await expect(page.getByRole('heading', { name: 'Hide and Seek' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Hvor er jeg?' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Spilguide' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Where Am I?' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Clear filter' })).toBeVisible()
+  await expect(page.getByLabel('Municipalities')).toBeVisible()
   await expect(page.locator('#map')).toBeVisible()
 })
 
@@ -205,27 +202,4 @@ test('where-am-i ignores stale address responses', async ({ page }) => {
   await expect(page.getByRole('option', { name: 'Gammelt resultat' })).toHaveCount(0)
 })
 
-test('guide page loads station groups and tabs', async ({ page }, testInfo) => {
-  await page.goto('/guide.html')
-  await waitForGuideReady(page)
 
-  await expect(page.getByRole('heading', { name: 'Spilguide' })).toBeVisible()
-  await expect(page.locator('#station-groups .guide-line-diagram').first()).toBeVisible()
-
-  await page.getByRole('tab', { name: 'Regler' }).click()
-  await expect(page.locator('#guide-panel-rules')).toBeVisible()
-
-  await page.getByRole('tab', { name: 'Spørgsmål' }).click()
-  await expect(page.locator('#guide-panel-questions')).toBeVisible()
-
-  if (testInfo.project.name === 'phone') {
-    const cards = page.locator('#guide-panel-questions .guide-mini-card')
-    const firstCard = await cards.nth(0).boundingBox()
-    const secondCard = await cards.nth(1).boundingBox()
-
-    expect(secondCard.y).toBeGreaterThan(firstCard.y + firstCard.height)
-    expect(await page.locator('body').evaluate((body) => body.scrollWidth)).toBeLessThanOrEqual(
-      await page.locator('body').evaluate((body) => body.clientWidth),
-    )
-  }
-})

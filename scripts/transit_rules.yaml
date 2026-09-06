@@ -1,0 +1,16 @@
+service:
+  day: saturday
+  start_time: "11:00"
+  end_time: "16:00"
+
+transit:
+  - type: metro
+  - type: s-train
+  - type: bus
+    pattern: "[digit]S"
+
+zones:
+  - "1"
+  - "2"
+  - "3"
+  - "4"

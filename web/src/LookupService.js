@@ -133,23 +133,23 @@ export class AdministrativeLookup {
 // --- Device Geolocation Lookup ---
 
 function geolocationErrorMessage(error) {
-  if (!error) return 'Kunne ikke hente din placering.'
+  if (!error) return 'Could not retrieve your location.'
   if (error.code === 1) {
-    return 'Placering er blokeret. Tillad lokalitet i Safari-indstillinger og prøv igen.'
+    return 'Location access is blocked. Allow location access in your browser settings and try again.'
   }
   if (error.code === 2) {
-    return 'Placering er midlertidigt utilgængelig. Prøv igen om et øjeblik.'
+    return 'Location is temporarily unavailable. Please try again in a moment.'
   }
   if (error.code === 3) {
-    return 'Placering tog for lang tid. Prøv igen med bedre signal.'
+    return 'Location lookup took too long. Try again with a stronger signal.'
   }
-  return 'Kunne ikke hente din placering.'
+  return 'Could not retrieve your location.'
 }
 
 export function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     if (!('geolocation' in navigator)) {
-      reject(new Error('Din browser understøtter ikke geolokation.'))
+      reject(new Error('Your browser does not support geolocation.'))
       return
     }
 
@@ -232,7 +232,7 @@ export async function searchAddresses(query, { signal } = {}) {
     }
   }
   if (!receivedResponse) {
-    throw new Error('Adressesøgning er midlertidigt utilgængelig. Prøv igen senere.')
+    throw new Error('Address search is temporarily unavailable. Please try again later.')
   }
   return []
 }
@@ -242,7 +242,7 @@ export async function resolveAddressToCoordinates(suggestion) {
     return { lat: Number(suggestion.lat), lon: Number(suggestion.lon), label: suggestion.text }
   }
   if (!suggestion.id) {
-    throw new Error('Kunne ikke finde koordinater for den valgte adresse.')
+    throw new Error('Could not find coordinates for the selected address.')
   }
 
   for (const endpoint of ADDRESS_DETAIL_ENDPOINTS) {
@@ -261,5 +261,5 @@ export async function resolveAddressToCoordinates(suggestion) {
       // try next endpoint
     }
   }
-  throw new Error('Kunne ikke finde koordinater for den valgte adresse.')
+  throw new Error('Could not find coordinates for the selected address.')
 }
