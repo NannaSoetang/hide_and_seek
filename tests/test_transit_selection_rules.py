@@ -4,7 +4,7 @@ from pathlib import Path
 
 from shapely.geometry import Polygon
 
-from scripts.build_data import clip_route_to_zone_shapes, load_selected_stop_rows, load_transit_config, load_transit_rules, matches_transit_rule, merge_route_segments, select_best_route_shape
+from scripts.build_data import build_transit_features_for_rules, clip_route_to_zone_shapes, load_selected_stop_rows, load_transit_config, load_transit_rules, matches_transit_rule, merge_route_segments, select_best_route_shape
 
 
 def test_matches_transit_rule_handles_all_rule_classes():
@@ -122,3 +122,30 @@ def test_select_best_route_shape_prefers_coherent_path_over_backtracking():
     best = select_best_route_shape(candidates)
 
     assert best == [[0.0, 0.0], [1.0, 0.0], [2.0, 0.0]]
+
+
+def test_build_transit_features_for_rules_uses_in_zone_stop_sequence():
+    buffer = io.BytesIO()
+    zone = Polygon([(0, 0), (0, 5), (5, 5), (5, 0)])
+    with zipfile.ZipFile(buffer, mode="w") as archive:
+        archive.writestr("routes.txt", "route_id,route_short_name,route_type\nroute-1,F,109\n")
+        archive.writestr("trips.txt", "route_id,trip_id,service_id,shape_id\nroute-1,trip-1,1,shape-1\n")
+        archive.writestr("stop_times.txt", "trip_id,arrival_time,departure_time,stop_id,stop_sequence\ntrip-1,08:00:00,08:00:00,s1,0\ntrip-1,08:05:00,08:05:00,s2,1\ntrip-1,08:10:00,08:10:00,s3,2\ntrip-1,08:15:00,08:15:00,s4,3\n")
+        archive.writestr("stops.txt", "stop_id,stop_name,stop_lat,stop_lon,zone_id\ns1,Stop 1,1,1,1\ns2,Stop 2,2,2,1\ns3,Stop 3,3,3,1\ns4,Stop 4,4,4,2\n")
+        archive.writestr("shapes.txt", "shape_id,shape_pt_sequence,shape_pt_lon,shape_pt_lat\nshape-1,0,0,0\nshape-1,1,10,10\nshape-1,2,20,20\n")
+
+    with zipfile.ZipFile(io.BytesIO(buffer.getvalue()), mode="r") as archive:
+        features = build_transit_features_for_rules(
+            archive,
+            {},
+            [{"type": "s-train"}],
+            "s-tog",
+            allowed_zone_shapes=[zone],
+        )
+
+    assert len(features) == 1
+    coords = features[0]["geometry"]["coordinates"]
+    assert coords[0] == [1.0, 1.0]
+    assert coords[-1] == [3.0, 3.0]
+    assert [1.0, 1.0] in coords and [2.0, 2.0] in coords and [3.0, 3.0] in coords
+    assert [4.0, 4.0] not in coords

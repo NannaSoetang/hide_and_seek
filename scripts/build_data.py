@@ -382,8 +382,19 @@ def _filter_trips_by_service_window(
     if not service_window:
         return trip_rows
 
-    calendar_rows = load_csv_from_zip(archive, "calendar.txt")
-    calendar_dates = load_csv_from_zip(archive, "calendar_dates.txt")
+    calendar_rows: list[dict[str, str]] = []
+    calendar_dates: list[dict[str, str]] = []
+    try:
+        calendar_rows = load_csv_from_zip(archive, "calendar.txt")
+    except KeyError:
+        pass
+    try:
+        calendar_dates = load_csv_from_zip(archive, "calendar_dates.txt")
+    except KeyError:
+        pass
+    if not calendar_rows and not calendar_dates:
+        return trip_rows
+
     stop_times = load_csv_from_zip(archive, "stop_times.txt")
     stop_times_by_trip: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in stop_times:
@@ -925,50 +936,43 @@ def build_transit_features_for_rules(
         ordered = [stop_id for _, stop_id in sorted(entries)]
         if len(ordered) < 2:
             continue
+        ordered_stops_by_route.setdefault(route_id, []).append(ordered)
 
-        existing = ordered_stops_by_route.get(route_id, [])
-        if existing:
-            seen = set(existing)
-            for stop_id in ordered:
-                if stop_id not in seen:
-                    existing.append(stop_id)
-                    seen.add(stop_id)
-            ordered_stops_by_route[route_id] = existing
-        else:
-            ordered_stops_by_route[route_id] = ordered
-
-    for route_id, ordered in ordered_stops_by_route.items():
-        stop_ids_by_route[route_id] = set(ordered)
-
-    stop_rows_all = load_selected_stop_rows(
-        archive,
-        {route_id: set(stops) for route_id, stops in stop_ids_by_route.items()},
-        allowed_zone_shapes=None,
-        allowed_zones=None,
-    )
-    trip_stop_paths: dict[str, list[list[float]]] = defaultdict(list)
-    for trip in trip_rows:
-        route_id = trip["route_id"]
-        trip_id = trip["trip_id"]
-        entries = stop_times_by_trip.get(trip_id)
-        if not entries:
-            continue
-        ordered = [stop_id for _, stop_id in sorted(entries)]
-        if len(ordered) < 2:
-            continue
-        stop_path: list[list[float]] = []
-        for stop_id in ordered:
-            stop = stop_rows_all.get(stop_id)
-            if stop:
-                stop_path.append([float(stop["stop_lon"]), float(stop["stop_lat"])])
-        if len(stop_path) >= 2:
-            trip_stop_paths[route_id].append(_dedupe_coords(stop_path))
+    route_stop_ids_by_route: dict[str, set[str]] = {
+        route_id: {stop_id for ordered in sequences for stop_id in ordered}
+        for route_id, sequences in ordered_stops_by_route.items()
+    }
+    stop_rows_all = load_selected_stop_rows(archive, route_stop_ids_by_route, allowed_zone_shapes=None, allowed_zones=None)
     stop_rows = load_selected_stop_rows(
         archive,
-        {route_id: set(stops) for route_id, stops in stop_ids_by_route.items()},
+        route_stop_ids_by_route,
         allowed_zone_shapes=allowed_zone_shapes,
         allowed_zones=set(DEFAULT_TRANSIT_ZONES),
     )
+
+    trip_stop_paths: dict[str, list[list[float]]] = defaultdict(list)
+    for route_id, sequences in ordered_stops_by_route.items():
+        for ordered in sequences:
+            filtered = [stop_id for stop_id in ordered if stop_id in stop_rows]
+            if len(filtered) < 2:
+                continue
+            stop_path = [[float(stop_rows_all[stop_id]["stop_lon"]), float(stop_rows_all[stop_id]["stop_lat"])] for stop_id in filtered]
+            if len(stop_path) >= 2:
+                trip_stop_paths[route_id].append(_dedupe_coords(stop_path))
+
+    for route_id, sequences in ordered_stops_by_route.items():
+        route_candidates = [
+            [stop_id for stop_id in ordered if stop_id in stop_rows]
+            for ordered in sequences
+            if len([stop_id for stop_id in ordered if stop_id in stop_rows]) >= 2
+        ]
+        if route_candidates:
+            best = max(route_candidates, key=len)
+            stop_ids_by_route[route_id] = set(best)
+            ordered_stops_by_route[route_id] = best
+        else:
+            stop_ids_by_route[route_id] = set()
+            ordered_stops_by_route[route_id] = []
 
     line_features_by_line: dict[str, dict[str, Any]] = {}
     for route_id, route in sorted(routes.items(), key=lambda item: item[1].get("route_short_name", "")):
@@ -984,13 +988,14 @@ def build_transit_features_for_rules(
         raw_segments: list[list[list[float]]] = []
         if trip_stop_paths.get(route_id):
             raw_segments.extend(trip_stop_paths[route_id])
-        for shape_id in sorted(shape_ids_by_route.get(route_id, [])):
-            points = sorted(shape_points.get(shape_id, []))
-            if len(points) < 2:
-                continue
-            shape_coords = [[lon, lat] for _, lon, lat in points]
-            if len(shape_coords) >= 2:
-                raw_segments.append(shape_coords)
+        if not raw_segments:
+            for shape_id in sorted(shape_ids_by_route.get(route_id, [])):
+                points = sorted(shape_points.get(shape_id, []))
+                if len(points) < 2:
+                    continue
+                shape_coords = [[lon, lat] for _, lon, lat in points]
+                if len(shape_coords) >= 2:
+                    raw_segments.append(shape_coords)
 
         if not raw_segments and ordered:
             filtered_indices = [i for i, stop_id in enumerate(ordered) if stop_id in stop_rows]
