@@ -126,7 +126,7 @@ def test_select_best_route_shape_prefers_coherent_path_over_backtracking():
 
 def test_build_transit_features_for_rules_uses_in_zone_stop_sequence():
     buffer = io.BytesIO()
-    zone = Polygon([(0, 0), (0, 5), (5, 5), (5, 0)])
+    zone = Polygon([(0, 0), (0, 3.5), (3.5, 3.5), (3.5, 0)])
     with zipfile.ZipFile(buffer, mode="w") as archive:
         archive.writestr("routes.txt", "route_id,route_short_name,route_type\nroute-1,F,109\n")
         archive.writestr("trips.txt", "route_id,trip_id,service_id,shape_id\nroute-1,trip-1,1,shape-1\n")
