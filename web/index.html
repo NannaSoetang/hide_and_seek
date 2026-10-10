@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="da">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,14 +8,18 @@
   </head>
   <body>
     <main>
-      <div class="map-topbar" aria-label="Application controls">
+      <div class="map-topbar" aria-label="Programstyring" data-i18n-aria-label="mapPage.topbarLabel">
         <h1 class="map-title">Hide and Seek</h1>
-        <a class="where-am-i-link" href="./where-am-i.html" aria-label="Go to Where Am I page">
-          Where Am I?
+        <a class="where-am-i-link" href="./where-am-i.html" aria-label="Gå til Hvor er jeg?" data-i18n="mapPage.quickLink.text" data-i18n-aria-label="mapPage.quickLink.ariaLabel">
+          Hvor er jeg?
         </a>
+        <div class="language-switch" role="group" aria-label="Sprog" data-i18n-aria-label="language.label">
+          <button type="button" data-language="da" aria-pressed="true">DA</button>
+          <button type="button" data-language="en" aria-pressed="false">EN</button>
+        </div>
       </div>
-      <div id="map" aria-label="Map of Metro and S-train lines and stations"></div>
-      <div class="map-state is-visible is-loading" role="status" aria-live="polite">Loading map…</div>
+      <div id="map" aria-label="Kort over metro- og S-togslinjer og stationer" data-i18n-aria-label="mapPage.map.ariaLabel"></div>
+      <div class="map-state is-visible is-loading" role="status" aria-live="polite">Indlæser kort...</div>
     </main>
   </body>
 </html>

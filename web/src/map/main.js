@@ -6,10 +6,11 @@ import { addBoundary, createBaseMap, loadBoundary, loadJson } from './shared.js'
 import { AdministrativeLayer } from './AdministrativeLayer.js'
 import { addTransportLayers, clearSelectedStation, filterTransportData, loadTransportData } from './transport.js'
 import { ADMIN_LAYERS, adminLayerStyle, getAdminLayerContextLabel, getAdminLayerLabel, TRANSIT_NETWORKS } from '../config/theme.js'
-import { APP_CONTENT } from '../config/app-content.js'
+import { getAppContent } from '../config/app-content.js'
+import { bindLanguageControls, getLocale, setLocale, translateStaticContent } from '../config/language.js'
 
 const SKIP_CONTEXT_CLICK_FLAG = '__skipNextContextClick'
-const UI = APP_CONTENT.mapPage
+const UI = () => getAppContent(getLocale()).mapPage
 
 function hasActiveMapState(map, adminLayers) {
   const hasLineFilter = Boolean(map.__selectedTransitLine)
@@ -57,8 +58,8 @@ function addClearFilterControl(map, adminLayers) {
     const container = L.DomUtil.create('div', 'leaflet-bar map-clear-filter-control')
     const button = L.DomUtil.create('button', 'map-clear-filter-button', container)
     button.type = 'button'
-    button.textContent = UI.controls.clearFilter.text
-    button.setAttribute('aria-label', UI.controls.clearFilter.ariaLabel)
+    button.textContent = UI().controls.clearFilter.text
+    button.setAttribute('aria-label', UI().controls.clearFilter.ariaLabel)
 
     const updateState = () => {
       const hasAnyFilter = hasActiveMapState(map, adminLayers)
@@ -94,13 +95,15 @@ function escapeHtml(value) {
 }
 
 function buildContextPopup(context) {
+  const content = UI()
+  const locale = getLocale()
   const lines = []
-  if (context.kommune) lines.push(`<p><strong>${getAdminLayerContextLabel('kommuner')}:</strong> ${escapeHtml(context.kommune)}</p>`)
-  if (context.opstillingskreds) lines.push(`<p><strong>${getAdminLayerContextLabel('opstillingskredse')}:</strong> ${escapeHtml(context.opstillingskreds)}</p>`)
-  if (context.postomraade) lines.push(`<p><strong>${getAdminLayerContextLabel('postomraader')}:</strong> ${escapeHtml(context.postomraade)}</p>`)
-  if (context.sogn) lines.push(`<p><strong>${getAdminLayerContextLabel('sogne')}:</strong> ${escapeHtml(context.sogn)}</p>`)
-  if (context.stationName) lines.push(`<p><strong>Station:</strong> ${escapeHtml(context.stationName)}</p>`)
-  if (context.lines) lines.push(`<p><strong>Lines:</strong> ${escapeHtml(context.lines)}</p>`)
+  if (context.kommune) lines.push(`<p><strong>${getAdminLayerContextLabel('kommuner', locale)}:</strong> ${escapeHtml(context.kommune)}</p>`)
+  if (context.opstillingskreds) lines.push(`<p><strong>${getAdminLayerContextLabel('opstillingskredse', locale)}:</strong> ${escapeHtml(context.opstillingskreds)}</p>`)
+  if (context.postomraade) lines.push(`<p><strong>${getAdminLayerContextLabel('postomraader', locale)}:</strong> ${escapeHtml(context.postomraade)}</p>`)
+  if (context.sogn) lines.push(`<p><strong>${getAdminLayerContextLabel('sogne', locale)}:</strong> ${escapeHtml(context.sogn)}</p>`)
+  if (context.stationName) lines.push(`<p><strong>${content.popup.station}:</strong> ${escapeHtml(context.stationName)}</p>`)
+  if (context.lines) lines.push(`<p><strong>${content.popup.lines}:</strong> ${escapeHtml(context.lines)}</p>`)
 
   return [
     '<article class="admin-popup">',
@@ -177,7 +180,10 @@ function setMapState(mode, message = '') {
 }
 
 async function init() {
-  setMapState('loading', 'Loading map…')
+  bindLanguageControls()
+  translateStaticContent(getAppContent(getLocale()))
+  setLocale(getLocale())
+  setMapState('loading', UI().status.loading)
   const map = createBaseMap('map')
   const [boundary, transportData, adminLayerData] = await Promise.all([
     loadBoundary(),
@@ -190,10 +196,6 @@ async function init() {
   })
 
   const transportLayers = {}
-  const englishAdminLayerNames = Object.fromEntries(
-    ADMIN_LAYERS.map((layer) => [layer.id, getAdminLayerLabel(layer.id, 'en')]),
-  )
-
   for (const network of TRANSIT_NETWORKS) {
     transportLayers[network] = addTransportLayers(
       map,
@@ -221,16 +223,23 @@ async function init() {
     showContextPopup(map, adminLayers, event.latlng)
   })
 
-  const layerControl = L.control.layers(
-    null,
-    Object.fromEntries(adminLayers.map((layer) => [englishAdminLayerNames[layer.config.id] || layer.config.displayName, layer.overlay])),
-    {
-      collapsed: !window.matchMedia('(min-width: 700px)').matches,
-      position: 'topright',
-    },
-  )
-  layerControl.addTo(map)
+  let layerControl
+  const renderLayerControl = () => {
+    if (layerControl) layerControl.remove()
+    const locale = getLocale()
+    layerControl = L.control.layers(
+      null,
+      Object.fromEntries(adminLayers.map((layer) => [getAdminLayerLabel(layer.config.id, locale), layer.overlay])),
+      {
+        collapsed: !window.matchMedia('(min-width: 700px)').matches,
+        position: 'topright',
+      },
+    )
+    layerControl.addTo(map)
+    updateLayerControlState()
+  }
   const updateLayerControlState = () => {
+    if (!layerControl) return
     const makeCollapsed = !window.matchMedia('(min-width: 700px)').matches
     if (makeCollapsed) {
       layerControl.collapse()
@@ -238,8 +247,24 @@ async function init() {
       layerControl.expand()
     }
   }
+  renderLayerControl()
   window.addEventListener('resize', updateLayerControlState)
-  updateLayerControlState()
+  document.addEventListener('localechange', () => {
+    translateStaticContent(getAppContent(getLocale()))
+    renderLayerControl()
+    map.closePopup()
+    for (const layers of Object.values(transportLayers)) {
+      layers.lineLayer.eachLayer((layer) => {
+        const line = layer.feature?.properties?.line
+        layer.setTooltipContent(`${line || ''} ${UI().tooltip.line}`)
+      })
+    }
+    const clearButton = document.querySelector('.map-clear-filter-button')
+    if (clearButton) {
+      clearButton.textContent = UI().controls.clearFilter.text
+      clearButton.setAttribute('aria-label', UI().controls.clearFilter.ariaLabel)
+    }
+  })
   addClearFilterControl(map, adminLayers)
   // Enable only the `kommuner` admin overlay by default so users see municipalities immediately
   const defaultAdminId = 'kommuner'
@@ -272,6 +297,6 @@ async function init() {
 
 init().catch((error) => {
   console.error('Could not load map boundary.', error)
-  setMapState('error', 'Map unavailable. Please refresh the page and try again.')
+  setMapState('error', UI().status.error)
   document.body.dataset.appReady = 'false'
 })

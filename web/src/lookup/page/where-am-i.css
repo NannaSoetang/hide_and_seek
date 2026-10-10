@@ -11,6 +11,8 @@ body.subpage-body { overflow-x: hidden; overflow-y: auto; }
 
 .where-header h1 { margin: 0; font-size: 1.4rem; }
 
+.where-header .language-switch { margin-top: 0.2rem; }
+
 .where-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;

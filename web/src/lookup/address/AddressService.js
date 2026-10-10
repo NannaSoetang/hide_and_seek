@@ -1,3 +1,6 @@
+import { getAppContent } from '../../config/app-content.js'
+import { getLocale } from '../../config/language.js'
+
 const AUTOCOMPLETE_ENDPOINTS = [
   'https://api.dataforsyningen.dk/adresser/autocomplete',
   'https://api.dataforsyningen.dk/autocomplete',
@@ -51,7 +54,7 @@ export async function searchAddresses(query, { signal } = {}) {
     }
   }
   if (!receivedResponse) {
-    throw new Error('Address search is temporarily unavailable. Please try again later.')
+    throw new Error(getAppContent(getLocale()).whereAmIPage.statuses.addressUnavailable)
   }
   return []
 }
@@ -60,7 +63,7 @@ export async function resolveAddressToCoordinates(suggestion) {
   if (suggestion.lat !== null && suggestion.lon !== null) {
     return { lat: Number(suggestion.lat), lon: Number(suggestion.lon), label: suggestion.text }
   }
-  if (!suggestion.id) throw new Error('Could not find coordinates for the selected address.')
+  if (!suggestion.id) throw new Error(getAppContent(getLocale()).whereAmIPage.statuses.addressCoordinatesMissing)
 
   const payload = await fetchJson(buildUrl(ADDRESS_DETAIL_ENDPOINT, { id: suggestion.id }))
   const item = Array.isArray(payload) ? payload[0] : payload
@@ -68,5 +71,5 @@ export async function resolveAddressToCoordinates(suggestion) {
   if (Array.isArray(coords) && coords.length >= 2) {
     return { lat: Number(coords[1]), lon: Number(coords[0]), label: suggestion.text }
   }
-  throw new Error('Could not find coordinates for the selected address.')
+  throw new Error(getAppContent(getLocale()).whereAmIPage.statuses.addressCoordinatesMissing)
 }

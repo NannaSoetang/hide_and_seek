@@ -20,15 +20,22 @@ async function clickExposedTransitLine(page) {
   await page.mouse.click(point.x, point.y)
 }
 
-test('interactive map loads title, links, and English map controls', async ({ page }) => {
+test('interactive map loads with Danish by default and can switch to English', async ({ page }) => {
   await page.goto('/')
   await waitForMapReady(page)
 
   await expect(page.getByRole('heading', { name: 'Hide and Seek' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Where Am I?' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Clear filter' })).toBeVisible()
-  await expect(page.getByLabel('Municipalities')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Hvor er jeg?' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Ryd linje- og lagfiltrering' })).toBeVisible()
+  await expect(page.getByLabel('Kommuner')).toBeVisible()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'da')
   await expect(page.locator('#map')).toBeVisible()
+
+  await page.getByRole('button', { name: 'EN', exact: true }).click()
+  await expect(page.getByRole('link', { name: 'Where am I?' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Clear line and layer filtering' })).toBeVisible()
+  await expect(page.getByLabel('Municipalities')).toBeVisible()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
 test('interactive map can open station context popup', async ({ page }) => {
@@ -136,6 +143,12 @@ test('where-am-i page loads and tabs can switch', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Hvor er jeg?' })).toBeVisible()
   await expect(page.locator('#panel-location')).toBeVisible()
   expect(administrativeRequests).toEqual([])
+
+  await page.getByRole('button', { name: 'EN', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Where am I?' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'My location' })).toBeVisible()
+  await page.getByRole('button', { name: 'DA', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Hvor er jeg?' })).toBeVisible()
 
   await page.getByRole('tab', { name: 'Adresse' }).click()
   await expect(page.locator('#panel-address')).toBeVisible()

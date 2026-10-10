@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="da">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,56 +9,60 @@
   <body class="subpage-body">
     <main class="where-page">
       <header class="where-header">
-        <a class="subpage-back-link" href="./index.html" aria-label="Back to map">Back to map</a>
-        <h1>Where Am I?</h1>
+        <a class="subpage-back-link" href="./index.html" aria-label="Tilbage til kortet" data-i18n="whereAmIPage.backLink.text" data-i18n-aria-label="whereAmIPage.backLink.ariaLabel">Tilbage til kortet</a>
+        <h1 data-i18n="whereAmIPage.title">Hvor er jeg?</h1>
+        <div class="language-switch" role="group" aria-label="Sprog" data-i18n-aria-label="language.label">
+          <button type="button" data-language="da" aria-pressed="true">DA</button>
+          <button type="button" data-language="en" aria-pressed="false">EN</button>
+        </div>
       </header>
 
-      <nav class="where-tabs" aria-label="Choose lookup type">
-        <button id="tab-location" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-location">
-          My location
+      <nav class="where-tabs" aria-label="Vælg opslagstype" data-i18n-aria-label="whereAmIPage.tabsLabel">
+        <button id="tab-location" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-location" data-i18n="whereAmIPage.tabs.location">
+          Min placering
         </button>
-        <button id="tab-address" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-address">
-          Address
+        <button id="tab-address" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-address" data-i18n="whereAmIPage.tabs.address">
+          Adresse
         </button>
       </nav>
 
       <section id="panel-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
-        <button id="find-location-button" class="primary-button" type="button">Find my location</button>
+        <button id="find-location-button" class="primary-button" type="button" data-i18n="whereAmIPage.buttons.findLocation">Find min placering</button>
         <p id="location-status" class="status-text" aria-live="polite"></p>
       </section>
 
       <section id="panel-address" class="tab-panel is-hidden" role="tabpanel" aria-labelledby="tab-address">
-        <label class="field-label" for="address-query">Address</label>
-        <input id="address-query" class="text-input" type="text" autocomplete="off" placeholder="Search street, number or postal area" />
-        <div id="address-results" class="address-results" role="listbox" aria-label="Address suggestions"></div>
+        <label class="field-label" for="address-query" data-i18n="whereAmIPage.fields.address">Adresse</label>
+        <input id="address-query" class="text-input" type="text" autocomplete="off" placeholder="Søg efter vej, husnummer eller postområde" data-i18n-placeholder="whereAmIPage.placeholders.addressQuery" />
+        <div id="address-results" class="address-results" role="listbox" aria-label="Adresseforslag" data-i18n-aria-label="whereAmIPage.addressSuggestionsLabel"></div>
         <p id="address-status" class="status-text" aria-live="polite"></p>
       </section>
 
       <section class="result-card" aria-live="polite">
-        <h2>Result</h2>
+        <h2 data-i18n="whereAmIPage.result">Resultat</h2>
         <dl class="result-list">
           <div class="result-item">
-            <dt>Municipality</dt>
+            <dt data-i18n="whereAmIPage.fields.municipality">Kommune</dt>
             <dd id="result-municipality">-</dd>
           </div>
           <div class="result-item">
-            <dt>Constituency</dt>
+            <dt data-i18n="whereAmIPage.fields.constituency">Opstillingskreds</dt>
             <dd id="result-constituency">-</dd>
           </div>
           <div class="result-item">
-            <dt>Postal area</dt>
+            <dt data-i18n="whereAmIPage.fields.postalArea">Postområde</dt>
             <dd id="result-postal-area">-</dd>
           </div>
           <div class="result-item">
-            <dt>Parish</dt>
+            <dt data-i18n="whereAmIPage.fields.parish">Sogn</dt>
             <dd id="result-parish">-</dd>
           </div>
           <div class="result-item">
-            <dt>Address</dt>
+            <dt data-i18n="whereAmIPage.fields.address">Adresse</dt>
             <dd id="result-address">-</dd>
           </div>
           <div class="result-item">
-            <dt>Coordinates</dt>
+            <dt data-i18n="whereAmIPage.fields.coordinates">Koordinater</dt>
             <dd id="result-coordinates">-</dd>
           </div>
         </dl>

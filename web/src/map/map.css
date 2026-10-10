@@ -26,6 +26,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
+  max-width: calc(100vw - var(--safe-left) - var(--safe-right) - 2rem);
   padding: 0.35rem 0.5rem 0.35rem 0.8rem;
   border: 1px solid rgb(255 255 255 / 66%);
   border-radius: 0.9rem;
@@ -42,6 +43,7 @@ body {
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .where-am-i-link {
@@ -59,6 +61,16 @@ body {
   font-size: 0.89rem;
   font-weight: 700;
   transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.map-topbar .language-switch { margin-left: 0.1rem; }
+
+@media (max-width: 560px) {
+  .map-topbar { left: calc(var(--safe-left) + 0.55rem); gap: 0.35rem; padding: 0.3rem; }
+  .map-title { font-size: 0.82rem; }
+  .where-am-i-link { min-height: 34px; padding-inline: 0.48rem; font-size: 0.78rem; }
+  .map-topbar .language-switch button { min-width: 30px; min-height: 28px; padding-inline: 0.2rem; }
 }
 
 .where-am-i-link:focus-visible,

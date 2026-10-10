@@ -1,21 +1,25 @@
+import { getAppContent } from '../../config/app-content.js'
+import { getLocale } from '../../config/language.js'
+
 function geolocationErrorMessage(error) {
-  if (!error) return 'Could not retrieve your location.'
+  const statuses = getAppContent(getLocale()).whereAmIPage.statuses
+  if (!error) return statuses.geoUnknown
   if (error.code === 1) {
-    return 'Location access is blocked. Allow location access in your browser settings and try again.'
+    return statuses.geoPermissionDenied
   }
   if (error.code === 2) {
-    return 'Location is temporarily unavailable. Please try again in a moment.'
+    return statuses.geoUnavailable
   }
   if (error.code === 3) {
-    return 'Location lookup took too long. Try again with a stronger signal.'
+    return statuses.geoTimeout
   }
-  return 'Could not retrieve your location.'
+  return statuses.geoUnknown
 }
 
 export function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     if (!('geolocation' in navigator)) {
-      reject(new Error('Your browser does not support geolocation.'))
+      reject(new Error(getAppContent(getLocale()).whereAmIPage.statuses.geoNotSupported))
       return
     }
 

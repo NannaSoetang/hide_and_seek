@@ -76,3 +76,31 @@ main {
 .tab-panel.is-hidden {
   display: none;
 }
+
+.language-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid #c7d1df;
+  border-radius: 6px;
+  background: #f2f5f8;
+}
+
+.language-switch button {
+  min-width: 36px;
+  min-height: 30px;
+  padding: 0 0.35rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #34465c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.language-switch button[aria-pressed="true"] {
+  background: #1f4f8f;
+  color: #fff;
+}

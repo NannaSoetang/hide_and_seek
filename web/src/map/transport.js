@@ -1,6 +1,8 @@
 import L from 'leaflet'
 import { loadJson } from './shared.js'
 import { TRANSIT_LINE_THEME, buildTransitLineStyle, getTransitLineColor } from '../config/theme.js'
+import { getAppContent } from '../config/app-content.js'
+import { getLocale } from '../config/language.js'
 
 const STATION_PANE = 'transitStationPane'
 const TRANSIT_LINE_PANE = 'transitLinePane'
@@ -110,7 +112,7 @@ export function addTransportLayers(map, data, network, options = {}) {
     style: (feature) => buildTransitLineStyle(feature),
     onEachFeature: (feature, layer) => {
       const line = feature.properties?.line
-      layer.bindTooltip(`${line || ''} line`, { sticky: true, direction: 'center' })
+      layer.bindTooltip(`${line || ''} ${getAppContent(getLocale()).mapPage.tooltip.line}`, { sticky: true, direction: 'center' })
       layer.on('click', () => {
         if (map.__selectedStationLayer) {
           clearSelectedStation(map)
